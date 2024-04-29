@@ -74,3 +74,35 @@ Prezentacja w jaki sposób można tworzyć kod w React, React przyjmuje kod w cz
 
 Renderowanie elementów HTML za pomocą funkcji createElement() zamiast składni JSX.
 Hooki useState i useEffect przez wywołanie React.useEffect, React.useState zamiast przez wykorzystanie zainstalowanej aplikacji
+
+## 3.14 Prezentacja dokumentacji React
+
+## 3.15 Rozpoczęcie nowego projektu
+
+Przedstawiono dwa buildery używane przy projektach React: CRA i Vite.
+CRA jest starterem zawierającym Eslint, Prettier, Jest, webpack itd. Nie zaleca się korzystania z niego na realnych aplikacjach, jedynie do celów edukacyjnych.
+Vite jest przedstyawiony jako bardzo szybki builder do budowania "realnych aplikacji". Problemem jest konieczność instalowania dodatkowych paczek jak ESLint, przy którym łatwo o błędy.
+
+## 3.16 Rozpoczęcie projektu przy użyciu CRA
+
+Wstęp do budowy terminala i podstawowych komend:
+
+- ls,
+- dir,
+- cd
+
+Instalacja projektu za pomocą komendy:
+
+> npx create-react-app@5 pizza-menu
+
+Zapoznanie ze strukturą utworzonego projektu i ruchomienie projektu za pomocą komendy
+
+> npm start
+
+Naniesienie swoich, drobnych zmian
+
+## 4. Sekcja 4: (Optional) Review of Essential JavaScript for React
+
+### 4.17. Wstęp do sekcji
+
+### 4.18. Destrukturyzacja obiektów i tablic
