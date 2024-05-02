@@ -106,3 +106,178 @@ Naniesienie swoich, drobnych zmian
 ### 4.17. Wstęp do sekcji
 
 ### 4.18. Destrukturyzacja obiektów i tablic
+
+Zainstalowanie dodayku Quokka.js do wywyołania JS w środowisku VSC.
+Zaprezentowane sposoby destrukturyzacji obiektów:
+Poprzez stworzenie zmiennej obiektu zawierającego elementy do których chcemy sie dostać z obiektu:
+
+> const { title, author, genres } = book;
+
+\*Sposoby destrukturyzacji obiektów niewymienione w kursie:
+
+- Destrukturyzacja w funkcjach
+  > function showUser({name, surname}) {
+  > console.log(name);
+  > console.log(surname);
+  > }
+  > const user = {
+  > name: "Marcin",
+  > surname: "Nowak"
+  > };
+  > showUser(user);
+
+Zaprezentowane sposoby destrukturyzacji tablic:
+Poprzez stworzenie zmiennej tablicy zawierającej elementy do których chcemy sie dostać z tablicy (nazwy zostają przypisane do kolejnych elementów):
+
+> const [primaryGenre, secondaryGenre] = genres;
+
+\*Sposoby destrukturyzacji tablic niewymienione w kursie:
+
+- Pominięcie elementów
+  > const [name1, name2,, name4] = tab;
+- Ustawienie domyślnych wartości
+  > const [name1 = "brak", name2 = "brak", name3 = "brak"] = tab;
+- Zamiana miejscami wartości
+  > [a, b] = [b, a];
+
+### 4.19. Rest/Spread Operator
+
+Rozbicie tablicy na pojedyncze wartości oraz resztę starej tablicy. Wartość reszta starej tablicy musi być wydzielona na końcu:
+
+> const [primaryGenre, secondaryGenre, ...otherGenres] = genres;
+
+Dodanie do tablicy pojedyncze wartości za pomocą operatora spread:
+
+> const newGenres = [...otherGenres, "epic games"];
+
+Dodanie do obiektu pojedyncze wartości za pomocą operatora spread:
+
+> const updatedBook = { ...book, moviePublicationDate: 2000 }
+
+Edycja pojedynczej wartości (price) za pomocą operatora spread:
+
+> const updatedBook = { ...book, moviePublicationDate: 2000, pages: 2000 }
+
+### 4.20. Template Literals
+
+String zapisywany za pomocą ``, w którym można odwołac się do zmiennej przy pomocy ${zmienna}:
+
+> const { moviePublicationDate } = updatedBook;
+> const summary = `Data publikacji: ${updatedBook.moviePublicationDate}`;
+
+### 4.21 Użycie operatorów warunkowych zamiast if/else
+
+warunek ? true : false
+
+deklaracja zmiennej:
+
+> const stop = x > y ? "Stop" : "Move"
+
+### 4.22 Funkcje strzałkowe
+
+(parametr) => {blok kodu}
+
+Prowadzący zaleca używanie funkcji strzałkowych jako jednolinijkowe:
+(parametr) => kod
+
+wyrażenie funkcyjne:
+const funkcja = (parametr) => kod
+
+deklaracja funkcji:
+(parametr) => kod
+
+Wyrażenia można wywoływać wewnątrz template stringów
+
+### 4.23 Skrócone wyrażenia logiczne: &&, ||, ??
+
+&& jeśli pierwsza wartość jest true, to równanie zwraca drugą wartość. Jeśli pierwsza wartość jest falsy to zwraca pierwszą wartość
+
+|| jeśli pierwsza wartość jest true, to równanie zwraca pierwszą wartość. Jeśli pierwsza wartość jest falsy to zwraca drugą wartość.
+Jest tu problem, jeśli chcemy pozyskać info o tym, że czegoś jest 0, co nie jest tożsame z odpowiednikiem "undefined" to otrzymamy zwrotkę jakby wartość była false, a nie 0.
+
+?? jeśli pierwsza wartość jest true, to równanie zwraca drugą wartość. Jeśli pierwsza wartość jest falsy to zwraca pierwszą wartość.
+Tu problem z wartościami "nullish" został poprawiony
+
+### 4.24 Operator Optional Chaining
+
+?. Dodawany po wartości która może zwracać undefined lub null
+Przydatne gdy nie mamy pewności co do sktuktury danych które otrzymamy
+
+### 4.25 Metoda .map()
+
+Metoda zwraca nową tablicę z tą samą długością, ale z wykonanymi operacjami na każdym z elementów.
+
+> const essentialsData = books.map((book) => ({
+> title: book.title,
+> author: book.author,
+> reviewsCount: getTotalReviewCount(book),
+> }));
+
+### 4.26 Metoda .filter()
+
+Metoda zwraca nową tablicę z wartościami spełniającymi warunek.
+Da sie zastosować dwa filtry:
+
+> const longBooksWithMovie = books
+> .filter((book) => book.pages > 500)
+> .filter((book) => book.hasMovieAdaptation);
+
+Ale lepiej użyć jednego z wyrazeniem logicznym:
+
+> const longBooksWithMovie = books
+> .filter((book) => book.pages > 500 && book.hasMovieAdaptation)
+
+Metody filter można używać z innymi metodami np.
+
+> const adventureBooks = books.filter((books) =>
+> books.genres.includes("adventure")
+> ).map(book=>book.title)
+
+### 4.27 Metoda .reduce()
+
+W kursie przedstawiono metodę .reduce() jako przykład funkcji akumulującej wyniki
+
+> const pagesAllBooks = books.reduce((sum, book) => sum + book.pages, 0);
+
+sum - początkowo wynosi 0, następnie akumuluje wyniki dodawania book.pages, w rezultacie dostajemy sumę stron wszystkich książek
+
+Zamiast ", 0" można podstawić obiekt lub tablicę, co w połączeniu z operatorem spread pozwala na filtrowanie, mapowanie, zliczanie elementów itd.
+
+### 4.28 Metoda .sort()
+
+Metoda mutująca tablicę na której działa, służy sortowaniu
+
+> const sorted = arr.sort((a, b) => a - b);
+
+Aby zapobiec zmianom oryginalnej tablicy, sortowanie przeprowadza sie na kopii wykonanej za pomocą metody .slice();
+
+> const sorted = arr.slice().sort((a, b) => b - a);
+
+> const sortedByPages = books.slice().sort((a, b) => b.pages - a.pages);
+
+### 4.29 Niemutujące tablice
+
+Wykorzystanie operatora spread (dodanie) i metod filter() (usuwanie) oraz map() (aktualizacja) nie mutuje tablic, tylko zwraca nową
+
+### 4.30 JS asynchroniczny - Promises
+
+Promis składa sie z fetcha() i następujących po nim metod .then() zawierających instrukcje
+
+> fetch("https://jsonplaceholder.typicode.com/todos").then(res=>res.json()).then(data=>console.log(data));
+
+Asynchroniczność polega na tym, że kod może wykonać jakąś operację, bez oczekiwania na zakończenie poprzedniej operacji.
+
+### 4.31 JS asynchroniczny - Async/await
+
+Blok async/await pozwala na czytelniejsze i prostsze przypisanie danych pobranych asynchronicznie ze źródła
+
+> async function getTodos() {
+> const res = await fetch("https://jsonplaceholder.typicode.com/todos");
+> const data = await res.json();
+> console.log(data);
+>
+> return data;
+> }
+> const todos = getTodos();
+>
+> console.log(todos); //Promise
