@@ -281,3 +281,292 @@ Blok async/await pozwala na czytelniejsze i prostsze przypisanie danych pobranyc
 > const todos = getTodos();
 >
 > console.log(todos); //Promise
+
+## 5. Sekcja 5: Working With Components, Props, and JSX
+
+### 5.32 Wprowadzenie do sekcji
+
+### 5.33 Renderowanie komponentu Root i strict mode w JS
+
+Strict Mode jest częścią React.
+Komponenty renderuje się poprzez odwołanie do elementu html któy jest rootem i wywołanie metody render():
+
+> const root = ReactDOM.createRoot(document.getElementById('root'));
+> root.render(
+> <React.StrictMode>
+> <App />
+> </React.StrictMode>
+> );
+
+### 5.34. Debugging
+
+Główne przyczyny nie działania aplikacji:
+
+- Brak uruchomionej aplikacji (npm start)
+- Potrzeba przeładowania przeglądarki
+
+Błędy mogą pojawiaś się w zakładkach VSCode: termional i problemy, dane wyjściowe oraz w konsoli przeglądarki.
+
+Kolejne przykłady błędów:
+
+- Wiele zwracanych elementów JSX nie owrapowanych rodzicem
+- Zmienna do któej nic się nie odwołuje (eslint)
+
+### 5.35 Komponenty jako bloki kodu
+
+Komponent to podstawowe założenie react. W React służą do budowania bloków UI. UI składa się z warstw danych, logiki i wyglądu.
+Cały UI składa się z wielu połączonych komponentów.
+
+### 5.36 Tworzenie i reużywalność komponentów
+
+Komponenty w React tworzymy jako funkcje, nazwa funkcji jest zapisywana z wielkiej litery, PascalCase.
+Komponentów można używać wielokrotnie.
+
+### 5.37 Czym jest JSX
+
+Pozwala pisać kod deklaratywnie, opisuje jak komponent ma działać i wyglądać. Komponenty uruchamiają blok kodu JSX. JSX jest rozszerzeniem JS pozwalającym na osadzenie JS, CSS i komponentów React w składni HTML
+JSX jest konwertowany do funkcji React.createElement()
+
+Kod imperatwny: krok po kroku opisujemy jak utworzyć komponent: querySelectory, addEventListener, classList.add() itd.
+Kod deklaratywny: JSX
+
+> <p>{question.text}</p>
+> <UpvotBtn
+> onClick={upvote}
+> upvotes={upvotes}
+> />
+
+### 5.38 Tworzenie dodatkowych komponentów
+
+Utworzenie komponentów Header, Menu, Footer i osadzenie w Menu komponentu Pizza
+
+### 5.39 JS w komponentach
+
+Użycie zmiennych i funkcji do poierania informacji o godzinie wewnątrz komponentu
+
+> const hour = new Date().getHours();
+> const hours = {
+> open: 12,
+> close: 18
+> }
+> const isOpen = hour >= hours.open & hour <= hours.close;
+
+### 5.40 Separation of Concerns (Modulartność kodu)
+
+W react zastosowano nowe podejście w podziale kodu na logikę i UI. Dotychczasowo za html, css i js odpowiadały osobne pliki, teraz wszystkie informacje są przechowywane w obrębie jednego komponentu, zachowując przy tym podział obowiązków konkretnych bloków kodu.
+
+### 5.41 Stylowanie w aplikacji React
+
+Liniowo za pomocą obiektu
+
+> <h1 style={{ display: "flex", fontSize: "32px" }}> Tekst </h1>;
+
+Przekazanie obiektu ze zmiennej:
+
+> const styles = { display: "flex", fontSize: "32px" }
+>
+> <h1 style={styles}> Tekst </h1>;
+
+Za pomocą klasy ostylowanej w osobnym pliku .css:
+
+> <div> className="container"</div>
+
+Nie można użyć słowa class, ponieważ jest zarezerwowane w JS (skłądnie to JSX, a nie HTML) dla deklaracji klas
+
+### 5.42 Obsługa propsów
+
+Props to przekazanie wartości poprzez atrybuty do elementu potomnego.
+
+> <Pizza
+>   imgSrc={pizza.photoName}
+>   name={pizza.name}
+>   ingredients={pizza.ingredients}
+>   key={i}
+> />
+
+Wywołanie właściwości propsa poprzez destrukturyzację obiektu props w elemencie dziecka:
+
+> Pizza(props) {
+> const { imgSrc, name, ingredients } = props;
+> }
+
+### 5.43 Props, Immutability, and One-Way Data Flow
+
+- Propsy służą do przekazywania danych z komponentu rodzica do komponentu dziecka (w dół drzewa komponentów)
+- Niezbędne narzędzie do obsługi komponentów, podobne do parametrów funkcji
+- Dzięki propsom komponent rodzica kontroluje jak komponent dziecka wygląda i działa
+- Cokolwiek może być ptrzekazane jako props:
+  - pojedyncza wartość,
+  - tablice,
+  - obiekty,
+  - funkcje,
+  - inne komponenty
+
+Propsy są niemutowalne, a przepływ danych jest w dół drzewa komponentu. Jeśli jest potrzeba zmian propsa, to odbywa się przez stan. Zmiany w propsach prowadzą do zmian w komponencie rodzica, a to tworzy efekty uboczne, co nie jest czystym rozwiązaniem. Komponenty mają być czystymi funkcjami, to pozwalia optymalizować aplikacje, unikać błędów i czynią apkę przewidywalną.
+
+Jednokierunkowy przepływ danych czyni aplikacje łatwiejszymi do zrozumienia oraz do kontroli. Prościej je naprawiać i mamy większą kontrolę nad nią oraz zwiększa wydajność.
+Dwukierunkowy przepływ danych jest wykorzystywany np. w angularze.
+
+### 5.44 Zadanie #1 Karta profilu
+
+Kod w repo
+
+### 5.45 Zasady JSX
+
+Specyfika:
+
+- JSX działą i wygląda jak HTML, lecz obsługuje tryb "JavaScript", dzięki zastosowaniu {}
+- Można zamieszczać wywołania JS wewnątrz {}. Np.: odwołąnia do zmiennych, tworzenie tablic lub obiektów, funkcje tablicowe np. [].map(), operator warunkowy itd.
+- If/else, pętle, switche nie są dopuszczone
+- JSX działa dzięki wywołaniu JavaScript
+  - Można zamieścić JSX wewnątrz JSX za pomocą {}
+  - JSX można pisać wszędzie wewnątrz komponentu (if/else, przypisanie do zmiennycg, dodanie do funkcji)
+- JSX ma jeden element root
+
+Różnice w porównaniu do HTMLa:
+
+- className zamiast class
+- htmlFro zamiast for
+- każdy tag musi być zamknięty np. <img />, <br />
+- obsługa zdarzeń, atrybuty i inne właściwości są pisane camelCasem: onClick, OnMouseOver
+  - wyjątkiem są aria-_ i data-_, one są pisane jak HTML
+- liniowe style CSS są wprowadzane jako obiekt: {{<style>}}
+- właściwości CSS są wywoływane jako camelCase
+- komentarze muszą być wewnątrz {} jak w JS
+
+### 5.46 Wywołanie listy
+
+Za pomocą funkcji .map() wywołanej na tablicy. Chodzi o to, żeby było można podstawić tyle komponentów dziecka ile mamy danych do podziału przekazanuych do rodzica.
+
+> <main className="menu">
+>   <h2>Our Menu</h2>
+>   {
+>     pizzaData.map((pizza, i) => {
+>       return (
+>         <Pizza
+>           imgSrc={pizza.photoName}
+>           name={pizza.name}
+>           ingredients={pizza.ingredients}
+>           key={i}
+>           price={pizza.price}
+>         />
+>       );
+>     })
+>   }
+> </main>
+
+### 5.47 Warunkowe renderowanie z &&
+
+Jeśli sprawdza czy jakaś wartość istnieje, to jeśli jej nie ma zwróci 0, a jeśli sprawdzi jakieś porównanie to zwróci false. Jeśli się da, to lepiej użyć operatora warunkowego.
+
+> const pizzas = pizzaData;
+> const pizzasNums = pizzaData.length;
+> return
+>
+>   <main className="menu">
+>     <h2>Our Menu</h2>
+>     pizzasNums > 0 && 
+>       <ul className="pizzas">
+>         {pizzas.map(pizza, i) => 
+>           return 
+>             <Pizza
+>               imgSrc={pizza.photoName}
+>               name={pizza.name}
+>               ingredients={pizza.ingredients}
+>               key={i}
+>               price={pizza.price}
+>             />
+>           ;
+>         }
+>       </ul>     
+>   </main>
+> ;
+
+### 5.48 Warunkowe renderowanie z operatorami
+
+> {pizzasNums > 0 ? (
+>
+>   <ul className="pizzas">
+>     {pizzas.map((pizza, i) => {
+>       return (
+>         <Pizza
+>           imgSrc={pizza.photoName}
+>           name={pizza.name}
+>           ingredients={pizza.ingredients}
+>           key={i}
+>           price={pizza.price}
+>         />
+>       );
+>     })}
+>   </ul>
+> ) : (
+>   <p>Pracujemy nad menu, odwiedź nas później</p>
+> )}
+
+### 5.49 Warunkowe renderowanie z wieloma deklaracjami return
+
+Przydatne np. gdy jakieś dane nie wymagają wyświetlenia w komponencie
+
+> function Pizza(props) {
+>   const { photoName, name, ingredients, price, soldOut } = props;
+>   if (soldOut) return null;
+>   return (
+>     <div className="pizza">
+>       <img src={photoName} alt={name} />
+>       <div>
+>         <h3>{name}</h3>
+>         <p>{ingredients}</p>
+>         <span>{price}</span>
+>       </div>
+>     </div>
+>   );
+> }
+
+### 5.50 Wyodrębnianie JSX w nowym komponencie
+
+Utworzenie komponentu Order w stopce
+
+### 5.51 Destrukturyzacja propsów
+
+Podstawowym sposobem jest destrukturyzacja bezpośrednio w deklaracji komponentu:
+
+> function Pizza({ photoName, name, ingredients, price, soldOut }) {
+> }
+
+Kolejnym sposobem jest zadeklarowanie jako zmienne:
+
+> function Pizza(props) {
+>   const { photoName, name, ingredients, price, soldOut } = props;
+> }
+
+### 5.52 React Fragments
+
+Pozwala grupować elementy bez dodawania dodatkowych elementów w drzewie HTML
+
+> <></>
+
+Użycie React Fragment gdy potrzebujemy przekazać atrybut key:
+
+> <React.Fragment key={i}></React.Fragment>
+
+### 5.53 Warunkowe dodawanie klas i tekstu
+
+Dodanie klasy:
+
+> <div className={`pizza ${soldOut && "sold-out"}`}></div>
+
+Wpływanie na tekst:
+
+> <span>{soldOut ? "Sold out" : price}</span>
+
+### 5.54 Sekcja podsumowująca
+
+Każdy komponent jest samodzielnym elementem UI. Zawiera własne: dane, logikę JS oraz własny wygląd.
+Komponenty są napisane za pomocą deklaratywnej składni JSX. Każdy fragment JSX może zawierać znaczniki, zasadniczo w formie HTML.
+Do komponentów potomnych przekazuje się konfiguracje za pomocą propsów. 
+Za pomocą metod tablicowych .map(), renderujemy wiele komponentów.
+Renderowanie warunkowe służy do wprowadzania zależności w konfigurowanych komponentach.
+
+### 5.55 Zadanie #2 Karta profilu v2
+
+Kod w repo pod katalogiem 5.44
