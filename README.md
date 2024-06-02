@@ -508,18 +508,19 @@ Jeśli sprawdza czy jakaś wartość istnieje, to jeśli jej nie ma zwróci 0, a
 Przydatne np. gdy jakieś dane nie wymagają wyświetlenia w komponencie
 
 > function Pizza(props) {
->   const { photoName, name, ingredients, price, soldOut } = props;
->   if (soldOut) return null;
->   return (
->     <div className="pizza">
->       <img src={photoName} alt={name} />
->       <div>
->         <h3>{name}</h3>
->         <p>{ingredients}</p>
->         <span>{price}</span>
->       </div>
->     </div>
->   );
+> const { photoName, name, ingredients, price, soldOut } = props;
+> if (soldOut) return null;
+> return (
+>
+> <div className="pizza">
+> <img src={photoName} alt={name} />
+> <div>
+> <h3>{name}</h3>
+> <p>{ingredients}</p>
+> <span>{price}</span>
+> </div>
+> </div>
+> );
 > }
 
 ### 5.50 Wyodrębnianie JSX w nowym komponencie
@@ -536,7 +537,7 @@ Podstawowym sposobem jest destrukturyzacja bezpośrednio w deklaracji komponentu
 Kolejnym sposobem jest zadeklarowanie jako zmienne:
 
 > function Pizza(props) {
->   const { photoName, name, ingredients, price, soldOut } = props;
+> const { photoName, name, ingredients, price, soldOut } = props;
 > }
 
 ### 5.52 React Fragments
@@ -563,10 +564,152 @@ Wpływanie na tekst:
 
 Każdy komponent jest samodzielnym elementem UI. Zawiera własne: dane, logikę JS oraz własny wygląd.
 Komponenty są napisane za pomocą deklaratywnej składni JSX. Każdy fragment JSX może zawierać znaczniki, zasadniczo w formie HTML.
-Do komponentów potomnych przekazuje się konfiguracje za pomocą propsów. 
+Do komponentów potomnych przekazuje się konfiguracje za pomocą propsów.
 Za pomocą metod tablicowych .map(), renderujemy wiele komponentów.
 Renderowanie warunkowe służy do wprowadzania zależności w konfigurowanych komponentach.
 
 ### 5.55 Zadanie #2 Karta profilu v2
 
 Kod w repo pod katalogiem 5.44
+
+## Sekcja 6: State, Events, and Forms: Interactive Components
+
+### 6.56 Przegląd sekcji
+
+Sekcja o tym jak stworzyć interaktywne komponenty
+
+### 6.57 Tworzenie komponentu z krokami
+
+Sekcja inicjująca projekt
+
+### 6.58 Obsługa zdarzeń w React
+
+Obsługujemy deklaratywnie, eventy obsługujemy liniowo np. onClick={}, zamiast addEventListener.
+
+### 6.59 Czym jest stan w React
+
+Stan to dane które może przechowywać podczas cyklu życia aplikacji. To coś na kształt pamięci komponentu.
+Zmianna stanu to zmienna w komponencie. Aktualizacja stanu powoduje re-renderowanie komponentu.
+Stan pozwala programistom na utrzymanie wartości zmiennych pomiędzy renderowaniami.
+
+### 6.60 Tworzenie zmiennej stanu przy pomocy hooka useState
+
+Poprzez destrukturyzację tablicy zawierającej się w useState()
+
+> const [step, setStep] = useState(1)
+
+### 6.61 Nie obsługuj stanu ręcznie!
+
+Nie można edytować stanu za pomocą let
+
+> let [zmienna, setZmienna] = useState(1)
+> zmienna = zmienna ++ // nie zadziała!
+
+**Nie wolno** mutować zmiennych:
+
+> const [test] = useState({name: "John"})
+> test.name = "Paul"
+
+### 6.62 Mechanika stanu
+
+Każda zmiana stanu wywołuje ponowne wyrenderowanie komponentu z podstawionymi już danymi.
+
+React nosi swoją nazwę ponieważ reaguje na zmiany stanu poprzez re-render UI.
+
+### 6.63 Dodanie kolejnego stanu
+
+Dodano useState z isOpen, żeby przełączać widoczność dzięki operatorowi warunkowemu &&
+
+### 6.64 React developer tools
+
+Zapoznanie z zakładką Components w React dev tools
+
+### 6.65 Aktualizacja stanu na podstawie aktualnego stanu
+
+Najlepiej aktualizować stan na podstawie aktualnego stany z wykorzystaniem callbacka
+
+> function handleAddStep() {
+> step > 1 && setStep((s)=>s - 1)
+> }
+
+### 6.66 Praktyczne wskazówki dotyczące stanów
+
+Każdy komponent ma własny stan. UI to reprezentacja danych zmieniających się w czasie, a nie jawna manipulacja DOMem.
+Opisujemy UI danymi zmieniającymi stan, obsługą zdarzeń i JSxem.
+
+**Wskazówki**
+
+- Używaj stanu dla zmiennych które muszą pozostać zapamiętane (w JS to let, [] lub {}).
+- Jeżeli coś w komponencie ma być dynamiczne, trzeba utworzyć stan powiązany z tym elementem i trzeba aktualizować stan gdy ten element powinien się zmienić.
+- Jeśli chce zmienić wygląd komponentu lub wyświetlane dane to powinienem aktualizować stan. To dzieje sie za pomocą obsługi zdarzeń.
+- Komponent jest odbiciem stanu zmieniającego sie nieustannie
+- Dla danych nie potrzebujących re-renderowania, nie używaj useState, użyj zwykłej zmiennej.
+
+### 6.67 Użycie Vanilla JS
+
+Przykład wykonanej aplikacji w Vanilla JS oraz zaprezentowanie, że komponenty są osobnymi bytami.
+
+### 6.68 Wyzwanie 1: Licznik daty
+
+Licznik wskazuje datę +/- od dnia zero. W dodatku ma być opcja "step" dzięki której ustalamy jak duży ma być przeskok czasu.
+
+W repo 6.68.
+
+### 6.69 Rozpoczęcie nowego projektu "Far Away" Lista do podróży
+
+W repo 6.69
+
+### 6.70 Tworzenie Layoutu
+
+Utworzenie komponentów:
+
+> <Logo />
+> <Form />
+> <PackingList />
+> <Stats />
+
+### 6.71 Renderowanie list elementów
+
+Renderowanie za pomocą metody JS .map()
+
+### 6.72 Tworzenie formularza i obsługa podzadań
+
+Utworzenie opition za pomocą Array.from()
+
+> {Array.from({ length: 20 }, (\_, i) => i + 1).map((num) => (
+>
+>   <option value={num} key={num}>
+>     {num}
+>   </option>
+> ))}
+
+### 6.73 Kontrolowanie elementów
+
+Manipulacja inputem oraz selectem za pomocą stanu i metod onChange
+
+### 6.74 State vs. Props
+
+**Stan**
+
+- Dane wewnątgrzne
+- Pamięć komponentu, może być aktualizowany przez komponent
+- Aktualizacja stanu powodoje ponowne renderowanie komponentu
+- Czyni komponent interaktywnym
+
+**Props**
+
+- Zewnętrzne dane, przetrezymywane przez komponent rodzica
+- Podobny do argumentu funkcji
+- Tylko do odczytu
+- Otrzymanie nowych propsów powoduje ponowne wyrenderowanie komponentu. Często gdy rodzić jest aktualizowany.
+- Używane przez rodzica do konfugurowania komponentu dziecka
+
+### 6.75 Zadanie #1: Flashcards
+
+Zrobienie aplikacji do wyświetlania pytania i odpowiedzi. Odpowiedź ma się pojawić po kliknięciu, gdy użytkownik kliknie na inną kartę stara zostaje ponownie zasłonięta. Do użycia powinien być wykorzystany jeden stan.
+
+Repo 6.75
+
+### 6.76 Wyzwanie 2: Licznik daty v2
+
+Repo 6.76
