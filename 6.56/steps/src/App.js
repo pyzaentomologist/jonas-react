@@ -1,5 +1,7 @@
 import React, {useState} from "react";
 import { Step } from "./components/Step";
+import { StepMessage } from "./components/StepMessage";
+import { Button } from "./components/subcomponents/Button";
 
 const messages = [
   "Learn React ⚛️",
@@ -36,22 +38,25 @@ function App() {
               return <Step step={id} isActive={isActive} key={i} />;
             })}
           </div>
-          <p className="message">
-            {step}: {messages[step - 1]}
-          </p>
+          <StepMessage step={step}>
+            {messages[step - 1]}
+            <div className="buttons">
+              <Button
+                onClick={() => alert(`Learn how ${messages[step - 1]}`)}
+                bgColor="#e7e7e7e7"
+                color="#333"
+              >
+                Learn how
+              </Button>
+            </div>
+          </StepMessage>
           <div className="buttons">
-            <button
-              onClick={handleAddStep}
-              style={{ backgroundColor: "#7950f2", color: "#fff" }}
-            >
-              Previous
-            </button>
-            <button
-              onClick={handleReduceSteps}
-              style={{ backgroundColor: "#7950f2", color: "#fff" }}
-            >
-              Next
-            </button>
+            <Button onClick={handleAddStep} bgColor="#7950f2" color="#fff">
+              <span>👈</span> Previous
+            </Button>
+            <Button onClick={handleReduceSteps} bgColor="#7950f2" color="#fff">
+              Next <span>👉</span>
+            </Button>
           </div>
         </div>
       )}

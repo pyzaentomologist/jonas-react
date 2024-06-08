@@ -1,19 +1,23 @@
 import React, { useState } from "react";
 
-export function Form() {
+export function Form(props) {
+  const { handleNewItem } = props;
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
+
   function handleSubmit(e) {
     e.preventDefault();
     if (!description) return;
-    const item = { description, quantity, package: false, id: new Date() };
-    console.log(item);
+    const item = { description, quantity, packed: false, id: Date.now() };
+    handleNewItem(item);
     setDescription("");
     setQuantity(1);
   }
+
   function handleInput(e) {
     setDescription(e.target.value);
   }
+
   function handleSelect(e) {
     setQuantity(Number(e.target.value));
   }

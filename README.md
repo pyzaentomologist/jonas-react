@@ -1,8 +1,8 @@
-The Ultimate React Course 2024: React, Redux & More
+# The Ultimate React Course 2024: React, Redux & More
 
-# 1. Sekcja 1: Welcome, Welcome, Welcome!
+## 1. Sekcja 1: Welcome, Welcome, Welcome
 
-## 1.1. Wprowadzenie do kursu
+### 1.1. Wprowadzenie do kursu
 
 ### 1.2. Projekt rozpoczęty w codesandbox
 
@@ -67,10 +67,12 @@ Wtyczki:
 
 Prezentacja w jaki sposób można tworzyć kod w React, React przyjmuje kod w czystym JS. React i babel zaimportowany w pliku html z linków:
 
+```
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+```
 
 Renderowanie elementów HTML za pomocą funkcji createElement() zamiast składni JSX.
 Hooki useState i useEffect przez wywołanie React.useEffect, React.useState zamiast przez wykorzystanie zainstalowanej aplikacji
@@ -291,12 +293,14 @@ Blok async/await pozwala na czytelniejsze i prostsze przypisanie danych pobranyc
 Strict Mode jest częścią React.
 Komponenty renderuje się poprzez odwołanie do elementu html któy jest rootem i wywołanie metody render():
 
+```
 > const root = ReactDOM.createRoot(document.getElementById('root'));
 > root.render(
 > <React.StrictMode>
 > <App />
 > </React.StrictMode>
 > );
+```
 
 ### 5.34. Debugging
 
@@ -330,11 +334,13 @@ JSX jest konwertowany do funkcji React.createElement()
 Kod imperatwny: krok po kroku opisujemy jak utworzyć komponent: querySelectory, addEventListener, classList.add() itd.
 Kod deklaratywny: JSX
 
+```
 > <p>{question.text}</p>
 > <UpvotBtn
 > onClick={upvote}
 > upvotes={upvotes}
 > />
+```
 
 ### 5.38 Tworzenie dodatkowych komponentów
 
@@ -344,12 +350,14 @@ Utworzenie komponentów Header, Menu, Footer i osadzenie w Menu komponentu Pizza
 
 Użycie zmiennych i funkcji do poierania informacji o godzinie wewnątrz komponentu
 
+```
 > const hour = new Date().getHours();
 > const hours = {
 > open: 12,
 > close: 18
 > }
 > const isOpen = hour >= hours.open & hour <= hours.close;
+```
 
 ### 5.40 Separation of Concerns (Modulartność kodu)
 
@@ -359,17 +367,23 @@ W react zastosowano nowe podejście w podziale kodu na logikę i UI. Dotychczaso
 
 Liniowo za pomocą obiektu
 
-> <h1 style={{ display: "flex", fontSize: "32px" }}> Tekst </h1>;
+```
+> <h1 style={{ display: "flex", fontSize: "32px" }}> Tekst </h1>
+```
 
 Przekazanie obiektu ze zmiennej:
 
+```
 > const styles = { display: "flex", fontSize: "32px" }
 >
-> <h1 style={styles}> Tekst </h1>;
+> <h1 markdown="1" style={styles}> Tekst </h1>
+```
 
 Za pomocą klasy ostylowanej w osobnym pliku .css:
 
+```
 > <div> className="container"</div>
+```
 
 Nie można użyć słowa class, ponieważ jest zarezerwowane w JS (skłądnie to JSX, a nie HTML) dla deklaracji klas
 
@@ -427,10 +441,10 @@ Różnice w porównaniu do HTMLa:
 
 - className zamiast class
 - htmlFro zamiast for
-- każdy tag musi być zamknięty np. <img />, <br />
+- każdy tag musi być zamknięty np. `<img />, <br />`
 - obsługa zdarzeń, atrybuty i inne właściwości są pisane camelCasem: onClick, OnMouseOver
   - wyjątkiem są aria-_ i data-_, one są pisane jak HTML
-- liniowe style CSS są wprowadzane jako obiekt: {{<style>}}
+- liniowe style CSS są wprowadzane jako obiekt: `{{<style>}}`
 - właściwości CSS są wywoływane jako camelCase
 - komentarze muszą być wewnątrz {} jak w JS
 
@@ -438,6 +452,7 @@ Różnice w porównaniu do HTMLa:
 
 Za pomocą funkcji .map() wywołanej na tablicy. Chodzi o to, żeby było można podstawić tyle komponentów dziecka ile mamy danych do podziału przekazanuych do rodzica.
 
+```
 > <main className="menu">
 >   <h2>Our Menu</h2>
 >   {
@@ -455,20 +470,23 @@ Za pomocą funkcji .map() wywołanej na tablicy. Chodzi o to, żeby było można
 >   }
 > </main>
 
+```
+
 ### 5.47 Warunkowe renderowanie z &&
 
 Jeśli sprawdza czy jakaś wartość istnieje, to jeśli jej nie ma zwróci 0, a jeśli sprawdzi jakieś porównanie to zwróci false. Jeśli się da, to lepiej użyć operatora warunkowego.
 
+```
 > const pizzas = pizzaData;
 > const pizzasNums = pizzaData.length;
 > return
 >
 >   <main className="menu">
 >     <h2>Our Menu</h2>
->     pizzasNums > 0 && 
+>     pizzasNums > 0 &&
 >       <ul className="pizzas">
->         {pizzas.map(pizza, i) => 
->           return 
+>         {pizzas.map(pizza, i) =>
+>           return
 >             <Pizza
 >               imgSrc={pizza.photoName}
 >               name={pizza.name}
@@ -478,12 +496,14 @@ Jeśli sprawdza czy jakaś wartość istnieje, to jeśli jej nie ma zwróci 0, a
 >             />
 >           ;
 >         }
->       </ul>     
+>       </ul>
 >   </main>
 > ;
+```
 
 ### 5.48 Warunkowe renderowanie z operatorami
 
+```
 > {pizzasNums > 0 ? (
 >
 >   <ul className="pizzas">
@@ -502,11 +522,13 @@ Jeśli sprawdza czy jakaś wartość istnieje, to jeśli jej nie ma zwróci 0, a
 > ) : (
 >   <p>Pracujemy nad menu, odwiedź nas później</p>
 > )}
+```
 
 ### 5.49 Warunkowe renderowanie z wieloma deklaracjami return
 
 Przydatne np. gdy jakieś dane nie wymagają wyświetlenia w komponencie
 
+```
 > function Pizza(props) {
 > const { photoName, name, ingredients, price, soldOut } = props;
 > if (soldOut) return null;
@@ -522,6 +544,7 @@ Przydatne np. gdy jakieś dane nie wymagają wyświetlenia w komponencie
 > </div>
 > );
 > }
+```
 
 ### 5.50 Wyodrębnianie JSX w nowym komponencie
 
@@ -531,34 +554,46 @@ Utworzenie komponentu Order w stopce
 
 Podstawowym sposobem jest destrukturyzacja bezpośrednio w deklaracji komponentu:
 
+```
 > function Pizza({ photoName, name, ingredients, price, soldOut }) {
 > }
+```
 
 Kolejnym sposobem jest zadeklarowanie jako zmienne:
 
+```
 > function Pizza(props) {
 > const { photoName, name, ingredients, price, soldOut } = props;
 > }
+```
 
 ### 5.52 React Fragments
 
 Pozwala grupować elementy bez dodawania dodatkowych elementów w drzewie HTML
 
+```
 > <></>
+```
 
 Użycie React Fragment gdy potrzebujemy przekazać atrybut key:
 
+```
 > <React.Fragment key={i}></React.Fragment>
+```
 
 ### 5.53 Warunkowe dodawanie klas i tekstu
 
 Dodanie klasy:
 
+```
 > <div className={`pizza ${soldOut && "sold-out"}`}></div>
+```
 
 Wpływanie na tekst:
 
+```
 > <span>{soldOut ? "Sold out" : price}</span>
+```
 
 ### 5.54 Sekcja podsumowująca
 
@@ -596,19 +631,25 @@ Stan pozwala programistom na utrzymanie wartości zmiennych pomiędzy renderowan
 
 Poprzez destrukturyzację tablicy zawierającej się w useState()
 
+```
 > const [step, setStep] = useState(1)
+```
 
 ### 6.61 Nie obsługuj stanu ręcznie!
 
 Nie można edytować stanu za pomocą let
 
+```
 > let [zmienna, setZmienna] = useState(1)
 > zmienna = zmienna ++ // nie zadziała!
+```
 
 **Nie wolno** mutować zmiennych:
 
+```
 > const [test] = useState({name: "John"})
 > test.name = "Paul"
+```
 
 ### 6.62 Mechanika stanu
 
@@ -628,9 +669,11 @@ Zapoznanie z zakładką Components w React dev tools
 
 Najlepiej aktualizować stan na podstawie aktualnego stany z wykorzystaniem callbacka
 
+```
 > function handleAddStep() {
 > step > 1 && setStep((s)=>s - 1)
 > }
+```
 
 ### 6.66 Praktyczne wskazówki dotyczące stanów
 
@@ -663,10 +706,12 @@ W repo 6.69
 
 Utworzenie komponentów:
 
+```
 > <Logo />
 > <Form />
 > <PackingList />
 > <Stats />
+```
 
 ### 6.71 Renderowanie list elementów
 
@@ -676,12 +721,14 @@ Renderowanie za pomocą metody JS .map()
 
 Utworzenie opition za pomocą Array.from()
 
+```
 > {Array.from({ length: 20 }, (\_, i) => i + 1).map((num) => (
 >
 >   <option value={num} key={num}>
 >     {num}
 >   </option>
 > ))}
+```
 
 ### 6.73 Kontrolowanie elementów
 
@@ -713,3 +760,263 @@ Repo 6.75
 ### 6.76 Wyzwanie 2: Licznik daty v2
 
 Repo 6.76
+
+## 7. Sekcja 7: Thinking In React: State Management
+
+### 7.77 Przegląd sekcji
+
+Poruszone askpekty:
+
+- Myślenie "Reactowe"
+- Zarządzanie stanem
+- Kiedy i gdzie tworzyć stan
+- Kominukacja pomiędzy komponentami podrzędnymi oraz nadrzędnymi
+
+### 7.78 Czym jest myślenie "Reactowe"
+
+- Dobry model mentalny jak tworzyć:
+  - komponenty,
+  - stan
+  - propsy
+  - data flow
+  - effects
+  - etc.
+- Myślenie o zmianie stanu, a nie zmianie komponentu
+- Proces:
+  - Podzielenie kodu na komponenty i tworzenie drzewa komponentów
+  - Zbudowanie statycznej wersji kodu, bez stanu
+  - Myślenie o stanie:
+    - Kiedy użyć stanu
+    - Rodzaj stanu: lokalny vs. globalny
+    - Gdzie powinien znajdować się stan
+  - Ustalenie data flow
+    - Jednokeirunkowy przepływ danych
+    - komunikacja dziecko-rodzic
+    - Dostęp do globalnego stanu
+
+Pytania na które powinienem znać odpowiedź:
+
+> Jak podzielić UI na komponenty?
+
+> Jak sprawić, żeby komponenty były wielokrotnego użytku?
+
+> Jak utworzyć UI z reużywalnych komponentów?
+
+> Jakich składowych stanu potrzebuję do interaktywności?
+
+> Gdzie powinien znajdować się stan? Który komponent powinien zarządzać konkretnym stanem?
+
+> Jakiego rodzaju stanu powinienem lub mogę użyć?
+
+> Jak utworzyć przepływ danych przez aplikację?
+
+### 7.79 Podstawy zarządzania stanem w React
+
+Zarządzanie stanem jako decyzja kiedy tworzyć nowe elementy stanu, jakie typy stanu są konieczne, gdzie powinny znajdować się wywołania stanu oraz jak powinny przepływać dane przez aplikację.
+
+**Różnice pomiędzy stanem globalnym i stanem lokalnym**
+
+Stan lokalny:
+
+- stan potrzebny jednemu lub kilku componentom
+- stan zdefiniowany w komponencie, dostępny tylko dla tego komponentu i komponentów potomnych
+- zawsze powinno się zaczyna od stanu lokalnego
+
+Stan globalny:
+
+- stan potrzebny w wielu komponentach
+- udostępniony dla każdego komponentu w aplikacji
+
+**Gdzie i kiedy użyć stanu**
+
+Kiedy: <br/> <br/>
+
+```mermaid
+  block-beta
+  columns 5
+    A space B
+    B space C
+    B space:7 D
+    D space E
+    D space:7 F
+    F space G
+    F space:7 H
+    A("Potrzebuję przechowania danych") --> B("Czy dane zmieniają się?")
+    B -- "Nie" --> C("Zwykla zmienna const")
+    B -- "Tak" --> D("Czy jest możłiwe obliczanie na podstawie stanu lub propsów?")
+    D -- "Tak" --> E("Użyj wartości stanu pochodnego")
+    D -- "Nie" --> F("Czy to powinno re-renderować komponent?")
+    F -- "Nie" --> G("Użyj Ref (useRef)")
+    F -- "Tak" --> H("Utwórz nowy stan dla komponentu")
+```
+Gdzie: <br/> <br/>
+
+```mermaid
+  block-beta
+  columns 3
+    A space:5 B
+    B space:1 C
+    B space:3 D
+    D space:1 E
+    D space:3 F
+    F space:1 G
+    F space:3 H
+    A("Utwórz nowy stan dla komponentu") --> B("Czy stan jest używany <br /> przez jeden komponent?")
+    B -- "Tak" --> C("Użyj w tym komponencie")
+    B -- "Nie" --> D("Czy jest używany w komponencie potomnym?")
+    D -- "Tak" --> E("Użyj propsa")
+    D -- "Nie" --> F("Czy jest używany przez komponenty siostrzane?")
+    F -- "Tak" --> G("Podnieś stan do pierwszego wspólnego komponentu")
+    F -- "Nie" --> H("Użyj stanu globalnego")
+```
+Stan globalny możemy wykorzystać gdy jest potrzbny w wielu komponentach rozsianych w rónych miejscdach aplikacji
+
+### 7.80 Jak myśleć o stanie i wynoszeniu stanu do komponentu nadrzędnego
+
+repo 6.69
+
+### 7.81 Wyjaśnienie "Wyniesienie stanu do komponentu rodzica"
+
+Przepływ od rodzica do dziecka. Aktualizacja stanu za pomocą funkcji zadeklarowanej w rodzicu i przekazanej do dziecka.
+
+### 7.82 Usunięcie elementu: Wieksza komunikacja rodzic-dziecko
+
+repo 6.69
+
+Usuwanie za pomocą funkcji handleDelete() w App.js
+```
+> function handleDelete(id) {
+>   setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+> }
+```
+
+### 7.83 Edycja elementu: Złożona operacja na danych ze stanu
+
+Dodanie inputa do zmiany stanu rzeczy z listy potrzebnych do podróży:
+
+```
+> <input
+>   type="checkbox"
+>   checked={packed !== undefined ? packed : false}
+>   onChange={() => changePacked(id)}
+> />
+```
+
+### 7.84 Stan pochodny
+
+repo 6.69
+
+Stan pochodny jest wyliczany z istniejącego stanu lub propsa
+Np.
+
+```
+> const [cart, setCard] = useState([
+  { name: "book1", price: "15,99" },
+  { name: "book2", price: "12,99" }
+])
+const numItems = cart.length;
+const totalPrice = cart.reduce((acc, cur) => acc + cur.price, 0)
+```
+
+### 7.85 Obliczanie statystyk - Stan pochodny
+
+repo 6.69
+
+```
+> const { items } = props;
+>   
+> if (!items.length) // zabezpiczenie przed wykonywaniem obliczeń, gdy nie ma elementów
+>   return (
+>     <p className="stats">
+>       <em>Dodaj coś do listy pakowania</em>
+>     </p>
+>   )
+> 
+> const itemsNumbers = items.length;  
+> const intemsPackedNumbers = items.filter((item) => item.packed && item).length;
+> const itemsPackedPercentage = Math.round((intemsPackedNumbers / itemsNumbers) * 100);
+```
+
+### 7.86 Sortowanie elementów
+
+repo 6.69
+
+Sortowanie z użyciem stanu do ustalenia wartości selecta. Sortowanie przy pomocy zmiennej let bez użycia stanu do przetrzymywania informacji o kolejności elementów w liście:
+
+```
+>  const [sortBy, setSortBy] = useState("default");
+>
+>  let sortedItems;
+>
+>  if (sortBy === "description") {
+>    sortedItems = newItems
+>      .slice()
+>      .sort((a, b) => a.description.localeCompare(b.description));
+>  } else if (sortBy === "package-status") {
+>    sortedItems = newItems
+>      .slice()
+>      .sort((a, b) => Number(a.packed) - Number(b.packed));
+>  } else {
+>    sortedItems = newItems
+>      .slice()
+>      .sort((a, b) => a.id - b.id);
+>  }
+>
+>  function handleSort(value) {
+>    setSortBy(value);
+>  }
+```
+
+### 7.87 Czyszczenie listy
+
+repo 6.69
+
+Przekazanie pustej tablicy do stanu z listą elementów, wywołanie confirm:
+
+```
+> const confirmed = window.confirm("Czy jesteś pewny, że chcesz wyczyścić listę?");
+> confirmed && setItems([]);
+```
+
+### 7.88 Przenoszenie komponentów do osobnych plików
+
+repo 6.69
+
+### 7.89 Zadanie #1: Komponent akordeonu
+
+repo 7.89
+
+### 7.90 Props {children}: reużywalny przycisk
+
+repo 6.56
+
+Props {children} jest czymś w rodzaju dziury, któą można napełnić dowolnym kodem JSX. Podstawowe narzędzie do tworzenia reużywalnych i łatwych w konfiguracji komponentów. Użyteczny podczas tworzenia komponentów które nie muszą znać swojego kontentu przed użyciem, np. modal.
+
+### 7.91 Więcej przykładów reużywalności z propsem {children}
+
+Przekazanie komponentu Button jako children:
+
+repo 6.56
+
+```
+> <StepMessage step={step}>
+>   {messages[step - 1]}
+>   <div className="buttons">
+>     <Button
+>       onClick={() => alert(`Learn how ${messages[step - 1]}`)}
+>       bgColor="#e7e7e7e7"
+>       color="#333"
+>     >
+>       Learn how
+>     </Button>
+>   </div>
+> </StepMessage>
+```
+
+### 7.92 Zadanie #2: Komponent akordeonu v2
+
+Zmiana w elementach akordeonu, teraz żaden z komponentów nie będzie zarządzał informacją o stane samodzielnie, a będzie dziedziczył informację czy ma być otwarty od rodzica (na podstawie swojego id). Zmieni się funkcjonalność, od teraz moze być tylko jeden element otwarty.
+
+### 7.93 Wyzwanie #1: Kalkulator napiwków
+
+repo 7.93
