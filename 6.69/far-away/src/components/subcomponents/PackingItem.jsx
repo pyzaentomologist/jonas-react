@@ -1,15 +1,20 @@
 import React from "react";
 
 export function PackingItem(props) {
-  const { id, description, quantity, packed } = props;
+  const { id, description, quantity, packed, handleDelete, changePacked } =
+    props;
   return (
     <>
       <li>
+        <input
+          type="checkbox"
+          checked={packed !== undefined ? packed : false}
+          onChange={() => changePacked(id)}
+        />
         <span style={packed ? { textDecoration: "line-through" } : {}}>
-          <strong>{id}.</strong>
           {description} {quantity}x
         </span>
-        <button>❌</button>
+        <button onClick={() => handleDelete(id)}>❌</button>
       </li>
     </>
   );
