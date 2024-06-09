@@ -1020,3 +1020,43 @@ Zmiana w elementach akordeonu, teraz żaden z komponentów nie będzie zarządza
 ### 7.93 Wyzwanie #1: Kalkulator napiwków
 
 repo 7.93
+
+## 8 Sekcja 8: [Optional] Practice Project: Eat-'N-Split
+
+### 8.94 Przegląd sekcji
+
+Podsumowanie podstaw z React podczas tworzenia aplikacji "Eat-N-Split"
+
+### 8.95 Wstęp do projektu
+
+Aplikacja do pomocy podczas podziału wydatków. Ma podsumować wydatki, dodać przyjaciela.
+
+repo 8.95
+
+### 8.96 Wersja statyczna aplikacji: Lista przyjaciół
+
+repo 8.95
+
+### 8.97 Wersja statyczna aplikacji: Formularze
+
+repo 8.95
+
+### 8.98 Pojawianie się formularza dodającego przyjaciół
+
+repo 8.95
+
+### 8.99 Dodanie przyjaciela
+
+repo 8.95
+
+### 8.100 Wybranie przyjaciela
+
+repo 8.95
+
+### 8.101 Tworzenie elementu kontrolującego
+
+repo 8.95
+
+### 8.102 Rozdszielenie rachunku
+
+repo 8.95
