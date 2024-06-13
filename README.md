@@ -696,11 +696,11 @@ Przykład wykonanej aplikacji w Vanilla JS oraz zaprezentowanie, że komponenty 
 
 Licznik wskazuje datę +/- od dnia zero. W dodatku ma być opcja "step" dzięki której ustalamy jak duży ma być przeskok czasu.
 
-W repo 6.68.
+W repo katalog 6.68.
 
 ### 6.69 Rozpoczęcie nowego projektu "Far Away" Lista do podróży
 
-W repo 6.69
+W repo katalog 6.69
 
 ### 6.70 Tworzenie Layoutu
 
@@ -755,11 +755,11 @@ Manipulacja inputem oraz selectem za pomocą stanu i metod onChange
 
 Zrobienie aplikacji do wyświetlania pytania i odpowiedzi. Odpowiedź ma się pojawić po kliknięciu, gdy użytkownik kliknie na inną kartę stara zostaje ponownie zasłonięta. Do użycia powinien być wykorzystany jeden stan.
 
-Repo 6.75
+repo katalog 6.75
 
 ### 6.76 Wyzwanie 2: Licznik daty v2
 
-Repo 6.76
+repo katalog 6.76
 
 ## 7. Sekcja 7: Thinking In React: State Management
 
@@ -873,7 +873,7 @@ Stan globalny możemy wykorzystać gdy jest potrzbny w wielu komponentach rozsia
 
 ### 7.80 Jak myśleć o stanie i wynoszeniu stanu do komponentu nadrzędnego
 
-repo 6.69
+repo katalog 6.69
 
 ### 7.81 Wyjaśnienie "Wyniesienie stanu do komponentu rodzica"
 
@@ -881,7 +881,7 @@ Przepływ od rodzica do dziecka. Aktualizacja stanu za pomocą funkcji zadeklaro
 
 ### 7.82 Usunięcie elementu: Wieksza komunikacja rodzic-dziecko
 
-repo 6.69
+repo katalog 6.69
 
 Usuwanie za pomocą funkcji handleDelete() w App.js
 ```
@@ -904,7 +904,7 @@ Dodanie inputa do zmiany stanu rzeczy z listy potrzebnych do podróży:
 
 ### 7.84 Stan pochodny
 
-repo 6.69
+repo katalog 6.69
 
 Stan pochodny jest wyliczany z istniejącego stanu lub propsa
 Np.
@@ -920,7 +920,7 @@ const totalPrice = cart.reduce((acc, cur) => acc + cur.price, 0)
 
 ### 7.85 Obliczanie statystyk - Stan pochodny
 
-repo 6.69
+repo katalog 6.69
 
 ```
 > const { items } = props;
@@ -939,7 +939,7 @@ repo 6.69
 
 ### 7.86 Sortowanie elementów
 
-repo 6.69
+repo katalog 6.69
 
 Sortowanie z użyciem stanu do ustalenia wartości selecta. Sortowanie przy pomocy zmiennej let bez użycia stanu do przetrzymywania informacji o kolejności elementów w liście:
 
@@ -969,7 +969,7 @@ Sortowanie z użyciem stanu do ustalenia wartości selecta. Sortowanie przy pomo
 
 ### 7.87 Czyszczenie listy
 
-repo 6.69
+repo katalog 6.69
 
 Przekazanie pustej tablicy do stanu z listą elementów, wywołanie confirm:
 
@@ -980,15 +980,15 @@ Przekazanie pustej tablicy do stanu z listą elementów, wywołanie confirm:
 
 ### 7.88 Przenoszenie komponentów do osobnych plików
 
-repo 6.69
+repo katalog 6.69
 
 ### 7.89 Zadanie #1: Komponent akordeonu
 
-repo 7.89
+repo katalog 7.89
 
 ### 7.90 Props {children}: reużywalny przycisk
 
-repo 6.56
+repo katalog 6.56
 
 Props {children} jest czymś w rodzaju dziury, któą można napełnić dowolnym kodem JSX. Podstawowe narzędzie do tworzenia reużywalnych i łatwych w konfiguracji komponentów. Użyteczny podczas tworzenia komponentów które nie muszą znać swojego kontentu przed użyciem, np. modal.
 
@@ -996,7 +996,7 @@ Props {children} jest czymś w rodzaju dziury, któą można napełnić dowolnym
 
 Przekazanie komponentu Button jako children:
 
-repo 6.56
+repo katalog 6.56
 
 ```
 > <StepMessage step={step}>
@@ -1019,7 +1019,7 @@ Zmiana w elementach akordeonu, teraz żaden z komponentów nie będzie zarządza
 
 ### 7.93 Wyzwanie #1: Kalkulator napiwków
 
-repo 7.93
+repo katalog 7.93
 
 ## 8 Sekcja 8: [Optional] Practice Project: Eat-'N-Split
 
@@ -1031,32 +1031,257 @@ Podsumowanie podstaw z React podczas tworzenia aplikacji "Eat-N-Split"
 
 Aplikacja do pomocy podczas podziału wydatków. Ma podsumować wydatki, dodać przyjaciela.
 
-repo 8.95
+repo katalog 8.95
 
 ### 8.96 Wersja statyczna aplikacji: Lista przyjaciół
 
-repo 8.95
+repo katalog 8.95
 
 ### 8.97 Wersja statyczna aplikacji: Formularze
 
-repo 8.95
+repo katalog 8.95
 
 ### 8.98 Pojawianie się formularza dodającego przyjaciół
 
-repo 8.95
+repo katalog 8.95
 
 ### 8.99 Dodanie przyjaciela
 
-repo 8.95
+repo katalog 8.95
 
 ### 8.100 Wybranie przyjaciela
 
-repo 8.95
+repo katalog 8.95
 
 ### 8.101 Tworzenie elementu kontrolującego
 
-repo 8.95
+repo katalog 8.95
 
 ### 8.102 Rozdszielenie rachunku
 
-repo 8.95
+repo katalog 8.95
+
+## 9 Sekcja 9: Średniozaawansowany React: [2 Projekty]
+
+### 9.103 Wstęp do części 2
+
+Prezentacja aplikacji usePopcorn
+
+### 9.104 Przydatne źródła
+
+Pisanie odpornych komponentów
+https://overreacted.io/writing-resilient-components
+
+Nie rozpraszaj się wyimaginowanymi problemami:
+
+- Ludzie postrzegają lintera jako nadgorliwego, hałaśliwego strażnika, a nie pomocnego narzędzia
+- Ludzie odróżniają prawidłowego i nieprawidłowego użycia określonego wzorca. Na przykład istnieje popularna reguła zabraniająca wywoływania setState wewnątrz komponentu ComponentDidMount, ale jeśli zawsze byłby to bład to React blokowałby ją.
+- Ludzie nadgorliwie walczą o semantykę i egzekwowanie zasad, które nie wnoszą znaczącej różnicy. „Użyłeś deklaracji funkcji, ale w naszym projekcie zastosowano funkcje strzałkowe.”
+
+**“Has this rule ever helped us catch a bug?” If not, turn it off.**
+**Use the linter to find bugs, not enforcing the a e s t h e t i c s.**
+
+Zasady odpornych komponentów:
+
+- Nie zatrzymuj przepływu danych
+- Zawsze bądź gotowy do renderowania
+- Żaden komponent nie jest singletonem
+- Trzymaj stan lokalny w izolacji
+
+#### Principle 1: Don’t Stop the Data Flow
+
+##### Don’t Stop the Data Flow in Rendering
+
+##### Don’t Stop the Data Flow in Side Effects
+
+##### Don’t Stop the Data Flow in Optimizations
+
+#### Principle 2: Always Be Ready to Render
+
+#### Principle 3: No Component Is a Singleton
+
+#### Principle 4: Keep the Local State Isolated
+
+Filozofia react
+https://github.com/mithi/react-philosophies
+
+Przewodnik po renderowaniu w React
+https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/
+
+Wizaualny przewodnik po rendorowaniu w React
+https://alexsidorenko.com/blog/react-render-always-rerenders/
+
+React Fiber - konferencja
+https://www.youtube.com/watch?v=ZCuYPiUIONs
+
+React Fiber - czym jest
+https://www.youtube.com/watch?v=0ympFIwQFJw
+
+React i React Native
+https://levelup.gitconnected.com/how-exactly-does-react-handles-events-71e8b5e359f2
+
+React Events Listener
+https://gist.github.com/romain-trotard/76313af8170809970daa7ff9d87b0dd5
+
+Przewodnik jak zrobić samodzielnie aplikację React
+https://github.com/pomber/didact
+
+useSync­External­Store
+https://julesblom.com/writing/usesyncexternalstore
+
+Zagłębienie się jak działają hooki w React
+https://the-guild.dev/blog/react-hooks-system
+
+
+Dlaczego hooki React opierają się na kolejności wywołań?
+https://overreacted.io/why-do-hooks-rely-on-call-order
+
+React refs
+https://thoughtspile.github.io/2021/05/17/everything-about-react-refs/
+
+react use
+https://github.com/streamich/react-use
+
+reacthookz/web
+https://github.com/react-hookz/web
+
+## 10 Sekcja 10: Myślenie w React: Komponenty, Kompozycja i Reużywalność
+
+### 10.105 Przegląd sekcji
+
+W sekcji zapowiedziano:
+
+- Jak traktować komponenty
+- Czym jest kompozycja
+- Czy jest reużywalność
+- Jak podzielić komponent
+- Jak budować layout
+
+### 10.106 Rozpoczęcie projektu usePopcorn
+
+Wersja do testowania na usepopcorn.netlify.app
+
+repo katalog 10.106
+
+### 10.107 Jak dzielić komponenty w UI
+
+Jeśli komponent przyjmuje 10-15 propsów to powinien zostać podzielony.
+
+4 kryteria podziału komponentu:
+
+- Logiczny podział kontentu/layoutu
+- Reużywalność
+- Podział odpowiedzialności
+- Osobiste preferencje co do wielkości komponentu
+
+Logiczny podział kontentu/layoutu - jeśli komponent zawiera niespójne ze sobą fragmenty to należy go podzielić
+
+Reużywalność - jeśli da się ponownie użyć komponent i zajdzie taka potrzeba lub chęć
+
+Podział odpowiedzialności - Jeśli komponent robi zbyt wiele rzeczy lub zależy od zbyt wielu propsów. Jeśli posiada zbyt wiele stanów lub efektów. Jeśli kod (w tym JSX) są zbyt skomplikowane/mylące
+
+Osobiste preferencje co do wielkości komponentu - Dostosuj wielkość kodu do własnych wymagań/wymagań zespołu
+
+**Wskazówki ogólne**:
+
+- Tworząc nowy komponent **tworzę nową warstwę abstrakcji**. Abstrakcja kosztuje dodatkowy wysiłek umysłowy podczas tworzenia aplikacji. Ważne, żeby nie tworzyć zbyt wielu komponentów zbyt wcześnie.
+- Nazywanie komponentów na podstawie tego co robią i co wyświetlają. Można używać długich nazw.
+- Nie deklaruje się komponentu wewnątrz innego komponentu
+- Zamieszczanie komponentów wewnątrz tego samego pliku. Nie rozbijaj komponentów na osobne pliki zbyt wcześnie
+- Normą jest to, że projekty mają różnej wielkości komponenty: małe i ogromne.
+
+### 10.108 Podział komponentów w praktyce
+
+repo katalog 10.106
+
+### 10.109 Kategorie komponentów
+
+- komponenty bezstanowe lub prezentacyjne,
+- komponenty stanowe,
+- komponenty strukturalne
+
+**Komponenty bezstanowe**
+
+Bez stanu, przyjmują props i prezentują dane, zwykle małe i reużywalne
+
+**Komponenty stanowe**
+
+Posiadają stan, mogą być reużywalne
+
+**Komponenty strukturalne**
+
+Komponenty layoutu jak Pages, Layout, Screen. Skłądają się z mniejszych komponentów, mogą być małe, jednak zwykle są duże i raczej nie reużywalne.
+
+### 10.110 Przekazywanie komponentu w propsie przez wiele warstw
+
+repo katalog 10.106
+
+### 10.111 Kompozycja komponentu
+
+repo katalog 10.106
+
+### 10.112 Poprawienie przekazywania komponentu z kompozycją
+
+repo katalog 10.106
+
+### 10.113 Użycie kompozycji do stwoprzenia reużywalnego boxa
+
+repo katalog 10.106
+
+### 10.114 Wprowadzanie elementu jako propsa, alternatywa dla children
+
+```js
+> <Box element={<MovieList movies={movies} />} />
+```
+
+Z tego rozwiązania korzysta np. React Router.
+
+### 10.115 Tworzenie reużywalnego komponentu oceny filmu
+
+repo katalog 10.106
+
+### 10.116 Tworzenie gwiazdek oceny filmu
+
+repo katalog 10.106
+
+### 10.117 Obsługa zdarzenia: najechanie kursorem
+
+repo katalog 10.106
+
+Użycie metod onMouseEnter i onMouseLeave jako nasłuchujących na wydarzenia związane z najadem kursora.
+
+### 10.118 Props jako komponent API
+
+repo katalog 10.106
+
+### 10.119 Zwiększenie reużywalności przez API
+
+Przykład rozpisanych właściwości komponentu:
+
+```js
+>  const { maxRating = 5, color = "#fcc419", size = 48, className = "", messages = [], defaultRating = 0, onSetRating = () => {return true} } = props;
+```
+
+### 10.120 PropTypes
+
+Już się nie używa, jeśli chcemy panować na typami to pisze się kod w TypeScript.
+
+```
+> import PropTypes from 'prop-types' - zainstalowana wraz z CRA
+
+> StarRating.propTypes = {
+>   maxRating: PropTypes.number,
+>   messages: PropTypes.array,
+>   onSetRating: PropTypes.func,
+> }
+```
+
+### 10.121 Wyzwanie #1: Komponent skracający tekst
+
+repo katalog 10.121
+
+## 11 Sekcja 11: Jak React działa "pod spodem"
+
+### 11.122 Wstęp do sekcji
+
+### 11.123 Wstęp do projektu i prezentacja na czym polega
