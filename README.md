@@ -67,7 +67,7 @@ Wtyczki:
 
 Prezentacja w jaki sposób można tworzyć kod w React, React przyjmuje kod w czystym JS. React i babel zaimportowany w pliku html z linków:
 
-```
+```html
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
@@ -164,8 +164,10 @@ Edycja pojedynczej wartości (price) za pomocą operatora spread:
 
 String zapisywany za pomocą ``, w którym można odwołac się do zmiennej przy pomocy ${zmienna}:
 
+```js
 > const { moviePublicationDate } = updatedBook;
 > const summary = `Data publikacji: ${updatedBook.moviePublicationDate}`;
+```
 
 ### 4.21 Użycie operatorów warunkowych zamiast if/else
 
@@ -173,17 +175,24 @@ warunek ? true : false
 
 deklaracja zmiennej:
 
+```
 > const stop = x > y ? "Stop" : "Move"
+```
 
 ### 4.22 Funkcje strzałkowe
 
+```js
 (parametr) => {blok kodu}
+```
 
 Prowadzący zaleca używanie funkcji strzałkowych jako jednolinijkowe:
 (parametr) => kod
 
 wyrażenie funkcyjne:
+
+```js
 const funkcja = (parametr) => kod
+```
 
 deklaracja funkcji:
 (parametr) => kod
@@ -209,37 +218,47 @@ Przydatne gdy nie mamy pewności co do sktuktury danych które otrzymamy
 
 Metoda zwraca nową tablicę z tą samą długością, ale z wykonanymi operacjami na każdym z elementów.
 
+```js
 > const essentialsData = books.map((book) => ({
 > title: book.title,
 > author: book.author,
 > reviewsCount: getTotalReviewCount(book),
 > }));
+```
 
 ### 4.26 Metoda .filter()
 
 Metoda zwraca nową tablicę z wartościami spełniającymi warunek.
 Da sie zastosować dwa filtry:
 
+```js
 > const longBooksWithMovie = books
 > .filter((book) => book.pages > 500)
 > .filter((book) => book.hasMovieAdaptation);
+```
 
 Ale lepiej użyć jednego z wyrazeniem logicznym:
 
+```js
 > const longBooksWithMovie = books
 > .filter((book) => book.pages > 500 && book.hasMovieAdaptation)
+```
 
 Metody filter można używać z innymi metodami np.
 
+```js
 > const adventureBooks = books.filter((books) =>
 > books.genres.includes("adventure")
 > ).map(book=>book.title)
+```
 
 ### 4.27 Metoda .reduce()
 
 W kursie przedstawiono metodę .reduce() jako przykład funkcji akumulującej wyniki
 
+```js
 > const pagesAllBooks = books.reduce((sum, book) => sum + book.pages, 0);
+```
 
 sum - początkowo wynosi 0, następnie akumuluje wyniki dodawania book.pages, w rezultacie dostajemy sumę stron wszystkich książek
 
@@ -249,13 +268,17 @@ Zamiast ", 0" można podstawić obiekt lub tablicę, co w połączeniu z operato
 
 Metoda mutująca tablicę na której działa, służy sortowaniu
 
+```js
 > const sorted = arr.sort((a, b) => a - b);
+```
 
 Aby zapobiec zmianom oryginalnej tablicy, sortowanie przeprowadza sie na kopii wykonanej za pomocą metody .slice();
 
+```js
 > const sorted = arr.slice().sort((a, b) => b - a);
 
 > const sortedByPages = books.slice().sort((a, b) => b.pages - a.pages);
+```
 
 ### 4.29 Niemutujące tablice
 
@@ -265,7 +288,9 @@ Wykorzystanie operatora spread (dodanie) i metod filter() (usuwanie) oraz map() 
 
 Promis składa sie z fetcha() i następujących po nim metod .then() zawierających instrukcje
 
+```js
 > fetch("https://jsonplaceholder.typicode.com/todos").then(res=>res.json()).then(data=>console.log(data));
+```
 
 Asynchroniczność polega na tym, że kod może wykonać jakąś operację, bez oczekiwania na zakończenie poprzedniej operacji.
 
@@ -273,6 +298,7 @@ Asynchroniczność polega na tym, że kod może wykonać jakąś operację, bez 
 
 Blok async/await pozwala na czytelniejsze i prostsze przypisanie danych pobranych asynchronicznie ze źródła
 
+```js
 > async function getTodos() {
 > const res = await fetch("https://jsonplaceholder.typicode.com/todos");
 > const data = await res.json();
@@ -283,6 +309,7 @@ Blok async/await pozwala na czytelniejsze i prostsze przypisanie danych pobranyc
 > const todos = getTodos();
 >
 > console.log(todos); //Promise
+```
 
 ## 5. Sekcja 5: Working With Components, Props, and JSX
 
@@ -293,7 +320,7 @@ Blok async/await pozwala na czytelniejsze i prostsze przypisanie danych pobranyc
 Strict Mode jest częścią React.
 Komponenty renderuje się poprzez odwołanie do elementu html któy jest rootem i wywołanie metody render():
 
-```
+```js
 > const root = ReactDOM.createRoot(document.getElementById('root'));
 > root.render(
 > <React.StrictMode>
@@ -334,7 +361,7 @@ JSX jest konwertowany do funkcji React.createElement()
 Kod imperatwny: krok po kroku opisujemy jak utworzyć komponent: querySelectory, addEventListener, classList.add() itd.
 Kod deklaratywny: JSX
 
-```
+```js
 > <p>{question.text}</p>
 > <UpvotBtn
 > onClick={upvote}
@@ -350,7 +377,7 @@ Utworzenie komponentów Header, Menu, Footer i osadzenie w Menu komponentu Pizza
 
 Użycie zmiennych i funkcji do poierania informacji o godzinie wewnątrz komponentu
 
-```
+```js
 > const hour = new Date().getHours();
 > const hours = {
 > open: 12,
@@ -367,13 +394,13 @@ W react zastosowano nowe podejście w podziale kodu na logikę i UI. Dotychczaso
 
 Liniowo za pomocą obiektu
 
-```
+```js
 > <h1 style={{ display: "flex", fontSize: "32px" }}> Tekst </h1>
 ```
 
 Przekazanie obiektu ze zmiennej:
 
-```
+```js
 > const styles = { display: "flex", fontSize: "32px" }
 >
 > <h1 markdown="1" style={styles}> Tekst </h1>
@@ -381,7 +408,7 @@ Przekazanie obiektu ze zmiennej:
 
 Za pomocą klasy ostylowanej w osobnym pliku .css:
 
-```
+```js
 > <div> className="container"</div>
 ```
 
@@ -391,12 +418,14 @@ Nie można użyć słowa class, ponieważ jest zarezerwowane w JS (skłądnie to
 
 Props to przekazanie wartości poprzez atrybuty do elementu potomnego.
 
+```js
 > <Pizza
 >   imgSrc={pizza.photoName}
 >   name={pizza.name}
 >   ingredients={pizza.ingredients}
 >   key={i}
 > />
+```
 
 Wywołanie właściwości propsa poprzez destrukturyzację obiektu props w elemencie dziecka:
 
@@ -452,7 +481,7 @@ Różnice w porównaniu do HTMLa:
 
 Za pomocą funkcji .map() wywołanej na tablicy. Chodzi o to, żeby było można podstawić tyle komponentów dziecka ile mamy danych do podziału przekazanuych do rodzica.
 
-```
+```js
 > <main className="menu">
 >   <h2>Our Menu</h2>
 >   {
@@ -476,7 +505,7 @@ Za pomocą funkcji .map() wywołanej na tablicy. Chodzi o to, żeby było można
 
 Jeśli sprawdza czy jakaś wartość istnieje, to jeśli jej nie ma zwróci 0, a jeśli sprawdzi jakieś porównanie to zwróci false. Jeśli się da, to lepiej użyć operatora warunkowego.
 
-```
+```js
 > const pizzas = pizzaData;
 > const pizzasNums = pizzaData.length;
 > return
@@ -503,7 +532,7 @@ Jeśli sprawdza czy jakaś wartość istnieje, to jeśli jej nie ma zwróci 0, a
 
 ### 5.48 Warunkowe renderowanie z operatorami
 
-```
+```js
 > {pizzasNums > 0 ? (
 >
 >   <ul className="pizzas">
@@ -528,7 +557,7 @@ Jeśli sprawdza czy jakaś wartość istnieje, to jeśli jej nie ma zwróci 0, a
 
 Przydatne np. gdy jakieś dane nie wymagają wyświetlenia w komponencie
 
-```
+```js
 > function Pizza(props) {
 > const { photoName, name, ingredients, price, soldOut } = props;
 > if (soldOut) return null;
@@ -554,14 +583,14 @@ Utworzenie komponentu Order w stopce
 
 Podstawowym sposobem jest destrukturyzacja bezpośrednio w deklaracji komponentu:
 
-```
+```js
 > function Pizza({ photoName, name, ingredients, price, soldOut }) {
 > }
 ```
 
 Kolejnym sposobem jest zadeklarowanie jako zmienne:
 
-```
+```js
 > function Pizza(props) {
 > const { photoName, name, ingredients, price, soldOut } = props;
 > }
@@ -571,13 +600,13 @@ Kolejnym sposobem jest zadeklarowanie jako zmienne:
 
 Pozwala grupować elementy bez dodawania dodatkowych elementów w drzewie HTML
 
-```
+```js
 > <></>
 ```
 
 Użycie React Fragment gdy potrzebujemy przekazać atrybut key:
 
-```
+```js
 > <React.Fragment key={i}></React.Fragment>
 ```
 
@@ -585,7 +614,7 @@ Użycie React Fragment gdy potrzebujemy przekazać atrybut key:
 
 Dodanie klasy:
 
-```
+```js
 > <div className={`pizza ${soldOut && "sold-out"}`}></div>
 ```
 
@@ -631,7 +660,7 @@ Stan pozwala programistom na utrzymanie wartości zmiennych pomiędzy renderowan
 
 Poprzez destrukturyzację tablicy zawierającej się w useState()
 
-```
+```js
 > const [step, setStep] = useState(1)
 ```
 
@@ -639,14 +668,14 @@ Poprzez destrukturyzację tablicy zawierającej się w useState()
 
 Nie można edytować stanu za pomocą let
 
-```
+```js
 > let [zmienna, setZmienna] = useState(1)
 > zmienna = zmienna ++ // nie zadziała!
 ```
 
 **Nie wolno** mutować zmiennych:
 
-```
+```js
 > const [test] = useState({name: "John"})
 > test.name = "Paul"
 ```
@@ -669,7 +698,7 @@ Zapoznanie z zakładką Components w React dev tools
 
 Najlepiej aktualizować stan na podstawie aktualnego stany z wykorzystaniem callbacka
 
-```
+```js
 > function handleAddStep() {
 > step > 1 && setStep((s)=>s - 1)
 > }
@@ -706,7 +735,7 @@ W repo katalog 6.69
 
 Utworzenie komponentów:
 
-```
+```js
 > <Logo />
 > <Form />
 > <PackingList />
@@ -721,7 +750,7 @@ Renderowanie za pomocą metody JS .map()
 
 Utworzenie opition za pomocą Array.from()
 
-```
+```js
 > {Array.from({ length: 20 }, (\_, i) => i + 1).map((num) => (
 >
 >   <option value={num} key={num}>
@@ -796,19 +825,13 @@ Poruszone askpekty:
 
 Pytania na które powinienem znać odpowiedź:
 
-> Jak podzielić UI na komponenty?
-
-> Jak sprawić, żeby komponenty były wielokrotnego użytku?
-
-> Jak utworzyć UI z reużywalnych komponentów?
-
-> Jakich składowych stanu potrzebuję do interaktywności?
-
-> Gdzie powinien znajdować się stan? Który komponent powinien zarządzać konkretnym stanem?
-
-> Jakiego rodzaju stanu powinienem lub mogę użyć?
-
-> Jak utworzyć przepływ danych przez aplikację?
+- Jak podzielić UI na komponenty?
+- Jak sprawić, żeby komponenty były wielokrotnego użytku?
+- Jak utworzyć UI z reużywalnych komponentów?
+- Jakich składowych stanu potrzebuję do interaktywności?
+- Gdzie powinien znajdować się stan? Który komponent powinien zarządzać konkretnym stanem?
+- Jakiego rodzaju stanu powinienem lub mogę użyć?
+- Jak utworzyć przepływ danych przez aplikację
 
 ### 7.79 Podstawy zarządzania stanem w React
 
@@ -884,7 +907,7 @@ Przepływ od rodzica do dziecka. Aktualizacja stanu za pomocą funkcji zadeklaro
 repo katalog 6.69
 
 Usuwanie za pomocą funkcji handleDelete() w App.js
-```
+```js
 > function handleDelete(id) {
 >   setItems((prevItems) => prevItems.filter((item) => item.id !== id));
 > }
@@ -894,7 +917,7 @@ Usuwanie za pomocą funkcji handleDelete() w App.js
 
 Dodanie inputa do zmiany stanu rzeczy z listy potrzebnych do podróży:
 
-```
+```js
 > <input
 >   type="checkbox"
 >   checked={packed !== undefined ? packed : false}
@@ -909,7 +932,7 @@ repo katalog 6.69
 Stan pochodny jest wyliczany z istniejącego stanu lub propsa
 Np.
 
-```
+```js
 > const [cart, setCard] = useState([
   { name: "book1", price: "15,99" },
   { name: "book2", price: "12,99" }
@@ -922,7 +945,7 @@ const totalPrice = cart.reduce((acc, cur) => acc + cur.price, 0)
 
 repo katalog 6.69
 
-```
+```js
 > const { items } = props;
 >   
 > if (!items.length) // zabezpiczenie przed wykonywaniem obliczeń, gdy nie ma elementów
@@ -943,7 +966,7 @@ repo katalog 6.69
 
 Sortowanie z użyciem stanu do ustalenia wartości selecta. Sortowanie przy pomocy zmiennej let bez użycia stanu do przetrzymywania informacji o kolejności elementów w liście:
 
-```
+```js
 >  const [sortBy, setSortBy] = useState("default");
 >
 >  let sortedItems;
@@ -1266,7 +1289,7 @@ Przykład rozpisanych właściwości komponentu:
 
 Już się nie używa, jeśli chcemy panować na typami to pisze się kod w TypeScript.
 
-```
+```js
 > import PropTypes from 'prop-types' - zainstalowana wraz z CRA
 
 > StarRating.propTypes = {
@@ -1285,3 +1308,242 @@ repo katalog 10.121
 ### 11.122 Wstęp do sekcji
 
 ### 11.123 Wstęp do projektu i prezentacja na czym polega
+
+Projekt ma symulować kod innego programisty, mam się wcielić w osobę dołączającą do nowego zespołu
+
+### 11.124 Komponenty, instancje i elementy
+
+Komponent to funkcja która zwraca element React, szablon z któego React tworzy instancje komponentu.
+Instancja komponentu to osobne wywołania szablonu, które przechowują swój stan i props oraz posiadają własny cykl życia.
+Element React to wynik wywołania funkcji React.createElement(). Element React jest konwertowany w elemenet DOM.
+
+### 11.125 Instancje i elementy w praktyce
+
+repo katalog 10.121
+
+Zabezpieczenie React przed atakiem xss:
+
+```js
+> $$typeof: Symbol(react.element)
+```
+
+Wywołanie komponentu jak funkcji przez Komponent(), nie zadziała poprawnie. Element nie zostanie prawidłowo zinterpretowany jako instancja komponentu z type: DifferentContent(), a jako funkcja renderująca element html
+
+### 11.126 Jak działa renderowanie: Przegląd
+
+Renderowanie elementów w React składa się z dwóch faz: renderowanie i commit. Faza renderowania polega na wewnętrznej aktualizacji react, nie ma zmian graficznych na UI użytkownika. Faza commit polega na przekazaniu informacji o zmianie elementów, usunięciu elementów itd.
+Za wyświetlenie elementów odpowiada przeglądarka.
+
+Wywołąnie renderowania:
+
+- Początkowe renderowanie (initial render),
+- Rerender przez aktualizację stanu w jednym lub wielu instancjach komponentu
+
+Rednderowanie oświeża całą aplikację, ale nie aktualizuje całego dom. Render w react polega na wywołaniu funkcji komponentów i ustalaniu co należy zmienić w DOM później.
+Renderowanie nie jest wywołane od razu, a zostaje zaplanowane przez silnik obsługujący JS na "czas wolny". Wiele wywołań aktualizacji stanu jest obsługiwanych grupowo.
+
+### 11.127 Jak działa renderowanie: Faza renderowania
+
+Nie jest prawdą że:
+
+- Render w React polega na odświeżeniu widoku ekranu / DOM
+- React kasuje stary widok podczas rerenderowania
+
+Virtual DOM jest drzewem elementów React, stworzonym ze wszystkich instancji w drzewie komponentów. Nie ma nic wspólnego z "shadow DOM" który jest wbudowany w przegloarkę i obsługuje "web components".
+
+Jeśli element rodzica zostanie ponownie wyrenderowany, to wszystkie elementy potomne, aż do samego dołu drzewa również zostaną rerenderowane. Nie ma znaczenia czy na 15 piętrze potomków zmienił się props, czy nie.
+
+Nowy DOM zostanie uzgodniony z tak zwanym **drzewem Fiber**, istniejącym przed aktualizacją. Uzgadnianie jest dokonywane w Reconcilerze - Fiber (uzgadniaczu). Następnie dochodzi do aktualizacji drzewa Fiber.
+
+Dlaczego Reconciler jest potrzebny i zamiast niego nie aktualizować całego DOM?
+Zapis DOM jest stosunkowo powolny, nie ma sensu odświeżać gdy zmienia się tylko mała część DOM.
+React reużywa z istniejącego DOM, ile tylko może, dzięki reconciliation (uzgadnianiu).
+
+Reconciler odbiera Virtualny DOM i przebudowuje na Fiber Tree.
+
+Fibers nie są odtwarzane przy każdym renderowaniu ale jest mutowana.
+Fibers służą do porównywania aktualnego stanu, propsów, effectsów, hooków ze stanem początkowym
+Fibers są jednostką pracy. Praca jest wykonywana asynchronicznie: renderowanie jest podzielone na kawałki, zadania są prioretyzowane, a praca jest zastrzymana, reużyta lub odrzucona. Umożliwia użycie współbieżnych funkcji (concurrent features) jak Suspense i transitions. Długie renderowania nie blokują silnika JS.
+
+Diffing - analiza wykonana przez Fiber, wskazujaca na różnice pomiędzy aktualnym drzewem Fiber, a zaktualizowanym drzewem Fiber opartym na nowym wirtualnym DOM.
+
+Na końcu tworzy listę aktualizacji w DOM, jako wynik "listy efektów". 
+
+### 11.128 Jak działa renderowanie: Faza commitu
+
+React zapisuje do DOM: wstawia, usuwa i aktualizuje elementu DOM. Zmiany zostają "przelane" z listy DOM do właściwego DOM. Wykonując zmiany jedna po drugiej.
+Faza commitu jest synchroniczna, jest to konieczne, żeby DOM nie pokazywał częściowego rezultatu co zapewnia spójny UI. W tym celu podzielono proces renderowania na fazę renderowania i fazę zatwierdzania (commitu).
+
+Po fazie commitu drzewo Fiber workInFrogress zostaje drzewen aktualnym do następnego cyklu renderowania. Za fazę commitu nie odpowiada ani React, ani przeglądarka, tylko biblioteka React DOM.
+Na końcu rendorowany jest obraz w przeglądarce.
+
+React używa biblioteki React DOM, ponieważ został tak zaprojektowany, żeby nie korzystać z jednej platformy, a działać zarównow React DOM, ReactNative lub Remotion.
+Te biblioteki do fazy commitowania określono jako renderers, co jest błędem, bo nie obsługują rendorowania, tylko zatwierdzanie różnic w Fiber.
+
+BTW. wyniki fazy renderowania nie są listą aktualizacji DOM, a listą aktualizacji dowolnych elementów. Dlatego React woli nazywać wirtualny dom Elementami React.
+
+### 11.129 Jak działa Diffing
+
+Diffing jest oparty o dwa założenia:
+
+- Dwa elementy różnych typów tworzą różne drzewa.
+- elementy ze stabilnym kluczem nie zmieniają się podczas renderów
+- 
+### 11.130 Jak działa Diffing w praktyce 
+
+repo katalog 11.123
+
+Przedstawienie zasady mówiącej, ze jeśli nie zmienia się klucz to nie jest zmieniana wartość stanu elementu.
+
+### 11.131 Props key
+
+- Specjalny props któy musi być unikalny
+- pozwala React na rozróżnienie pomiędzy wieloma instancjami tego samego komponentu (np podczas generowania list otrzymujemy warning)
+- jeśli key będzie ten sam podczas renderowania, to zostanie przechowany w DOM.
+- jeśli key zmieni sie pomiędzy renderowaniami, to zostanie zniszczony i zostanie utworzony nowy element
+
+### 11.132 Resetowanie stanu za pomocą atrybutu key
+
+repo katalog 11.123
+
+### 11.133 Resetowanie stanu za pomocą atrybutu key w aplikacji eat-n-split
+
+repo katalog 8.95
+
+### 11.134 Zasady logiki renderowania: czeste komponenty
+
+Dwa typy logiki w komponentach React:
+
+- Logika renderowania,
+- Obsługa wydarzeń (Event Handler Functions)
+
+Logika renderowania - kod w górnej części komponentu (np useState), udział w opisie jak komponent ma wyglądać (JSX). Wykonywany za kazdym razem gdy komponent jest renderowany.
+
+Obsługa wydarzeń - funkcje wykonywane jako obsługa wydarzeń np. handlery. Kod odpowiada za: aktualizację stanu, obsługę zapytań HTTP, odczytywanie inputów, nawigacje do innego linku itd.
+
+##### Refresher - zasady programowania funkcyjnego
+
+Skutki uboczne (side effects) - modyfikacja danych poza zakresem funcji np. zmienianie zewnętrznych zmiennych, zapytania HTTP, zapisywanie do DOM.
+
+```js
+> function circleArea(r) {
+> const data = Date.now();
+> const area = 3.14 * r * r;
+> return `${date}: ${area}`
+> }
+```
+
+Pure functions - funkcje bez skutków ubocznych.
+
+```js
+> function circleArea(r) {
+>  areas.circle = 3.14 * r * r;
+> }
+```
+
+Side effects nie są złe, służą do porozumiewania się ze światem zewnętrznym.
+
+Zasady logiki renderowania:
+
+- Komponenty muszą być czyste jeśli chodzi o logikę renderowania. Te same propsy powinny być zwracane w jsx.
+- Nie może produkować efektór ubocznych
+  - Nie dopuszcza się wykonywać połączeń z siecią (Api calls)
+  - Nie dopuszcza się tworzyć liczników (timers)
+  - Nie dopuszcza się bezpośrednio pracować z API DOM
+  - Nie dopuszcza się mutować obiektór lub zmiennych znajdujących się na zewnątrz zakresu funkcji - **dlatego nei mutuje się propsów**
+  - Nie dopuszcza się aktualizować stanu lub referencji: to spowoduje nieskończoną pętlę
+- skutki uboczne są dozwolone, lub nawet wskazane w funkcjach obsługujących zdarzenia (np. useEffect).
+
+### 11.135 Grupowanie aktualizacji stanu
+
+Jak aktualizacje stanu są grupowane?
+
+- renderowania nie są wywoływane natychmiastowo, ale trafiają do planu silnika JS. Wiele setState jest grupowanych w obsłudze zdarzeń.
+
+```js
+> const reset = function() {
+>  setAnswer('');
+>  console.log(answer);
+>  setBest(false);
+>  setSolved(false);
+> }
+```
+
+Z powyższego kodu, wywołania setState nie są wykonywane jedno po drugim, a złączone w jedno wywołanie. Dzięki temu wywoływany jest jeden render i commit, zamiast trzech osobnych.
+Console.log wskaże stary stan dla answer, ponieważ zostaje odczytanyz  drzewa Fiber, a rerenderowanie jeszcze nie nastąpiło. Jest to związane z asynchronicznością (gdyby kod był synchroniczny, zmiana byłaby widoczna, ale rozjechałaby sie mechanika React).
+
+Jeśli potrzebujemy aktualizoweać stan na bazie poprzedniego stanu, to powinniśmy używać setState z callbackiem: (setAnswer(answer => ...))
+
+### 11.136 Grupowanie aktualizacji stanu w praktyce
+
+Obsługa wszystkich rodzajów funkcji przez batchowanie (grupowanie) jest dostępna od React 18, React 17 miał tę funkcję tylko podczas handlerów. Teraz obsługuje wszystkie rodzaje wydarzeń - np. timeouty
+
+### 11.137 Jak działa obsługa zdarzeń w React
+
+Propagacja zdarzeń następuje przez capturing(przesył informacji o evencie w dół drzewa DOM do elementu docelowego).
+Po osiągnięciu docelowego elementu przez event, wraca po całym drzewie DOM w górę zgodnie z bubblingiem.
+Bubliong i capturing są zasadami JS przemieszczania się eventów po DOM.
+Metodą zapobiegającą bubblingowi jest e.stopPropagation().
+
+Delegacja zdarzeń (event delegation) - obsługa zdarzeń dla wielu elementów. Lepsza wydajność i oszczędność pamięci, bo wymaga jednej funkcji obsługującej.
+Delegacja polega na:
+
+- dodaniu obsługi do elementu rodzica
+- sprawdzeniu który element rodzica odpowiada za wywołanie eventu
+- obsługa zdarzenia, jeśli event pochodzi od jednego z dzieci
+
+Sami w React nie mamy często styczności z delegacją zdarzeń, ponieważ React wykorzystuje ten proces automatycznie.
+W React wszystkie zdarzenia są obsługinawe w #root. Zdarzenie dociera do przycisku, a później bąbelkuje i zostaje rozwiązane w #root.
+
+Zdarzenia syntetyczne w React:
+
+- Wrapper dla natywnych zdarzeń DOM,
+- taki sam interface jak natywne obiekty zdarzeń (stopPropagation(), preventDefault())
+- Naprawia pewne niedoskonałości przeglądarek, dzięki czemu zdarzenia działają tak samo we wszystkich przeglądarkach (pewnie chodzi o obsługę silników JS np. mozilli i safari)
+- Najważniesze zdarzenia syntetyczne będą bąbelkowały (focus, blur, change), lecz bez scroll
+- Nazwy zdarzeń są tworzone za pomocą camelCase (onClick, onChange itd.)
+- Domyślne zachowanie zdarzeń są zablokowane przez React np. wysłanie formularza ma e.preventDefault();
+- Jeśli potrzebujesz obsługi podczas fazy capture, wystarczy dodać słowo capture (onClickCapture)
+
+### 11.138 Biblioteki vs. Frameworki i ekosystem React
+
+React jest libką, a nie freameworkiem.
+Framework to zlepek najpotrzebniejszych bibliotek do osiągnięcia jakiegoś celu podczas tworzenia aplikacji. Libki są po to, żeby uprościć proces wzorca tworzenia kodu.
+Vue, Svelte, Angular to frameworki, zawierają całe zesatwy bibliotek.
+
+Framework:
+
+- kompletna struktura projektu, wszystko jest załączone (baterie są w zestawie)
+- zamyka w konkretnym stacku technologicznym i cieżko z niego wyjść
+
+Biblioteka:
+
+- React jest biblioteką "widoku". React rysuje komponenty w widoku użytkownika.
+- Baterie trzeba dopasować samemu
+
+Biblioteki w ekosystemie React:
+
+- Routing (dla SPA) - React Router,
+- Https request - fetch(),
+- Zdalne zarządzanie stanem - React Query,
+- Globalne zarządzanie stanem - Context API, Redux,
+- Sylowanie - CSS Modules, styled components, tailwindcss,
+- Zarządzanie formularzem - React Hook Form,
+- Animacje/przejścia,
+- UI componenty
+
+### 11.139 Podsumowanie sekcji: Praktyczne informacje
+
+- Komponent to szablon dla kawałka UI, React tworzy instancję komponentu. Instancja komponentu gdy jest renderowana zwraca element React.
+- Renderowanie oznacza wywołanie funkcji komponentu i obliczanie któe elementu DOM potrzebują zmiany. Nie nadpisuje niczego w DOM. Zaq każdym razem gdy instancja komponentu jest inicjowana i rerendorowana, funkcja jest wywołąna ponownie.
+- Jedynie początkowe renderowanie i aktualizacja stanu moga wywołąć render, któe wykonuje się dla całej aplikacji, a nie dla pojedynczego komponentu.
+- Podczas rerenderowania instancji komponentu, wszystkie dzieci mogą być rerenderowane. To nie znaczy, ze wszystkie dzieci zostaną aktualizowane w DOM, dzięki uzgadnianiu (reconciliation), które sprawdza czy elementy zmieniają się pomiędzy renderowaniami. Wszystkie rerenderowania mogą wpłynać na wydajność aplikacji.
+- Diffing jest sposobem na podjęcie decyzji przez React jaki element DOM ma zostać dodany lub zmodyfikowany. Jeśli element pomiędzy renderami nie zmieni pozycji w drzewie elementów, to odpowedni element DOM i stan komponentu nie ulegną zmianom. Jeśli element zmieni pozycję lub jeśli to inny typ elemenetu, to element i stan elementu zostanią zniszczone i zresetowane.
+- Nadając atrybut key elementom, możemy je rozróżnić. Jeśli key nie zmienił się podczas renderowania, to element jest zatrzymany w DOM. Jeśli key zmieni się, to element zostanie przebudowany.
+- Nie wolno deklarować komponentu wewnątrz komponentu.
+- React nie aktualizuje DOM, dzieje się to przez ReactDOM (odpowiednikiem jest ReactNative).
+- Wiele wywołań aktualizacji stanu jest grupowanych i wykonywanych wspólnie. Aktualizacje są wykonywane asynchronicznie. Od React 18 grupowanie działa podczas timeoutów, promisów i natywnych obsług zdarzeń.
+- Gdy używamy zdarzeń otrzymujemy dostęp do syntetycznych obiektów zdarzeń, a nie do obiektów natywnych przeglądarki. Większosć zdarzeń bąbelkuje, prócz scrolla.
+- React to biblioteka, a nie framework. Potrzebuje innych libek do utworzenia bardziej skomplikowanych aplikacji.
+
+### 11.140 Przegląd sekcji
