@@ -1,15 +1,18 @@
 import React from "react";
 
 export function MovieWatched(props) {
-  const { movie } = props;
+  const { movie, onDeleteWatched } = props;
+
   return (
     <li key={movie.imdbID}>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
+      <img src={movie.poster} alt={`${movie.title} poster`} />
+      <h3>{movie.title}</h3>
       <div>
         <p>
           <span>⭐️</span>
-          <span>{movie.imdbRating}</span>
+          <span>
+            {isNaN(movie.imdbRating) ? "Brak danych" : movie.imdbRating}
+          </span>
         </p>
         <p>
           <span>🌟</span>
@@ -17,8 +20,13 @@ export function MovieWatched(props) {
         </p>
         <p>
           <span>⏳</span>
-          <span>{movie.runtime} min</span>
+          <span>
+            {isNaN(movie.runtime) ? "Brak danych" : `${movie.runtime} min`}
+          </span>
         </p>
+        <button className="btn-delete" onClick={() => onDeleteWatched(movie)}>
+          -
+        </button>
       </div>
     </li>
   );

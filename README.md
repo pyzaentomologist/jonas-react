@@ -1367,7 +1367,7 @@ Fibers są jednostką pracy. Praca jest wykonywana asynchronicznie: renderowanie
 
 Diffing - analiza wykonana przez Fiber, wskazujaca na różnice pomiędzy aktualnym drzewem Fiber, a zaktualizowanym drzewem Fiber opartym na nowym wirtualnym DOM.
 
-Na końcu tworzy listę aktualizacji w DOM, jako wynik "listy efektów". 
+Na końcu tworzy listę aktualizacji w DOM, jako wynik "listy efektów".
 
 ### 11.128 Jak działa renderowanie: Faza commitu
 
@@ -1388,8 +1388,8 @@ Diffing jest oparty o dwa założenia:
 
 - Dwa elementy różnych typów tworzą różne drzewa.
 - elementy ze stabilnym kluczem nie zmieniają się podczas renderów
-- 
-### 11.130 Jak działa Diffing w praktyce 
+
+### 11.130 Jak działa Diffing w praktyce
 
 repo katalog 11.123
 
@@ -1397,7 +1397,7 @@ Przedstawienie zasady mówiącej, ze jeśli nie zmienia się klucz to nie jest z
 
 ### 11.131 Props key
 
-- Specjalny props któy musi być unikalny
+- Specjalny props który musi być unikalny (ale tylko w obrębie listy)
 - pozwala React na rozróżnienie pomiędzy wieloma instancjami tego samego komponentu (np podczas generowania list otrzymujemy warning)
 - jeśli key będzie ten sam podczas renderowania, to zostanie przechowany w DOM.
 - jeśli key zmieni sie pomiędzy renderowaniami, to zostanie zniszczony i zostanie utworzony nowy element
@@ -1421,7 +1421,7 @@ Logika renderowania - kod w górnej części komponentu (np useState), udział w
 
 Obsługa wydarzeń - funkcje wykonywane jako obsługa wydarzeń np. handlery. Kod odpowiada za: aktualizację stanu, obsługę zapytań HTTP, odczytywanie inputów, nawigacje do innego linku itd.
 
-##### Refresher - zasady programowania funkcyjnego
+**Refresher** - zasady programowania funkcyjnego
 
 Skutki uboczne (side effects) - modyfikacja danych poza zakresem funcji np. zmienianie zewnętrznych zmiennych, zapytania HTTP, zapisywanie do DOM.
 
@@ -1546,4 +1546,154 @@ Biblioteki w ekosystemie React:
 - Gdy używamy zdarzeń otrzymujemy dostęp do syntetycznych obiektów zdarzeń, a nie do obiektów natywnych przeglądarki. Większosć zdarzeń bąbelkuje, prócz scrolla.
 - React to biblioteka, a nie framework. Potrzebuje innych libek do utworzenia bardziej skomplikowanych aplikacji.
 
-### 11.140 Przegląd sekcji
+## 12 Sekcja 12: Effects and Data Fetching
+
+### 12.140 Przegląd sekcji
+
+- pobieranie danych to podstawowa czynność
+- Efekty tworzy sie z hookiem useEffects
+- Efekty muszą być czyszczone
+- Będzie realna aplikacja
+
+### 12.141 Cykl życia komponentu
+
+**To instancja komponentu ma swój cykl życia** ale dla uproszczenia mówi się o cyklu życia komponentu.
+
+Cykle:
+
+#### Zamontowanie/inicjalny render
+
+- pierwszy render
+- tworzone są świeże stany i propsy
+
+#### Re-reder
+
+wydarza się gdy:
+
+- zmienia się stan
+- zmienia się props
+- re-renderuje się rodzic
+- zmienia się kontekst
+
+#### Odmontowanie komponentu
+
+- instancja komponentu jest zniszczona i usunięta
+- stan i props są zniszczone
+
+### 12.142 Jak nie pobierać danych w React
+
+**Nie pobiera się** bezpośrednio w metodzie fetch wraz z zapisaniem do stanu, to wywoła nieskończoną pętlę aktualizacji komponentu i przypisywania do stanu. Podobnie nie powinno się wywoływać przypisania stanu bezpośrednio w komponencie, bo zapętra się render komponentu. Z tego powodu powinno się izolować pobieranie dancyh i aktualizację stanu. Dane zostaną pobrane wraz z renderowaniem komponentu, zamiast po renderowaniu.
+
+### 12.143 useEffect - na ratunek
+
+Dane są pobierane po renderowaniu komponentu.
+
+useEffect składa się z częsci deklaracji funkcji oraz tablicy zależności.
+
+### 12.144 Zapoznanie z useEffect
+
+Czym jest efekt i czym różni sie od obsługi zdarzeń?
+Efekt uboczny to interakcjie pomiędzy komponentem i światem poza komponentem np. fetch danych z API. Efekty uboczne nie powinny występować w trakcie renderowania komponentu.
+
+Efekty uboczne mogą być tworzone w:
+
+- obsłudze zdarzeń - uruchamiane za każdym razem gdy wystąpi event na któy nasłuchują (onClick, onSubmit itd.)
+- useEffect - występuje za kazdym razem gdy nastąpi renderowanie (zamontowanie, odmontowanie, re-render komponentu)
+
+### 12.145 Użycie async Function
+
+Skutkiem asynchroniczności jest to, że w trakcie trwania funkcji w ogórej jest update stanu na podstawie fetcha, nie widać zmian stanu. Zmiany będą widoczne dopiero po zakończeniu fetcha.
+
+### 12.146 Dodanie stanu ładowania
+
+repo 10.106
+
+### 12.147 obsługa błedów
+
+repo 10.106
+
+Podstawowym sposobem obsłużenia błędów było:
+
+- utworzenie komponentu wyświetlanego podczas błędów
+- obsłużenie bloku try-catch i finally
+- dodanie w bloku try warunków do wytwołania błędów
+
+### 12.148 Tablica zależności w useEffect
+
+Domyślnie efekty są uruchamiane po kazdym renderze, zapobiega się temu przez dodanie tablicy zależności.
+Bez tablicy React nie wie kiedy uruchomić efekt.
+Za każdym razem gdy zmieni się któreś z zależności, efekt zostanie ponownie wywołany.
+Każda zmienna stanu i props użyte w efekcie muszą być w tablicy zależności.
+
+useEffect działa na zasadzie nasłuchiwania na zdarzenie aktualizacji śledzonej zmiennej.
+
+Efekty są reaktywne, reagują na zmiany stanu i propsów używanych wewnątrz efektu.
+
+Jeśli komponent re-renderuje się, ale nie aktualizuje sie żadna z zależności w tablicy, to useEffect nie wykona się.
+
+Efekty wykonują się po wyświetleniu aplikacji przez przeglądarkę i działają asynchronicznie.
+
+### 12.149 Synchronizacja zapytania z informacjami o filmie
+
+repo 10.106
+
+### 12.150 Wybranie filmu
+
+repo 10.106
+
+### 12.151 Załadowanie szczegółów filmu
+
+repo 10.106
+
+### 12.152 Dodanie/usuwanie do listy obejrzanych filmów
+
+repo 10.106
+
+### 12.153 Dodanie nowego efektu: Zmiana tytułu strony
+
+repo 10.106
+
+### 12.154 Sprzątanie po useEffect
+
+Funkcja sprzątająca (cleanup function) ma za zadanie przywrócenie stanu sprzed użycia efektu. Uruchamia się ją w dwóch momentach:
+
+- przed wykonaniem efektu
+- podczas odmontowania komponentu
+
+Czyszczenie efektu może być potrzebne gdy jeden efekt nadpisuje następny np. podczas requestów HTTP. Może dojść do "wyścigu warunków":
+
+- HTTP request
+- API subscription
+- Start timer
+- Add event listener
+
+Każdy efekt powinien pełnić jedną funkcję.
+
+### 12.155 Czyszczenie tytułu
+
+repo 10.106
+
+W JS występuje zjawisko domknięć (closure), polega na tym, że funkcje przechowują w pamięci wartości, które pojawiały się w nich. Widać to w useEffect, gdy podczas czyszczenia efektu za pomocą return, odwołujemy się do ostatniej wartości np. title.
+
+### 12.156 Czyszczenie danych po fetch
+
+repo 10.106
+
+Korzyści z rozwiązania tego problemu:
+
+- zmniejszenie liczby zapytań gdy użytkownik wypełnia samodzielnie input
+- brak ryzyka, że wcześniejsze zapytanie dotrze po późniejszym (race condition)
+- zmniejszenie liczby pobranych danych
+
+Nie ma potrzeby czyszczenia gdy użytkownik nie wywołuje wielu pobrań w krótkim czasie np. pobirając informacje o jednym obiekcie, lub ładując listę obiektów podczas montowania komponentu.
+
+### 12.157 Jeszcze jeden efekt: nasłuchiwanie na wciśnięcie klawisza
+
+repo 10.106
+
+Użyto tutaj klasycznego nasłuchiwania z JSa przez addEventListener()
+add.EventListeren nazwywany jest "włazem ewekuacyjnym"
+
+### 12.158 Wyzwanie #1: Przelicznik walut
+
+repo 12.158
