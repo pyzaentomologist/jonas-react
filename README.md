@@ -1367,7 +1367,7 @@ Fibers są jednostką pracy. Praca jest wykonywana asynchronicznie: renderowanie
 
 Diffing - analiza wykonana przez Fiber, wskazujaca na różnice pomiędzy aktualnym drzewem Fiber, a zaktualizowanym drzewem Fiber opartym na nowym wirtualnym DOM.
 
-Na końcu tworzy listę aktualizacji w DOM, jako wynik "listy efektów". 
+Na końcu tworzy listę aktualizacji w DOM, jako wynik "listy efektów".
 
 ### 11.128 Jak działa renderowanie: Faza commitu
 
@@ -1388,8 +1388,8 @@ Diffing jest oparty o dwa założenia:
 
 - Dwa elementy różnych typów tworzą różne drzewa.
 - elementy ze stabilnym kluczem nie zmieniają się podczas renderów
-- 
-### 11.130 Jak działa Diffing w praktyce 
+
+### 11.130 Jak działa Diffing w praktyce
 
 repo katalog 11.123
 
@@ -1397,7 +1397,7 @@ Przedstawienie zasady mówiącej, ze jeśli nie zmienia się klucz to nie jest z
 
 ### 11.131 Props key
 
-- Specjalny props któy musi być unikalny
+- Specjalny props który musi być unikalny (ale tylko w obrębie listy)
 - pozwala React na rozróżnienie pomiędzy wieloma instancjami tego samego komponentu (np podczas generowania list otrzymujemy warning)
 - jeśli key będzie ten sam podczas renderowania, to zostanie przechowany w DOM.
 - jeśli key zmieni sie pomiędzy renderowaniami, to zostanie zniszczony i zostanie utworzony nowy element
@@ -1421,7 +1421,7 @@ Logika renderowania - kod w górnej części komponentu (np useState), udział w
 
 Obsługa wydarzeń - funkcje wykonywane jako obsługa wydarzeń np. handlery. Kod odpowiada za: aktualizację stanu, obsługę zapytań HTTP, odczytywanie inputów, nawigacje do innego linku itd.
 
-##### Refresher - zasady programowania funkcyjnego
+**Refresher** - zasady programowania funkcyjnego
 
 Skutki uboczne (side effects) - modyfikacja danych poza zakresem funcji np. zmienianie zewnętrznych zmiennych, zapytania HTTP, zapisywanie do DOM.
 
@@ -1546,4 +1546,304 @@ Biblioteki w ekosystemie React:
 - Gdy używamy zdarzeń otrzymujemy dostęp do syntetycznych obiektów zdarzeń, a nie do obiektów natywnych przeglądarki. Większosć zdarzeń bąbelkuje, prócz scrolla.
 - React to biblioteka, a nie framework. Potrzebuje innych libek do utworzenia bardziej skomplikowanych aplikacji.
 
-### 11.140 Przegląd sekcji
+## 12 Sekcja 12: Effects and Data Fetching
+
+### 12.140 Przegląd sekcji
+
+- pobieranie danych to podstawowa czynność
+- Efekty tworzy sie z hookiem useEffects
+- Efekty muszą być czyszczone
+- Będzie realna aplikacja
+
+### 12.141 Cykl życia komponentu
+
+**To instancja komponentu ma swój cykl życia** ale dla uproszczenia mówi się o cyklu życia komponentu.
+
+Cykle:
+
+#### Zamontowanie/inicjalny render
+
+- pierwszy render
+- tworzone są świeże stany i propsy
+
+#### Re-reder
+
+wydarza się gdy:
+
+- zmienia się stan
+- zmienia się props
+- re-renderuje się rodzic
+- zmienia się kontekst
+
+#### Odmontowanie komponentu
+
+- instancja komponentu jest zniszczona i usunięta
+- stan i props są zniszczone
+
+### 12.142 Jak nie pobierać danych w React
+
+**Nie pobiera się** bezpośrednio w metodzie fetch wraz z zapisaniem do stanu, to wywoła nieskończoną pętlę aktualizacji komponentu i przypisywania do stanu. Podobnie nie powinno się wywoływać przypisania stanu bezpośrednio w komponencie, bo zapętra się render komponentu. Z tego powodu powinno się izolować pobieranie dancyh i aktualizację stanu. Dane zostaną pobrane wraz z renderowaniem komponentu, zamiast po renderowaniu.
+
+### 12.143 useEffect - na ratunek
+
+Dane są pobierane po renderowaniu komponentu.
+
+useEffect składa się z częsci deklaracji funkcji oraz tablicy zależności.
+
+### 12.144 Zapoznanie z useEffect
+
+Czym jest efekt i czym różni sie od obsługi zdarzeń?
+Efekt uboczny to interakcjie pomiędzy komponentem i światem poza komponentem np. fetch danych z API. Efekty uboczne nie powinny występować w trakcie renderowania komponentu.
+
+Efekty uboczne mogą być tworzone w:
+
+- obsłudze zdarzeń - uruchamiane za każdym razem gdy wystąpi event na któy nasłuchują (onClick, onSubmit itd.)
+- useEffect - występuje za kazdym razem gdy nastąpi renderowanie (zamontowanie, odmontowanie, re-render komponentu)
+
+### 12.145 Użycie async Function
+
+Skutkiem asynchroniczności jest to, że w trakcie trwania funkcji w ogórej jest update stanu na podstawie fetcha, nie widać zmian stanu. Zmiany będą widoczne dopiero po zakończeniu fetcha.
+
+### 12.146 Dodanie stanu ładowania
+
+repo 10.106
+
+### 12.147 obsługa błedów
+
+repo 10.106
+
+Podstawowym sposobem obsłużenia błędów było:
+
+- utworzenie komponentu wyświetlanego podczas błędów
+- obsłużenie bloku try-catch i finally
+- dodanie w bloku try warunków do wytwołania błędów
+
+### 12.148 Tablica zależności w useEffect
+
+Domyślnie efekty są uruchamiane po kazdym renderze, zapobiega się temu przez dodanie tablicy zależności.
+Bez tablicy React nie wie kiedy uruchomić efekt.
+Za każdym razem gdy zmieni się któreś z zależności, efekt zostanie ponownie wywołany.
+Każda zmienna stanu i props użyte w efekcie muszą być w tablicy zależności.
+
+useEffect działa na zasadzie nasłuchiwania na zdarzenie aktualizacji śledzonej zmiennej.
+
+Efekty są reaktywne, reagują na zmiany stanu i propsów używanych wewnątrz efektu.
+
+Jeśli komponent re-renderuje się, ale nie aktualizuje sie żadna z zależności w tablicy, to useEffect nie wykona się.
+
+Efekty wykonują się po wyświetleniu aplikacji przez przeglądarkę i działają asynchronicznie.
+
+### 12.149 Synchronizacja zapytania z informacjami o filmie
+
+repo 10.106
+
+### 12.150 Wybranie filmu
+
+repo 10.106
+
+### 12.151 Załadowanie szczegółów filmu
+
+repo 10.106
+
+### 12.152 Dodanie/usuwanie do listy obejrzanych filmów
+
+repo 10.106
+
+### 12.153 Dodanie nowego efektu: Zmiana tytułu strony
+
+repo 10.106
+
+### 12.154 Sprzątanie po useEffect
+
+Funkcja sprzątająca (cleanup function) ma za zadanie przywrócenie stanu sprzed użycia efektu. Uruchamia się ją w dwóch momentach:
+
+- przed wykonaniem efektu
+- podczas odmontowania komponentu
+
+Czyszczenie efektu może być potrzebne gdy jeden efekt nadpisuje następny np. podczas requestów HTTP. Może dojść do "wyścigu warunków":
+
+- HTTP request
+- API subscription
+- Start timer
+- Add event listener
+
+Każdy efekt powinien pełnić jedną funkcję.
+
+### 12.155 Czyszczenie tytułu
+
+repo 10.106
+
+W JS występuje zjawisko domknięć (closure), polega na tym, że funkcje przechowują w pamięci wartości, które pojawiały się w nich. Widać to w useEffect, gdy podczas czyszczenia efektu za pomocą return, odwołujemy się do ostatniej wartości np. title.
+
+### 12.156 Czyszczenie danych po fetch
+
+repo 10.106
+
+Korzyści z rozwiązania tego problemu:
+
+- zmniejszenie liczby zapytań gdy użytkownik wypełnia samodzielnie input
+- brak ryzyka, że wcześniejsze zapytanie dotrze po późniejszym (race condition)
+- zmniejszenie liczby pobranych danych
+
+Nie ma potrzeby czyszczenia gdy użytkownik nie wywołuje wielu pobrań w krótkim czasie np. pobirając informacje o jednym obiekcie, lub ładując listę obiektów podczas montowania komponentu.
+
+### 12.157 Jeszcze jeden efekt: nasłuchiwanie na wciśnięcie klawisza
+
+repo 10.106
+
+Użyto tutaj klasycznego nasłuchiwania z JSa przez addEventListener()
+add.EventListeren nazwywany jest "włazem ewekuacyjnym"
+
+### 12.158 Wyzwanie #1: Przelicznik walut
+
+repo 12.158
+
+## 13 Sekcja 13: Własne hooki, useRef itd
+
+### 13.159 Przegląd sekcji
+
+- Hooki są proste do nauki, trudne do opanowania
+- Zasady hooków
+- Pełniejsze poznanie useState
+- useRef
+- własne hooki
+
+### 13.160 Hooki react i ich zasady
+
+- Hooki to wbudowane w React funkcje (interfejs API):
+  - mogą tworzyć stan i mieć do niego dostęp w drzewie Fiber
+  - rejestrują efekty uboczne w drzewie Fiber
+  - wybór w elementach DOM
+  - wiele więcej
+- zawsze zaczynają się od use
+- pozwalają na proste reużywanie logiki, możemy wiele hooków spiąć w jeden
+- komponenty funkcyjne mogą posiadać swój własny stan i uruchamiać efekty uboczne w różnych momentach życia komponentu (przed React 16.8 obsługa była obiektowa)
+
+Hooki React:
+
+- useState
+- useEffect
+- useReducer
+- useContext
+- useRef
+- useCallback
+- useMemo
+- useTransition
+- useDefferredValue
+- useLayoutEffect
+- useDebugValue
+- useImperativeHandle
+- useId
+- useSyncExternalStore
+- useInsertionEffect
+
+Zasady hooków:
+
+- wywołujemy tylko na najwyższym poziomie komponentu - nie da się wewnątrz pętli, warunków, czy zagnieżdżonych funkcji
+- hooki mogą być wywoływane tylko z poziomu komponentu lub własnego hooka
+- nie mogą wyć wywołane po zwrócerniu wartości przez return
+
+### 13.161 Zasady hooków w praktyce
+
+Na przykładzie aplikacji usePopcorn repo 10.106
+
+### 13.162 Szczegóły useState
+
+Czasem, gdy komponent jest renderowany nie ma potrzeby używania useState, tylko można użyć stanu pochodnego poprzed przypisanie jakiejś właściwości do zmiennej.
+
+Przypisanie stanu jest asynchroniczne, przez co nie można odczytać zmienionego stanu zaraz po wykonaniu przypisania. Podczas aktualizacji stanu na podstawie poprzedniej wartości trzeba skorzystać z wywołania zwrotnego
+
+> setAvg((avg)=>(avg + newValue)/2)
+
+### 13.163 Tworzenie stanu z Callbackiem (Lazy Initial State)
+
+Zapisywanie danych o wybranych filmach w pamięci lokalnej przeglądarki
+
+Wykorzystano useState i useEffect. Do inicjalizacji useState wprowadzono odczytanie z pamięci lokalnej.
+
+> function getValueFromLocalStorage(key) {
+> const storedValue = localStorage.getItem(key);
+> return JSON.parse(storedValue);
+> }
+> function setValueFromLocalStorage(value, key) {
+> localStorage.setItem(key, JSON.stringify(value));
+> }
+
+repo 10.106
+
+### 13.164 Podsumowanie useState
+
+Stan można utworzyć poprzed nadanie początkowej wartości lub null, oraz przez dodanie callbacka (lazy evaluation). Funkcja musi być czysta i nie może przyjmować argumentów.
+
+Aktualizacja stanu może być poprzed dodanie do settera pojedynczej wartości, lub funcji wykorzystującej jako argument poprzedni stan: (c) => c+1
+
+### 13.165 Jak nie wybierać elementów DOM w React
+
+Nie powinno się używać imperatywnego JS w React, chodzi o to, żeby kod był deklaratywny
+
+### 13.166 Wstęp do innych hooków: useRef
+
+useRef to obiekt z mutowalną właściwości *.current* którego wartość przetrwa pomiędzy renderami
+Przypadki w których używa sie useRef:
+
+- tworzenie zmiennej która ma być taka sama pomiędzy renderami
+- wybieranie i przechowywanie lementów DOM
+
+Refs są dla danych które nie są renderowane (obsługa eventów lub efekty). W JSX trzeba użyć stanu.
+Nie można edytować i odczytywać *.current* wewnątrz logiki renderowania (można tylko w useEffect). Służy do zmierania danych
+
+State vs. Refs
+
+- Oba zapamiętują warości pomiędzy renderami
+- Aktualizacja stanu wywołuje ponowny render komponentu, aktualizacja refs nie wywołuje ponownego renderowania
+- stan jest mutowalny, refs nie
+- stan jest aktualizowany asynchornicznie, refs nie
+
+```mermaid
+  block-beta
+  columns 8
+    A:2 space B:2
+    B space C:2
+    B space:11 D:2
+    D space E:2
+    D space:11 F:2
+    F space G:2
+    F space:11 H:2
+    A("Potrzebuję przechowania danych") --> B("Czy dane zmieniają się?")
+    B -- "Nie" --> C("Zwykla zmienna const")
+    B -- "Tak" --> D("Czy jest możłiwe obliczanie na podstawie stanu lub propsów?")
+    D -- "Tak" --> E("Użyj wartości stanu pochodnego")
+    D -- "Nie" --> F("Czy to powinno re-renderować komponent?")
+    F -- "Nie" --> G("Użyj Ref (useRef)")
+    F -- "Tak" --> H("Utwórz nowy stan dla komponentu")
+```
+
+### 13.167 Użycie useRef do obsługi elementu DOM
+
+repo 10.106
+
+### 13.168 Użycie useRef do zachowania nadych pomiędzy renderami
+
+repo 10.106
+
+### 13.169 Czym są własne hooki i kiedy je tworzyć
+
+- Pozwalają nam re-używać logikę nie UI-ową.
+- Jeden hook powinien robić jedną rzecz
+- zasady hooków dotyczą również hooków customowych
+
+### 13.170 Pierwszy custom hook: useMovies
+
+repo 10.106
+
+### 13.171 Utworzenie hooka useLocalStorageState
+
+repo 10.106
+
+### 13.172 Utworzenie hooka useKey
+
+repo 10.106
+
+### 13.172 Wyzwanie #1: utworzenie włąsnego hooka useGeolocate
+
+repo 13.173

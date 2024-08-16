@@ -5,7 +5,9 @@ export function Summary(props) {
 
   const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
   const avgUserRating = average(watched.map((movie) => movie.userRating));
-  const avgRuntime = average(watched.map((movie) => movie.runtime));
+  const avgRuntime = average(
+    watched.map((movie) => movie.runtime).filter((runtime) => !isNaN(runtime))
+  );
 
   return (
     <div className="summary">
@@ -17,17 +19,23 @@ export function Summary(props) {
         </p>
         <p>
           <span>⭐️</span>
-          <span>{avgImdbRating}</span>
+          <span>
+            {isNaN(avgImdbRating.toFixed(1))
+              ? "Brak danych"
+              : avgImdbRating.toFixed(1)}
+          </span>
         </p>
         <p>
           <span>🌟</span>
-          <span>{avgUserRating}</span>
+          <span>{avgUserRating.toFixed(1)}</span>
         </p>
         <p>
           <span>⏳</span>
-          <span>{avgRuntime} min</span>
+          <span>
+            {avgRuntime.toFixed()} min
+          </span>
         </p>
       </div>
     </div>
-  )
+  );
 }
