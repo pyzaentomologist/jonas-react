@@ -30,23 +30,6 @@ async function fetchFromAPI(
   }
 }
 
-export async function fetchMovies(
-  setIsLoading,
-  setError,
-  setMovies,
-  query,
-  controller
-) {
-  const url = `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`;
-  await fetchFromAPI(
-    url,
-    setIsLoading,
-    setError,
-    (data) => setMovies(data.Search),
-    controller
-  );
-}
-
 export async function fetchMovie(
   setIsLoading,
   setError,

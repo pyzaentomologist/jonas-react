@@ -1,8 +1,9 @@
-import React, {useState, useEffect } from "react";
+import React, {useState, useEffect, useRef } from "react";
 import { fetchMovie } from "../api/fetcher";
 import { Loader } from "./Loader";
 import { ErrorMessage } from "./ErrorMessage";
 import {StarRating} from "./StarRating"
+import { useKey } from "../hooks/useKey";
 
 export function MovieDetails(props) {
   const { selectedId, onCloseMovie, onAddWatched, watched } = props;
@@ -10,6 +11,7 @@ export function MovieDetails(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [userRating, setUserRating] = useState("");
+  const countRef = useRef(0);
 
   const { Title: title, Year: year, Poster: poster, Runtime: runtime, imdbRating, Plot: plot, Released: released, Actors: actors, Director: director, Genre: genre } = movieData;
 
@@ -19,6 +21,10 @@ export function MovieDetails(props) {
   }, [setIsLoading, setError, setMovieData, selectedId]);
 
   useEffect(() => {
+    if (userRating) countRef.current = countRef.current + 1;
+  },[userRating])
+
+  useEffect(() => {
     if (!title) return;
     document.title = title;
     return function () {
@@ -26,17 +32,7 @@ export function MovieDetails(props) {
     } 
   }, [title]);
 
-  useEffect(() => {
-    function callback (e) {
-      if (e.code === "Escape") {
-        onCloseMovie();
-      }
-    }
-    document.addEventListener("keydown", callback);
-    return function () {
-      document.removeEventListener('keydown', callback
-  )}; 
-  }, [onCloseMovie]);
+  useKey("Escape", onCloseMovie)
 
   function handleAdd() {
     const newWatchedMovie = {
@@ -47,6 +43,7 @@ export function MovieDetails(props) {
       imdbRating: Number(imdbRating),
       runtime: Number(runtime.split(" ").at(0)),
       userRating,
+      countRatingDecisions: countRef.current,
     };
     
     if (!userRating) {

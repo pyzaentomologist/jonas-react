@@ -1697,3 +1697,153 @@ add.EventListeren nazwywany jest "włazem ewekuacyjnym"
 ### 12.158 Wyzwanie #1: Przelicznik walut
 
 repo 12.158
+
+## 13 Sekcja 13: Własne hooki, useRef itd
+
+### 13.159 Przegląd sekcji
+
+- Hooki są proste do nauki, trudne do opanowania
+- Zasady hooków
+- Pełniejsze poznanie useState
+- useRef
+- własne hooki
+
+### 13.160 Hooki react i ich zasady
+
+- Hooki to wbudowane w React funkcje (interfejs API):
+  - mogą tworzyć stan i mieć do niego dostęp w drzewie Fiber
+  - rejestrują efekty uboczne w drzewie Fiber
+  - wybór w elementach DOM
+  - wiele więcej
+- zawsze zaczynają się od use
+- pozwalają na proste reużywanie logiki, możemy wiele hooków spiąć w jeden
+- komponenty funkcyjne mogą posiadać swój własny stan i uruchamiać efekty uboczne w różnych momentach życia komponentu (przed React 16.8 obsługa była obiektowa)
+
+Hooki React:
+
+- useState
+- useEffect
+- useReducer
+- useContext
+- useRef
+- useCallback
+- useMemo
+- useTransition
+- useDefferredValue
+- useLayoutEffect
+- useDebugValue
+- useImperativeHandle
+- useId
+- useSyncExternalStore
+- useInsertionEffect
+
+Zasady hooków:
+
+- wywołujemy tylko na najwyższym poziomie komponentu - nie da się wewnątrz pętli, warunków, czy zagnieżdżonych funkcji
+- hooki mogą być wywoływane tylko z poziomu komponentu lub własnego hooka
+- nie mogą wyć wywołane po zwrócerniu wartości przez return
+
+### 13.161 Zasady hooków w praktyce
+
+Na przykładzie aplikacji usePopcorn repo 10.106
+
+### 13.162 Szczegóły useState
+
+Czasem, gdy komponent jest renderowany nie ma potrzeby używania useState, tylko można użyć stanu pochodnego poprzed przypisanie jakiejś właściwości do zmiennej.
+
+Przypisanie stanu jest asynchroniczne, przez co nie można odczytać zmienionego stanu zaraz po wykonaniu przypisania. Podczas aktualizacji stanu na podstawie poprzedniej wartości trzeba skorzystać z wywołania zwrotnego
+
+> setAvg((avg)=>(avg + newValue)/2)
+
+### 13.163 Tworzenie stanu z Callbackiem (Lazy Initial State)
+
+Zapisywanie danych o wybranych filmach w pamięci lokalnej przeglądarki
+
+Wykorzystano useState i useEffect. Do inicjalizacji useState wprowadzono odczytanie z pamięci lokalnej.
+
+> function getValueFromLocalStorage(key) {
+> const storedValue = localStorage.getItem(key);
+> return JSON.parse(storedValue);
+> }
+> function setValueFromLocalStorage(value, key) {
+> localStorage.setItem(key, JSON.stringify(value));
+> }
+
+repo 10.106
+
+### 13.164 Podsumowanie useState
+
+Stan można utworzyć poprzed nadanie początkowej wartości lub null, oraz przez dodanie callbacka (lazy evaluation). Funkcja musi być czysta i nie może przyjmować argumentów.
+
+Aktualizacja stanu może być poprzed dodanie do settera pojedynczej wartości, lub funcji wykorzystującej jako argument poprzedni stan: (c) => c+1
+
+### 13.165 Jak nie wybierać elementów DOM w React
+
+Nie powinno się używać imperatywnego JS w React, chodzi o to, żeby kod był deklaratywny
+
+### 13.166 Wstęp do innych hooków: useRef
+
+useRef to obiekt z mutowalną właściwości *.current* którego wartość przetrwa pomiędzy renderami
+Przypadki w których używa sie useRef:
+
+- tworzenie zmiennej która ma być taka sama pomiędzy renderami
+- wybieranie i przechowywanie lementów DOM
+
+Refs są dla danych które nie są renderowane (obsługa eventów lub efekty). W JSX trzeba użyć stanu.
+Nie można edytować i odczytywać *.current* wewnątrz logiki renderowania (można tylko w useEffect). Służy do zmierania danych
+
+State vs. Refs
+
+- Oba zapamiętują warości pomiędzy renderami
+- Aktualizacja stanu wywołuje ponowny render komponentu, aktualizacja refs nie wywołuje ponownego renderowania
+- stan jest mutowalny, refs nie
+- stan jest aktualizowany asynchornicznie, refs nie
+
+```mermaid
+  block-beta
+  columns 8
+    A:2 space B:2
+    B space C:2
+    B space:11 D:2
+    D space E:2
+    D space:11 F:2
+    F space G:2
+    F space:11 H:2
+    A("Potrzebuję przechowania danych") --> B("Czy dane zmieniają się?")
+    B -- "Nie" --> C("Zwykla zmienna const")
+    B -- "Tak" --> D("Czy jest możłiwe obliczanie na podstawie stanu lub propsów?")
+    D -- "Tak" --> E("Użyj wartości stanu pochodnego")
+    D -- "Nie" --> F("Czy to powinno re-renderować komponent?")
+    F -- "Nie" --> G("Użyj Ref (useRef)")
+    F -- "Tak" --> H("Utwórz nowy stan dla komponentu")
+```
+
+### 13.167 Użycie useRef do obsługi elementu DOM
+
+repo 10.106
+
+### 13.168 Użycie useRef do zachowania nadych pomiędzy renderami
+
+repo 10.106
+
+### 13.169 Czym są własne hooki i kiedy je tworzyć
+
+- Pozwalają nam re-używać logikę nie UI-ową.
+- Jeden hook powinien robić jedną rzecz
+- zasady hooków dotyczą również hooków customowych
+
+### 13.170 Pierwszy custom hook: useMovies
+
+repo 10.106
+
+### 13.171 Utworzenie hooka useLocalStorageState
+
+repo 10.106
+
+### 13.172 Utworzenie hooka useKey
+
+repo 10.106
+
+### 13.172 Wyzwanie #1: utworzenie włąsnego hooka useGeolocate
+
+repo 13.173
