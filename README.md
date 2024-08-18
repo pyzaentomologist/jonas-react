@@ -1847,3 +1847,76 @@ repo 10.106
 ### 13.172 Wyzwanie #1: utworzenie włąsnego hooka useGeolocate
 
 repo 13.173
+
+## 14 Sekcja 14: React przed hookami: React klasowy
+
+### 14.174 Przegląd sekcji
+
+Historia pisania w React klasowym
+
+### 14.175 Pierwszy klasowy komponent
+
+repo 14.175
+
+Dodano state do klasy
+
+### 14.176 Praca z obsługą zdarzeń
+
+repo 14.175
+
+Manipulacja danymi w stanie (setState)
+
+### 14.177 Komponenty klasowe vs. komponenty funkcyjne
+
+**Konponenty funkcyjne**
+Komponenty funkcyjne są od 2019 roku (react 16.8)
+Tworzy się je za pomocą funkcji JS
+Propsy odczytujemy destruktyryzując props lub dostając się do właściwości props przez props.x
+Wprowadzono hooki
+Lokalny stan przechowujemy w useState
+Efekty uboczne obsługuje useEffect
+Zdarzenia obsługujemy funkcjami
+JSX jest zwracany przez funkcję
+Dodatkowe korzyści:
+
+- mniej kodu
+- czystszy kod: useEffect ma wbudowaną obsługgę cyklu życia komponentu
+- prościej dzielić logikę stanu
+- nie potrzeba używać "this"
+
+**Komponenty klasowe**
+React był o nie oparty od początku istnienia
+Tworzy się je za pomoca ES6, dziedzicząc React.Component
+Propsy odczytuje się przez this -> this.props.x
+Lokalny stan jest obsługiwany przez this.setState()
+Efekty uboczne są obsługiwane przez metody cyklu życia
+Obsługa zdarzeń przez metody klasy
+JSX jest zwracany przez metodę render()
+
+Dodatkowe korzyści:
+
+- Cykl życia jest czytelniejszy dla początkujących, bo jest opisany w kodzie przez componentDidMount componentWillUnmount i componentDidUpdate
+
+### 14.178 Start z aplikacją Classy Weather
+
+repo 14.175
+
+### 14.179 Pobranie danych o pogodzie
+
+repo 14.175
+
+### 14.180 Wyświetlanie informacji o pogodzie
+
+repo 14.175
+
+### 14.181 Refaktoryzacja kodu za pomocą klas
+
+repo 14.175
+
+### 14.182 Komunikacja dziecko - rodzic
+
+repo 14.175
+
+### 14.183 Cykl życia komponentu
+
+repo 14.175
