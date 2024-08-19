@@ -1920,3 +1920,58 @@ repo 14.175
 ### 14.183 Cykl życia komponentu
 
 repo 14.175
+
+## 15 Sekcja 15: Wprowadzenie do 3ciej części kursu
+
+### 15.184 Wstęp do części 3ciej
+
+4 projekty
+Hooki useReducer, useMemo, useCallback
+
+### 15.185 Przydatne źródła
+
+👉 [Tao of React - Software Design, Architecture & Best Practices](https://alexkondov.com/tao-of-react/)
+
+👉 [The new wave of React state management (Excellent read!)](https://frontendmastery.com/posts/the-new-wave-of-react-state-management/)
+
+👉 [A Visual Guide to React Rendering - useMemo](https://alexsidorenko.com/blog/react-render-usememo/)
+
+👉 [React as a UI Runtime (By Dan Abramov from the React team)](https://overreacted.io/react-as-a-ui-runtime/)
+
+👉 [You Might Not Need an Effect (Official React docs)](https://react.dev/learn/you-might-not-need-an-effect)
+
+👉 [A Complete Guide to useEffect (By Dan Abramov)](https://overreacted.io/a-complete-guide-to-useeffect/)
+
+👉 [useEffect sometimes fires before paint](https://thoughtspile.github.io/2021/11/15/unintentional-layout-effect/)
+
+👉 [Making setInterval Declarative with React Hooks (By Dan Abramov)](https://overreacted.io/making-setinterval-declarative-with-react-hooks/)
+
+👉 [Redux - Not Dead Yet! (By Mark Erikson from the Redux team)](https://blog.isquaredsoftware.com/2018/03/redux-not-dead-yet/)
+
+👉 [Why React Context is Not a "State Management" Tool (By Mark Erikson)](https://blog.isquaredsoftware.com/2021/01/context-redux-differences/)
+
+Library documentation:
+
+👉 [Vite (Why Vite is so fast)](https://vitejs.dev/guide/why.html)
+
+👉 [CSS Modules](https://github.com/css-modules/css-modules)
+
+👉 [React Router](https://reactrouter.com/en/main)
+
+👉 [React Leaflet: Installation](https://react-leaflet.js.org/docs/start-installation/)
+
+👉 [Redux: Style Guide (A must-read for Redux users!)](https://redux.js.org/style-guide/)
+
+👉 [Redux Toolkit](https://redux-toolkit.js.org/tutorials/overview)
+
+👉 [React Redux](https://react-redux.js.org/api/hooks)
+
+## 16 Sekcja 16: Zaawansowany hook useReducer
+
+### 16.186 Przegląd sekcji
+
+- useReducer to potężne narzędzie do zarządzania stanem.
+- Jest ważny w zrozumieniu **Redux**
+- Połowa sekcji to będą projekty
+
+### 16.187 Jeszcze jeden hook: useReducer
