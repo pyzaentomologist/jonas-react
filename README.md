@@ -1975,3 +1975,148 @@ Library documentation:
 - Połowa sekcji to będą projekty
 
 ### 16.187 Jeszcze jeden hook: useReducer
+
+repo 16.187
+
+Deklaracja reducera:
+
+> const [count, dispatch] = useReducer(reducer, 0);
+
+Funkcja redukująca:
+
+> function reducer(state, action) {
+> if (action.type === 'inc') return state + 1;
+> else if (action.type === "dec") return state - 1;
+> else return action.payload;
+> }
+
+Wywołanie reducera:
+
+> const reset = function () {
+> dispatch({ type: "reset", payload: 0 });
+> };
+
+Definiowanie type i payload są dobrą praktyką podczas tworzenia reducerów, ale payload nie zawsze jest potrzebny.
+
+### 16.188 Zarządzanie powiązanymi częściami stanu
+
+Funkcja reducer została przetworzona na:
+
+> function reducer(state, action) {
+> console.log(state, action);
+> switch (action.type) {
+> case "dec":
+> return { ...state, count: state.count - state.step };
+> case "inc":
+> return { ...state, count: state.count + state.step };
+> case "setCount":
+> return { ...state, count: action.payload };
+> case "setStep":
+> return { ...state, step: action.payload };
+> case "reset":
+> return initialState;
+> default:
+> throw new Error("Unknown action");
+> }
+> }
+
+### 16.189 Zarządzanie stanem z useReducer
+
+Zarządznie stanem za pomocą useState czasem jest niewystarczające np.:
+
+- komponent ma wiele zmiennych stanu i ich aktualizacji rozproszonych w wielu programach obsługi zdarzeń w całym komponencie lub wielu komponentach.
+- Wiele aktualizacji stanów musi zadziać sie w tym samym czasie, w reakcji na to zamo zdarzenie np. uruchamianie gry
+- Gdy aktualizacja jednego stanu zależy od wielu elementów stanu
+
+Stan z useReducer:
+
+- idealny do złożonych i powiązanych ze sobą stanów
+- powiązane stany są przechowywane w zmiennej state
+- useReducer potrzebuje funkcji reducer do aktualizacji stanów. Oddziela logikę stanu od componentu
+- reducer: prosta funkcja (**bez efektów ubocznych**) która odbiera state i action, a zwraca już aktualizowany stan
+- action: objekt opisujący jak aktualizować stan (type i payload)
+- dispatch: funkcja wywołująca aktualizację stanu przez wysyłanie akcjii z programu obsługi zdarzeń do reducer. dispatch zastępuje setState
+
+### 16.190 Aplikacja React Quiz
+
+repo 16.187
+
+Skorzystanie z fragmentów kodu, które są customowym emmetem i dodanie rozszerzenia Auto Rename Tag, które pomaga podczas zmiany elementów html.
+
+### 16.191 Załądowanie pytań ze sztucznego API
+
+repo 16.187
+
+Instalacja npm i json-server
+
+### 16.192 Obsługa ładowania, błędów i statusów
+
+repo 16.187
+
+Destrukturyzacja state w useReducer:
+
+> const [{ questions, status }, dispatch] = useReducer(reducer, initialState);
+
+Obsługa stanów ładowania:
+
+```
+<Main>
+  {status === "loading" && <Loader />}
+  {status === "error" && <Error />}
+  {status === "ready" && <StartScreen numQuestions={numQuestions} />}
+</Main>
+```
+
+### 16.193 Rozpoczęcie quizu
+
+repo 16.187
+
+### 16.194 Wyswietlanie pytań
+
+repo 16.187
+
+### 16.195 Obsługa nowych odpowiedzi
+
+repo 16.187
+
+### 16.196 Przeniesienie do następnego pytania
+
+repo 16.187
+
+### 16.197 Wyświetlanie paska progressu
+
+repo 16.187
+
+### 16.198 Kończenie quizu
+
+repo 16.187
+
+### 16.197 Restart quizu
+
+repo 16.187
+
+### 16.200 Dodanie timera do quizu za pomocą useEffect
+
+repo 16.187
+
+### 16.201 Podsumowanie sekcji: useState vs. useReducer
+
+useState:
+
+- idealny dla pojedynczych, samidzielnych stanów (numery, stringi, tablice itd.)
+- logika aktualizująca stan jest w obsłudze zdarzeń lub w efekcie, położona w jednym komponencie lub rozsiana po wielu komponentach
+- aktualizacja przez setState
+- imperatywna aktualizacja aktualizacja
+- prostszy do zrozumienia
+
+useReducer:
+
+- idealne dla wielu powiązanych stanów
+- logika aktualizacji stanu żyje w jednym miejscu, oddzielona od komponentu
+- stan jest aktualizowany przez wysyłanie akcji do reducera
+- deklaratywna aktualizacja stanu: złożone zmiany stanu są mapowane na akcje
+- wyższy poziom abstrakcji
+
+### 16.202 Wyzwanie 1: Tworzenie konta bankowego z useReducer
+
+repo 16.202
