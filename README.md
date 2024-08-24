@@ -2120,3 +2120,170 @@ useReducer:
 ### 16.202 Wyzwanie 1: Tworzenie konta bankowego z useReducer
 
 repo 16.202
+
+## 17 Sekcja 17: React Router: tworzenie SPA
+
+### 17.203 Wstęp do sekcji
+
+- najważniejsza 3rd-part liblary
+- budowanie SPA
+- style przy użyciu CSS Modules
+
+### 17.204 Tworzenie pierwszej aplikacji z Vite: "WorldWise"
+
+> npm create vite@4
+
+lub
+
+> npm create vite@latest
+
+Instalacja eslint:
+
+> npm i eslint vite-plugin-eslint eslint-config-react-app --save-dev
+
+Dodanie eslint.json, w pliku eslint.json:
+
+> {
+> "extends": "react-app"
+> }
+
+Edycja vite.config.js:
+
+> import eslint from "vite-plugin-eslint"
+> export default defineConfig({
+> plugins: [react(), eslint()],
+> })
+
+### 17.205 Routing i SPA
+
+Routing
+
+- Połączenie ścieżki z różnymi UI
+- pozwala użytkownikom przełaczać się pomiędzy widokami używając URL
+- Utrzymuje synchronizację z URL
+- pozwala na budowanie SPA
+
+SPA
+
+- Aplikacja która całkowicie wykonuje się po stronie użytkownika
+- Różne URLe to różne widoki
+- JS aktualizuje DOM
+- Strona nigdy nie jest przeładowana
+- Odczucie jest jak w przypadku apikacji mobilnych/desktopowych
+- Dodatkowe dane mogą być ładowane z web API
+
+### 17.206 Implementacja Strony Głównej i Routingu
+
+repo 17.204
+
+### 17.207 Linkowanie pomiędzy dwoma Routami <Link /> i <NavLink />
+
+Użycie Link powoduje brak przeładowania, dzięki czemu mamy SPA. Navlink oddatkowo dodaje klasę "active" do linku
+
+repo 17.204
+
+### 17.208 Stylwoanie w React
+
+Opcje stylowania:
+
+| STYLING OPTION     | WHERE              | HOW?               | SCOPE              | BASED ON           |
+|--------------------|--------------------|--------------------|--------------------|--------------------|
+| liniowy css        | JSX elements       | style props        | JSX element        | CSS                |
+| plik css lub sass  | External file      | className prop     | Entire app         | CSS                |
+| moduły css         | One external file per component  | className prop        | Component        | CSS |
+| css-in-js          | External file or component file     | Creates new component| Component| JavaScript|
+| Utility-first-css - tailwind| JSX element  | className prop     | JSX element     | CSS                |
+
+Jako alternatywę można użyć gotowej biblioteki UI np. MUI, Chakra UI, Mantine, Ant Designe
+
+### 17.209 CSS Modules
+
+repo 17.204
+
+Wbudowane w CRA i Vite.
+
+Selektory elementów DOM nie działają poprawnie jesli nie są rozwinięciem klasy
+
+### 17.210 Tworzenie pages
+
+repo 17.204
+
+### 17.211 Tworzenie Layoutu części z mapą
+
+repo 17.204
+
+### 17.212 Zagnieżdżone roouty
+
+repo 17.204
+
+index kieruje do strony właściwej dla zakresu routy
+
+> Route index element={HomePage }
+
+### 17.213 Implementacja listy miast
+
+repo 17.204
+
+### 17.214 Implementacja listy państw
+
+repo 17.204
+
+### 17.215 Przechowywanie stanu w URL
+
+URL jest doskonałym miejscem na przechowywanie informacji o UI użytkownika i alternatywą dla useState w niektórych sytuacjach.
+
+Przykłady:
+
+- otwarte/zamknięte panele
+- wybrane elementy listy
+- kolejność sortowania listy
+- dodane filtry list
+
+Korzyści:
+
+- Prosty sposób na przechowanie komponentów
+- dobry sposób na przenosienie danych z jednego komponentu do innego
+- można zapisać stan aplikacji jako link i udostępnić lub dodać do zakłądek w przeglądarce
+
+### 17.216 Dynamiczne routy z parametrami URL
+
+repo 17.204
+
+Dodanie do routy :id:
+
+```
+<Route path="cities/:id" element={<City city={cities} isLoading={isLoading} />} />
+```
+
+### 17.217 Odczytywanie i dodawanie zapytań
+
+repo 17.204
+
+zarządzanie parametrami za pomocą hooka
+
+```
+const [searchParams, setSearchParams] = useSearchParams();
+```
+
+### 17.218 Programowalna nawigacja z useNavigate
+
+repo 17.204
+
+### 17.219 Programowalna navigacja z <Navigate />
+
+repo 17.204
+
+Przypadkiem w którym ten komponent przydaje sie, jest kierowanie Routy indexu do docelowej np.
+
+```
+<Route
+  index
+  element={<Navigate replace to="cities" />}
+/>
+<Route
+  path="cities"
+  element={<CityList cities={cities} isLoading={isLoading} />}
+/>
+```
+
+Atrybut **replace** pozwala na powrót w przeglądarce do poprzedniej strony
