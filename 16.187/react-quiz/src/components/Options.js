@@ -1,5 +1,7 @@
-export function Options(props) {
-  const { question, dispatch, answer } = props;
+import { useQuiz } from "../hooks/useQuiz";
+
+export function Options() {
+  const { question, dispatch, answer } = useQuiz();
   const hasAnswered = answer !== null;
   return (
     <div className="options">
@@ -18,6 +20,7 @@ export function Options(props) {
         >
           {option}
         </button>
+        // <p></p>
       ))}
     </div>
   );

@@ -1,6 +1,8 @@
+import { useQuiz } from "../hooks/useQuiz";
 import { Button } from "./Button";
-export function FinishScreen(props) {
-  const { points, maxPossiblePoints, highscore, dispatch } = props;
+
+export function FinishScreen() {
+  const { points, maxPossiblePoints, highscore, dispatch } = useQuiz();
   const percentage = (points / maxPossiblePoints) * 100;
 
   let emoji;

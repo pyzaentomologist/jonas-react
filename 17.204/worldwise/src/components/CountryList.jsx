@@ -2,9 +2,10 @@ import { CountryItem } from "./CountryItem";
 import styles from "./CountryList.module.css";
 import { Message } from "./Message";
 import { Spinner } from "./Spinner";
+import { useCities } from "../hooks/useCities";
 
-export function CountryList(props) {
-  const { cities, isLoading } = props;
+export function CountryList() {
+  const { cities, isLoading } = useCities();
 
   if (isLoading) return <Spinner />;
 
@@ -15,7 +16,10 @@ export function CountryList(props) {
 
   const countries = cities.reduce((arr, city) => {
     if (!arr.map(el=>el.country).includes(city.country)) {
-      return [...arr, {country: city.country, emoji: city.emoji}]
+      return [
+        ...arr,
+        { country: city.country, emoji: city.emoji },
+      ];
     } else return arr;
   }, [])
   

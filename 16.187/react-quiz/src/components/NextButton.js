@@ -1,6 +1,7 @@
+import { useQuiz } from "../hooks/useQuiz";
 import { Button } from "./Button";
-export function NextButton(props) {
-  const { dispatch, answer, isLastQuestion } = props;
+export function NextButton() {
+  const { dispatch, answer, isLastQuestion } = useQuiz();
   if (answer === null) return null;
   
   if (!isLastQuestion) {
@@ -8,8 +9,6 @@ export function NextButton(props) {
       <Button dispatch={() => dispatch({ type: "nextQuestion" })}>Next</Button>
     );
   } else {
-    return (
-      <Button dispatch={() => dispatch({ type: "finish" })}>Finish</Button>
-    );
+    return <Button dispatch={() => dispatch({ type: "finish" })}>Finish</Button>;
   }
 }
