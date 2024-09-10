@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
+import { useQuiz } from "../hooks/useQuiz";
 
-export function Timer(props) {
-  const { seconds, dispatch } = props;
+export function Timer() {
+  const { seconds, dispatch } = useQuiz();
   const [time, setTime] = useState(seconds);
 
   const minutesLeft =

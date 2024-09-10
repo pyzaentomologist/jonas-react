@@ -2,9 +2,10 @@ import { CityItem } from './CityItem';
 import styles from './CityList.module.css';
 import { Message } from './Message';
 import { Spinner } from './Spinner';
+import { useCities } from "../hooks/useCities";
 
-export function CityList(props) {
-  const { cities, isLoading } = props;
+export function CityList() {
+  const { cities, isLoading } = useCities();
   
   if (isLoading) return <Spinner />
 

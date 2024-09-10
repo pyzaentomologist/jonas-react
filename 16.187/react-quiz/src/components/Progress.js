@@ -1,5 +1,7 @@
-export function Progress(props) {
-  const { index, numQuestions, points, maxPossiblePoints, answer } = props;
+import { useQuiz } from "../hooks/useQuiz";
+
+export function Progress() {
+  const { index, numQuestions, points, maxPossiblePoints, answer } = useQuiz();
   return (
     <header className="progress">
       <progress max={numQuestions} value={index + Number(answer !== null)}></progress>

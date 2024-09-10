@@ -2287,3 +2287,185 @@ Przypadkiem w którym ten komponent przydaje sie, jest kierowanie Routy indexu d
 ```
 
 Atrybut **replace** pozwala na powrót w przeglądarce do poprzedniej strony
+
+## 18 Sekcja 18: Contrext API
+
+### 18.220 Przegląd sekcji
+
+- Wzorce Context API
+- Głębokie poznanie zarządzania stanem
+- Dołączenie interaktywnej mapy
+
+### 18.221 Wyzwanie #1: Zrozumienie aplikacji "The Atomic Blog"
+
+repo 18.221
+
+### 18.222 Czy jest Context API
+
+Zapobiega prop drilling - polega na przekazywaniu propsów przez wiele poziomów komponentów
+
+- system do przekazywania danych przez aplikację bez koniecznosci przekazywania ręcznego propsów pomiędzy komponentami
+- pozwala używać globalnych stanów w aplikacji
+
+Context API używa:
+
+- Provider: nadaje dzieciom dostęp do wartości
+- value: dane któe udostępniamy
+- Consumers: wszystkie komponenty które odczytują wprowadzony kontekst
+
+Provider renderuje komponenty które używają go, ale istnieje możliość, gdy nie chcemy części dzieci re-renderować. W takim wypadki komponent, który używa kontekstu można owinąć w osobny komponent i przekazać pozostałe komp[onenty jako dzieci:
+
+```
+const counterContext = React.createContext();
+const CounterContextProvider = ({ children }) => {
+  const [count, setCount] = React.useState(0);
+  return (
+    <counterContext.Provider value={{ count, setCount }}>
+      <button onClick={() => setCount((prev) => prev + 1)}>Change state</button>
+      {children}
+    </counterContext.Provider>
+  );
+};
+
+const ComponentOne = () => {
+  const { count } = React.useContext(counterContext);
+  console.log("ComponentOne renders");
+  return <div></div>;
+};
+
+const ComponentTwo = () => {
+  console.log("ComponentTwo renders ");
+  return <div></div>;
+};
+function App() {
+  return (
+    <CounterContextProvider>
+      <ComponentOne />
+      <ComponentTwo />
+    </CounterContextProvider>
+  );
+}
+ReactDOM.render(
+  <App />,
+  document.getElementById("root")
+);
+```
+
+### 18.223 Torzenie i wprowadzanie kontekstu
+
+repo 18.221
+
+```
+<PostContext.Provider value={{
+  posts: searchedPosts,
+  onAddPost: handleAddPost,
+  onClearPosts: handleClearPosts,
+  searchQuery,
+  setSearchQuery
+}}>
+```
+
+### 18.224 Stosowanie kontekstu
+
+repo 18.221
+
+> const { onClearPosts } = useContext(PostContext)
+
+### 18.225 Zaawansowany wzorzec: własny Provider i hook
+
+repo 18.221
+
+### 18.226 Myślenie Reactowe: Zaawansowane zarządzanie stanem
+
+Dostępność stanu:
+
+- Local state
+  - jeden lub pare komponentów
+  - Postępny w komponencie i komponentach potomnych
+  
+- Global state
+  - wiele rozproszonych komponentów
+  - dostępny z poziomu całej aplikacji
+
+Miejsce stanu:
+
+- Remote state
+  - Zdalne dane z np. API
+  - zazwyczaj asynchroniczny
+  - potrzebuje ponownego fetchowania i aktualizacji
+  
+- UI State
+  - pozostałe rzeczy
+  - tematy, filtry, dane z formularza itd.
+  - synchroniczny i przechowywany w aplikacji
+
+| Where to place?       | Tools                           | When to use?           |
+|-----------------------|---------------------------------|------------------------|
+| Local component       | state, reducer, ref             | Local state            |
+| Perent component      | state, reducer, ref             | Odziedziczony          |
+| Context               | context, state, reducer         | globalny stan (UI)     |
+| Zewnętrzne biblioteki | redux, react query, swr, zustand| globalny stan (zdalny) |
+| URL         | React Router       | globalny stan (przenoszony pomiędzy stronami) |
+| Przeglądarka | Local storage, session storage | Dane przechowywane w przeglądarce|
+
+### 18.227 Powrót do WorldWise: tworzenie kontekstu CitiesContext
+
+repo 17.204
+
+### 18.228 Użycie CitiesContext
+
+repo 17.204
+
+### 18.229 Dokończenie widoku miasta
+
+repo 17.204
+
+### 18.230 Dodanie bibliotek leaflet i leaflet-react
+
+repo 17.204
+
+### 18.231 Wyśweitlanie znaczników miast na mapie
+
+repo 17.204
+
+### 18.232 Interacting with the map
+
+repo 17.204
+
+### 18.233 Ustawienia pozycji z geolokalizacją
+
+repo 17.204
+
+W narzędziach dev przeglądarki, w zakładce Components można użyć sensors - Location i dzięki temu użyć podrobionej lokalizacji urządzenia. 
+
+### 18.234 Pobranie danych o mieście któe wybrał użytkownik na mapie
+
+repo 17.204
+
+### 18.235 Dodawanie nowego miasta
+
+repo 17.204
+
+### 18.236 Usuwanie miasta
+
+repo 17.204
+
+### 18.237 Zaawansowane zarządzanie stanem: Context + Reducer
+
+repo 17.204
+
+### 18.238 Dodanie sztycznej autoryzacji: Dodanie kontekstu
+
+repo 17.204
+
+### 18.239 Dodanie sztycznej autoryzacji: Implementacja Logowania
+
+repo 17.204
+
+### 18.240 Dodanie sztycznej autoryzacji: Zabezpieczanie Routy
+
+repo 17.204
+
+### 18.241 Wyzwanie 2#: Refaktoryzacja React Quiz przy użyciu Context API
+
+repo 16.187

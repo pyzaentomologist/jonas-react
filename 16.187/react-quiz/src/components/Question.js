@@ -1,10 +1,12 @@
+import { useQuiz } from "../hooks/useQuiz";
 import { Options } from "./Options";
-export function Question(props) {
-  const { question, dispatch, answer } = props;
+
+export function Question() {
+  const { question } = useQuiz();
   return (
     <div>
       <h4>{question.question}</h4>
-      <Options question={question} answer={answer} dispatch={dispatch} />
+      <Options/>
     </div>
   );
 }
