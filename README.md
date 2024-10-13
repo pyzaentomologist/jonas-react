@@ -2469,3 +2469,196 @@ repo 17.204
 ### 18.241 Wyzwanie 2#: Refaktoryzacja React Quiz przy użyciu Context API
 
 repo 16.187
+
+## 19 Sekcja 19: Optymalizacje i zaawansowany useEffect
+
+### 19.242 Przegląd skecji
+
+- Analiza nadmiarowych renderów
+- optymalizacja wydajności
+- zagłębienie sie w useEffect
+
+### 19.243 Optymalizacja wydajności i nadmiarowe rendery
+
+Zapobieganie nadmiarowej liczbie renderów przez użycie:
+
+- memo
+- useMemo
+- useCallback
+- przekazywanie elementów jako dzieci albo propsów
+
+Wzrost prędkości aplikacji i jej responsywności:
+
+- useMemo
+- useCallback
+- useTransition
+
+Redukcja rozmiaru bundle:
+
+- 3rd-party packages
+- lazy loading i podział kodu
+
+Re-renderowanie komponentó następuje gdy:
+
+- zmienia się stan
+- zmienia się kontekst
+- re-renderuje się rodzic
+
+Zmarnowane rendery to te, które nie wpływają na dom, ale funkcje są wykonywane.
+
+### 19.244 Profiler
+
+Użycie narzędzia Profiler do śledzenia czasu renderu komponentów.
+
+### 19.245 Trick optymalizacjny z children
+
+```
+function Counter({children}) {
+  const [count, setCount] = useState(0);
+  return (
+    <div>
+      <button onClick={() => setCount((c) => c + 1)}>Increase: {count}</button>
+      {children}
+    </div>
+  );
+}
+
+export function Test() {
+  return (
+    <Counter>
+      <h1>Slow counter?!?</h1>
+      <SlowComponent />
+    </Counter>
+  );
+}
+```
+
+Komponent który jest przekazany jako props {children} nie ma szans na zmianę stanu więc nie jest aktualizowany.
+
+### 19.246 Zrozumieć memo
+
+**Memoizacja** technika optymalizacyjna zwracająca funkcję raz i zapisująca wynik w pamięci. Jeśli spróbujemy wykonać jeszcze raz funkcję z tymi samymi argumentami to zostanie zwrócony wynik bez wykonania funkcji.
+
+- używana do tworzenia komponentu który nie re-renderuje się gdy rodzić jest re-renderowany, tak długo jak props jest ten sam pomiędzy renderami
+- Wpływa tylko na propsy, zapamiętany komponent re-renderuje się gdy jego własny stan ulegnie zmianie lub gdy zmieni się kontekst
+- ma sens tylko gdy komponent renderuje się powoli i re-renderuje się często
+
+### 19.247 memo w praktyce
+
+Użycie memo powoduje zapamiętanie wartości podczas re-rendderowania aplikacji. Ponowne wywołanie komponentu/fetcha caschuje wartości.
+
+repo 18.221
+
+### 19.248 Zrozumieć useMemo i useCallback
+
+W react wszystko jest tworzone od nowa w każdym renderze (wliczając obiekty i funkcje)
+W JS dwa obiekty lub funkcje które wyglądają tak samo, są inne ({} != {})
+Jeśli obiekty lub funkcje są przekazywane jako props, dzieci komponentów zawsze widzą je jako nowe propsy przy ponownym renderze.
+Jeśli props jest inny pomiędzy ponownymi renderami, memo nie zadziała (dla obiektów, funkcji i zmieniających sie wartości w typach prostych).
+
+Do ustabilizowania sytuacji trzeba użyć hooków useMemo lub useCallback.
+
+Zastosowanie useMemo i useCallback:
+
+- zapamiętywanie wartości (useMemo) i funkcji (useCallback) pomiędzy renderami.
+- Wartości przekazywane do useMemo i useCallback są prze chowywane w cache i zwracane w przyszłych renderach, tak długo jak zależności pozostają takie same.
+- useMemo i useCallback mają tablicę zależności (jak useEffect): gdy jedna z zależności się zmienia, wartość jest przebudowana.
+- to trzy przypadki w których useMemo, useCallback i memo mają sens:  
+  - Zapamiętywanie propsa, żeby nie marnować renderów
+  - Zapamiętywanie wartości, żeby uniknąć kosztownych obliczeń przy każdym renderze
+  - Zapamiętywanie wartości któe są używane w tablicy zalezności w innym hooku np. useEffect
+
+### 19.249 useMemo w praktyce
+
+Dobrze przechowywać w tablicy zależności wartości będące prymitywami
+
+repo 18.221
+
+### 19.250 useCallback w praktyce
+
+Nie ma potrzeby owijania każdej funkcji/wartości w useCallback/useMemo.
+Settery z useState nie są potrzebne w tablicach zależności. Kompilator react domyślnie uważa je za stabilne.
+
+repo 18.221
+
+### 19.251 Optymalizacja ponownego renderowania kontekstu
+
+Aktualizacja jednej wartości z kontekstu powoduje odświeżenie każdego komponentu który korzysta z tego kontekstu.
+
+### 19.252 Powrót do aplikacji "WorldWise"
+
+Optymalizacja za pomocą useCallback w funkcji która po dodaniu do tablicy zależności useEffect wywoływała pętlę.
+
+### 19.253 Optymalizacja rozmiaru wygenerowanego pakietu z użyciem podziału kodu
+
+**Bundle**: Paczka z kodem aplikacji, przesyłana przez serwer.
+**Bundle size**: Wielkość bundla
+**Code splitting**: Podział kodu na wiele części, które będzi emożna pobrać dzięki mechanizmowi - lazy loading
+
+Do podziału została użyta wbudowana w react metoda lazy(), jednak do użycia jej musi być export default.
+Dodatkowo użyto komponentu Suspense do którego przekazano w propsie fallback komponent ładowania.
+
+### 19.254 Nie optymalizuj przedwcześnie
+
+Nie należy optymalizować przedwcześnie, jeśli nie ma takiej potrzeby.
+
+Optymalizacja ma sens tylko w przypadku realnych wąskich gardeł.
+
+### 19.255 Zasady useEffect i dobre praktyki
+
+W tablicy zależności useEffect powinny znaleźć się:
+
+- Wszystkie zmienne state, propsy i konteksty, które są używane w useEffect
+- Wszystkie reaktywne wartości powinny być zawarte w tablicy. Zmienne Reaktywne, to te, które zmieniają się np. odwołujące się do stanu.
+- Nie ignorujemy ostrzeżeń eslinta
+- Nie używamy obiektów lub tablic jako zależności
+
+Usuwanie funkcji z zależności:
+
+- przeniesienie funkcji do useEffect
+- jeśli funkcja nie jest używana tylko przez efekt to można ją zapamietać (useCallback)
+- Jeśli funkcja nie korzysta z wartości reaktywnych to przenieś ją po za komponent
+
+Usuwanie obiektu z zależności:
+
+- zamiast zamieszczania całego obiektu można zamieścić jedną wartość (primitive value)
+- jeśli nie da się wyodrębnić to trzeba uźyć memoizacji lub przenieść po za komponent
+
+Inne strategie:
+
+- jeśli jest zbyt dużo zależności reaqktywnych trzeba użyć reducera
+- setState i dispatch są domyślnie stabilne pomiędzy renderami
+
+useEffect powinien być używany jako ostatecznosć.
+Trzy przypadki nadużycia useEffect:
+
+- Odpowiedź na event użytkownika - zamiast tego powinna być użyta funkcja obsługi zdarzeń.
+- Pobieranie danych podczas montowania komponentu - powinno być zastąpione przez react query
+- synchronizacja stanów - zastąpi użycie event handlera i derived state
+
+### 19.256 Wyzwanie #1: Poprawa wydajności w Workout Timer
+
+repo 19.256
+
+### 19.257 Ustawienie stanu bazując na innym stanie
+
+Użycie useEffect do synchronizacji zmiennej
+
+```
+const [duration, setDuration] = useState(0);
+
+useEffect(() => {
+  setDuration((number * sets * speed) / 60 + (sets - 1) * durationBreak);
+}, [number, sets, speed, durationBreak]);
+```
+repo 19.256
+
+### 19.258 Użycie funkcji wspomagającej w useEffect
+
+Rozdzielenie odpowiedzialności pomiędzy dwa useEffect i przeniesienie ciała funcji do useEffect
+
+repo 19.256
+
+### 19.259 Domknięcia w useEffect
+
+Przykładowym wystąpieniem domknięć i nieaktualnych domknięć są useEffect. W tablicy zależności każda wartość która aktualizuje się ma wpływ na domknięcie (aktualizację danych do których odwołuje sie funkcja). Jeśli jakiejś zależności zabraknie w tablicy to dojdzie do pracy na nieaktualnym zbiorze danych i przechowywaniu informacji o nich w "migawce" (snapshot)

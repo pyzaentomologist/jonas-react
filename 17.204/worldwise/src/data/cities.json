@@ -49,18 +49,6 @@
       }
     },
     {
-      "id": "1776",
-      "cityName": "Merindad de Rio Ubierna",
-      "country": "Spain",
-      "emoji": "🇪🇸",
-      "date": "2024-09-07T17:50:13.710Z",
-      "notes": "dwqd",
-      "position": {
-        "lat": "42.50450285299051",
-        "lng": "-3.6474609375000004"
-      }
-    },
-    {
       "id": "b8a2",
       "cityName": "Pulgar",
       "country": "Spain",
@@ -70,6 +58,18 @@
       "position": {
         "lat": "39.707186656826565",
         "lng": "-4.152832031250001"
+      }
+    },
+    {
+      "id": "2068",
+      "cityName": "Atea",
+      "country": "Spain",
+      "emoji": "🇪🇸",
+      "date": "2024-10-12T07:06:57.062Z",
+      "notes": "dzasd",
+      "position": {
+        "lat": "41.178653972331674",
+        "lng": "-1.5820312500000002"
       }
     }
   ]

@@ -5,7 +5,7 @@ import {Button} from "../components/Button";
 import { useAuth } from "../hooks/useAuth";
 import { PageNav } from "../components/PageNav";
 
-export function Login() {
+export default function Login() {
   const { login, isAuthenticated, error } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -17,8 +17,8 @@ export function Login() {
   }
 
   useEffect(() => {
-    if (isAuthenticated) navigate("/app", {replace: true});
-  },[isAuthenticated, navigate])
+    if (isAuthenticated) navigate("/app", { replace: true });
+  }, [isAuthenticated, navigate]);
 
   return (
     <main className={styles.login}>
@@ -41,7 +41,7 @@ export function Login() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        { error && <p>{error}</p>}
+        {error && <p>{error}</p>}
         <div>
           <Button type="primary">Login</Button>
         </div>

@@ -2,7 +2,7 @@
 import styles from "./Product.module.css";
 import { PageNav } from "../components/PageNav";
 
-export function Pricing() {
+export default function Pricing() {
   return (
     <main className={styles.product}>
       <PageNav />
