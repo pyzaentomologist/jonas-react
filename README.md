@@ -2469,3 +2469,422 @@ repo 17.204
 ### 18.241 Wyzwanie 2#: Refaktoryzacja React Quiz przy użyciu Context API
 
 repo 16.187
+
+## 19 Sekcja 19: Optymalizacje i zaawansowany useEffect
+
+### 19.242 Przegląd skecji
+
+- Analiza nadmiarowych renderów
+- optymalizacja wydajności
+- zagłębienie sie w useEffect
+
+### 19.243 Optymalizacja wydajności i nadmiarowe rendery
+
+Zapobieganie nadmiarowej liczbie renderów przez użycie:
+
+- memo
+- useMemo
+- useCallback
+- przekazywanie elementów jako dzieci albo propsów
+
+Wzrost prędkości aplikacji i jej responsywności:
+
+- useMemo
+- useCallback
+- useTransition
+
+Redukcja rozmiaru bundle:
+
+- 3rd-party packages
+- lazy loading i podział kodu
+
+Re-renderowanie komponentó następuje gdy:
+
+- zmienia się stan
+- zmienia się kontekst
+- re-renderuje się rodzic
+
+Zmarnowane rendery to te, które nie wpływają na dom, ale funkcje są wykonywane.
+
+### 19.244 Profiler
+
+Użycie narzędzia Profiler do śledzenia czasu renderu komponentów.
+
+### 19.245 Trick optymalizacjny z children
+
+```
+function Counter({children}) {
+  const [count, setCount] = useState(0);
+  return (
+    <div>
+      <button onClick={() => setCount((c) => c + 1)}>Increase: {count}</button>
+      {children}
+    </div>
+  );
+}
+
+export function Test() {
+  return (
+    <Counter>
+      <h1>Slow counter?!?</h1>
+      <SlowComponent />
+    </Counter>
+  );
+}
+```
+
+Komponent który jest przekazany jako props {children} nie ma szans na zmianę stanu więc nie jest aktualizowany.
+
+### 19.246 Zrozumieć memo
+
+**Memoizacja** technika optymalizacyjna zwracająca funkcję raz i zapisująca wynik w pamięci. Jeśli spróbujemy wykonać jeszcze raz funkcję z tymi samymi argumentami to zostanie zwrócony wynik bez wykonania funkcji.
+
+- używana do tworzenia komponentu który nie re-renderuje się gdy rodzić jest re-renderowany, tak długo jak props jest ten sam pomiędzy renderami
+- Wpływa tylko na propsy, zapamiętany komponent re-renderuje się gdy jego własny stan ulegnie zmianie lub gdy zmieni się kontekst
+- ma sens tylko gdy komponent renderuje się powoli i re-renderuje się często
+
+### 19.247 memo w praktyce
+
+Użycie memo powoduje zapamiętanie wartości podczas re-rendderowania aplikacji. Ponowne wywołanie komponentu/fetcha caschuje wartości.
+
+repo 18.221
+
+### 19.248 Zrozumieć useMemo i useCallback
+
+W react wszystko jest tworzone od nowa w każdym renderze (wliczając obiekty i funkcje)
+W JS dwa obiekty lub funkcje które wyglądają tak samo, są inne ({} != {})
+Jeśli obiekty lub funkcje są przekazywane jako props, dzieci komponentów zawsze widzą je jako nowe propsy przy ponownym renderze.
+Jeśli props jest inny pomiędzy ponownymi renderami, memo nie zadziała (dla obiektów, funkcji i zmieniających sie wartości w typach prostych).
+
+Do ustabilizowania sytuacji trzeba użyć hooków useMemo lub useCallback.
+
+Zastosowanie useMemo i useCallback:
+
+- zapamiętywanie wartości (useMemo) i funkcji (useCallback) pomiędzy renderami.
+- Wartości przekazywane do useMemo i useCallback są prze chowywane w cache i zwracane w przyszłych renderach, tak długo jak zależności pozostają takie same.
+- useMemo i useCallback mają tablicę zależności (jak useEffect): gdy jedna z zależności się zmienia, wartość jest przebudowana.
+- to trzy przypadki w których useMemo, useCallback i memo mają sens:  
+  - Zapamiętywanie propsa, żeby nie marnować renderów
+  - Zapamiętywanie wartości, żeby uniknąć kosztownych obliczeń przy każdym renderze
+  - Zapamiętywanie wartości któe są używane w tablicy zalezności w innym hooku np. useEffect
+
+### 19.249 useMemo w praktyce
+
+Dobrze przechowywać w tablicy zależności wartości będące prymitywami
+
+repo 18.221
+
+### 19.250 useCallback w praktyce
+
+Nie ma potrzeby owijania każdej funkcji/wartości w useCallback/useMemo.
+Settery z useState nie są potrzebne w tablicach zależności. Kompilator react domyślnie uważa je za stabilne.
+
+repo 18.221
+
+### 19.251 Optymalizacja ponownego renderowania kontekstu
+
+Aktualizacja jednej wartości z kontekstu powoduje odświeżenie każdego komponentu który korzysta z tego kontekstu.
+
+### 19.252 Powrót do aplikacji "WorldWise"
+
+Optymalizacja za pomocą useCallback w funkcji która po dodaniu do tablicy zależności useEffect wywoływała pętlę.
+
+### 19.253 Optymalizacja rozmiaru wygenerowanego pakietu z użyciem podziału kodu
+
+**Bundle**: Paczka z kodem aplikacji, przesyłana przez serwer.
+**Bundle size**: Wielkość bundla
+**Code splitting**: Podział kodu na wiele części, które będzi emożna pobrać dzięki mechanizmowi - lazy loading
+
+Do podziału została użyta wbudowana w react metoda lazy(), jednak do użycia jej musi być export default.
+Dodatkowo użyto komponentu Suspense do którego przekazano w propsie fallback komponent ładowania.
+
+### 19.254 Nie optymalizuj przedwcześnie
+
+Nie należy optymalizować przedwcześnie, jeśli nie ma takiej potrzeby.
+
+Optymalizacja ma sens tylko w przypadku realnych wąskich gardeł.
+
+### 19.255 Zasady useEffect i dobre praktyki
+
+W tablicy zależności useEffect powinny znaleźć się:
+
+- Wszystkie zmienne state, propsy i konteksty, które są używane w useEffect
+- Wszystkie reaktywne wartości powinny być zawarte w tablicy. Zmienne Reaktywne, to te, które zmieniają się np. odwołujące się do stanu.
+- Nie ignorujemy ostrzeżeń eslinta
+- Nie używamy obiektów lub tablic jako zależności
+
+Usuwanie funkcji z zależności:
+
+- przeniesienie funkcji do useEffect
+- jeśli funkcja nie jest używana tylko przez efekt to można ją zapamietać (useCallback)
+- Jeśli funkcja nie korzysta z wartości reaktywnych to przenieś ją po za komponent
+
+Usuwanie obiektu z zależności:
+
+- zamiast zamieszczania całego obiektu można zamieścić jedną wartość (primitive value)
+- jeśli nie da się wyodrębnić to trzeba uźyć memoizacji lub przenieść po za komponent
+
+Inne strategie:
+
+- jeśli jest zbyt dużo zależności reaqktywnych trzeba użyć reducera
+- setState i dispatch są domyślnie stabilne pomiędzy renderami
+
+useEffect powinien być używany jako ostatecznosć.
+Trzy przypadki nadużycia useEffect:
+
+- Odpowiedź na event użytkownika - zamiast tego powinna być użyta funkcja obsługi zdarzeń.
+- Pobieranie danych podczas montowania komponentu - powinno być zastąpione przez react query
+- synchronizacja stanów - zastąpi użycie event handlera i derived state
+
+### 19.256 Wyzwanie #1: Poprawa wydajności w Workout Timer
+
+repo 19.256
+
+### 19.257 Ustawienie stanu bazując na innym stanie
+
+Użycie useEffect do synchronizacji zmiennej
+
+```
+const [duration, setDuration] = useState(0);
+
+useEffect(() => {
+  setDuration((number * sets * speed) / 60 + (sets - 1) * durationBreak);
+}, [number, sets, speed, durationBreak]);
+```
+repo 19.256
+
+### 19.258 Użycie funkcji wspomagającej w useEffect
+
+Rozdzielenie odpowiedzialności pomiędzy dwa useEffect i przeniesienie ciała funcji do useEffect
+
+repo 19.256
+
+### 19.259 Domknięcia w useEffect
+
+Przykładowym wystąpieniem domknięć i nieaktualnych domknięć są useEffect. W tablicy zależności każda wartość która aktualizuje się ma wpływ na domknięcie (aktualizację danych do których odwołuje sie funkcja). Jeśli jakiejś zależności zabraknie w tablicy to dojdzie do pracy na nieaktualnym zbiorze danych i przechowywaniu informacji o nich w "migawce" (snapshot)
+
+## 20 Sekcja 20: Redux i nowoczesny zestaw narzędzi Redux (Modern Redux Toolkit)
+
+### 20.260 Przegląd sekcji
+
+- Nauka Redux na bazie useReducer
+- Nowoczesny zestaw narzędzi Redux
+- Zapytania API z Thunks
+
+### 20.261 Wstęp do Redux
+
+Opis Redux:
+
+- Zewnętrzna biblioteka do zarządzania stanem globalnym
+- samodzielna biblioteka, ale prosta do integracji z react
+- Wszystkie globalne stany są przechowywane w jednym globalnie dostępnym miejscu, które aktualizuje się przez "actions", jak w useReducer
+- Koncepcja jest podobna jak przy użyciu Context API + useReducer
+- Wszystkie komponenty korzystające z globalnego stanu są re-renderowane
+- Dwie wersje Redux: Classic Redux i Modern Redux Toolkit
+
+Kiedyś Redux był używany w większości aplikacji React do zarządzania globalnym stanem. Aktualnie to zmieniło się, bo jest wiele alternatyw. Wiele aplikacji już nie potrzebuje Reduxa, chyba, ze potrzebują zarządzania wieloma globalnymi stanami UI.
+
+Mechanizm Redux:
+
+- Obsługa zdarzeń
+- funcja tworzenia akcji - do automatycznego pisania akcji, pomocna w trzymaniu każdej akcji w jednym miejscu (to konwencja) 
+- dispatch
+- Store - action: {dispatch, payload} - przechowuje wiele reducerów i informację o aktualnym stanie
+- nowy stan
+- re-render
+
+### 20.262 Tworzenie Reducera: konto banklowe
+
+W reducerze Redux nie tworzy się nowego błędu jako default, a zwraca się stan reduktora bez nowych akcji.
+
+### 20.263 Tworzenie Redux Store
+
+> npm i redux
+
+Korzystanie z createStore:
+
+```
+const store = createStore(reducer);
+
+store.dispatch({ type: "account/deposit", payload: 500 })
+
+console.log(store.getState())
+```
+
+repo 20.262
+
+### 20.264 Praca z Action Creator
+
+Tworzenie funkcji wykonujących określone akcje.
+Typ akcji opisuje się przez tworzenie "routy": type: "account/deposit", kiedyś używało się wielkich liter z podkreślnikiem: ACCOUNT_DEPOSIT
+
+repo 20.262
+
+### 20.265 Dodanie większej liczby stanów: Klient
+
+Połączono dwa reducery w jeden za pomocą wbudowanej w react metody combineReducers
+
+repo 20.262
+
+### 20.266 Praktyczna struktura plików Redux: State Slices
+
+repo 20.262
+
+### 20.267 Powrót do React, połączenie redux i aplikacji
+
+instalacja react-redux:
+
+npm i react-redux
+
+Dodanie providera z react-redux:
+```
+  <Provider store={store}>
+    <App />
+  </Provider>
+```
+
+react-redux udostępnia hook **useSelector** dzięki któremu można pobrać informacje z reduxa:
+
+```
+  const customer = useSelector((store) => store.customer.fullName);
+```
+
+### 20.268 Dodanie akcji do aplikacji
+
+W handlerze komponentu używamy metody react-redux:
+
+```
+import { useDispatch } from "react-redux";
+
+const dispatch = useDispatch();
+
+function handleClick() {
+  if (!fullName || !nationalId) return;
+  dispatch(createCustomer(fullName, nationalId));
+}
+```
+
+repo 20.262
+
+### 20.269 Starsza metoda podpinania komponentów do Redux
+
+Przez użycie Connect API
+
+```
+import { connect } from "react-redux";
+
+function BalanceDisplay({balance}) {
+  return <div className="balance">{formatCurrency(balance)}</div>;
+}
+
+function mapStateToProps(state) {
+  return {
+    balance: state.account.balance
+  }
+}
+export default connect(mapStateToProps)(BalanceDisplay);
+```
+
+repo 20.262
+
+### 20.270 Redux Middleware i Thunks
+
+W Redux nie można wykonywać funkcji asynchronicznych, reducery muszą być "pure functions", bez efektów ubocznych.
+Fetchowanie danych bezpośrednio w komponencie nie jest najlepszym rozwiązaniem, zdecydowanie lepiej korzystać z middleware (Thunk).
+
+Middleware są:
+
+- idealne dla kodu asynchronicznego
+- Wywołania API, timery, logi
+- Miejsce do efektów ubocznych
+
+### 20.271 Making an API Call With Redux Thunks
+
+Modyfikacja deposit, tak aby w nim była funkcja asynchroniczna i jej wynik został wysłany dispatchem do reducera:
+
+```
+export function deposit(amount, currency) {
+  if (currency === "USD") return { type: "account/deposit", payload: amount };
+  return async function (dispatch, getState) {
+    dispatch({type: "account/convertingCurrency"});
+    const res = await fetch(
+      `https://api.frankfurter.app/latest?amount=${amount}&from=${currency}&to=USD`
+    );
+    const data = await res.json();
+    const converted = data.rates.USD;
+
+    dispatch({
+      type: "account/deposit",
+      payload: converted,
+    });
+  };
+}
+```
+
+Dodanie obsługi deposit() do handlera w komponencie:
+
+```
+function handleDeposit() {
+  if (!depositAmount) return;
+  dispatch(deposit(depositAmount, currency));
+}
+```
+
+repo 20.262
+
+### 20.272 Redux DevTools
+
+repo 20.262
+
+### 20.273 Czy jest Redux Toolkit (RTK)?
+
+- Nowoczesny i zalecany sposób pisania Redux
+- Zmusza do korzystania z najlepszych praktyk podczas pisania kodu
+- kompatybiny z klasycznym Redux
+- Można napisać mniej kodu
+- Posiada 3 główne korzyści:
+  - Można pisać kod który zmienia stan wewnątrz reducera za pomocą libki Immer, która przetworzy kod znowu na niemutowalny
+  - Akcje są automatycznie tworzone
+  - Automatycznie skonfiguruje thunk middleware i DevTools
+
+### 20.274 Tworzenie i przechowywanie z RTK
+
+repo 20.262
+
+> npm i @reduxjs/toolkit
+
+Zmieniono createStore() na configureStore() z biblioteki reduxjs/toolkit
+
+### 20.275 Utworzenie stanu konta przy użuciu RTK
+
+repo 20.262
+
+### 20.276 Powrót do thunks
+
+W RTK da sie ręcznie ustawić middleware
+
+### 20.277 Utworzenie stanu użytkownika przy użuciu RTK
+
+repo 20.262
+
+### 20.278 Redux vs. Context API
+
+Charakterystyka context api + useReducer
+
+- wbudiwane w react
+- łatwe do zaimplementowania jako pojedynczy kontekst
+- ryzyko provider hell, gdy będzie wiele kontekstów
+- nie ma mechanizmów do operecji async
+- optymalizacja jest bolesna
+- tylko react devtools
+
+Charakterystyka redux
+
+- wymaga dodatkowych bibliotek
+- trudniejsza inicjalizacja w projekcie
+- jeśli już raz został dodany to łatwiej dodawać konteksty do projektu
+- wspiera middleware
+- optymalizacja na starcie
+- wsparcie dedykowanych devtoolsów
+
+W przybliżeniu context api + useReducer są używane w mniejszych aplikacjach, a redux w większych.
