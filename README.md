@@ -2662,3 +2662,229 @@ repo 19.256
 ### 19.259 Domknięcia w useEffect
 
 Przykładowym wystąpieniem domknięć i nieaktualnych domknięć są useEffect. W tablicy zależności każda wartość która aktualizuje się ma wpływ na domknięcie (aktualizację danych do których odwołuje sie funkcja). Jeśli jakiejś zależności zabraknie w tablicy to dojdzie do pracy na nieaktualnym zbiorze danych i przechowywaniu informacji o nich w "migawce" (snapshot)
+
+## 20 Sekcja 20: Redux i nowoczesny zestaw narzędzi Redux (Modern Redux Toolkit)
+
+### 20.260 Przegląd sekcji
+
+- Nauka Redux na bazie useReducer
+- Nowoczesny zestaw narzędzi Redux
+- Zapytania API z Thunks
+
+### 20.261 Wstęp do Redux
+
+Opis Redux:
+
+- Zewnętrzna biblioteka do zarządzania stanem globalnym
+- samodzielna biblioteka, ale prosta do integracji z react
+- Wszystkie globalne stany są przechowywane w jednym globalnie dostępnym miejscu, które aktualizuje się przez "actions", jak w useReducer
+- Koncepcja jest podobna jak przy użyciu Context API + useReducer
+- Wszystkie komponenty korzystające z globalnego stanu są re-renderowane
+- Dwie wersje Redux: Classic Redux i Modern Redux Toolkit
+
+Kiedyś Redux był używany w większości aplikacji React do zarządzania globalnym stanem. Aktualnie to zmieniło się, bo jest wiele alternatyw. Wiele aplikacji już nie potrzebuje Reduxa, chyba, ze potrzebują zarządzania wieloma globalnymi stanami UI.
+
+Mechanizm Redux:
+
+- Obsługa zdarzeń
+- funcja tworzenia akcji - do automatycznego pisania akcji, pomocna w trzymaniu każdej akcji w jednym miejscu (to konwencja) 
+- dispatch
+- Store - action: {dispatch, payload} - przechowuje wiele reducerów i informację o aktualnym stanie
+- nowy stan
+- re-render
+
+### 20.262 Tworzenie Reducera: konto banklowe
+
+W reducerze Redux nie tworzy się nowego błędu jako default, a zwraca się stan reduktora bez nowych akcji.
+
+### 20.263 Tworzenie Redux Store
+
+> npm i redux
+
+Korzystanie z createStore:
+
+```
+const store = createStore(reducer);
+
+store.dispatch({ type: "account/deposit", payload: 500 })
+
+console.log(store.getState())
+```
+
+repo 20.262
+
+### 20.264 Praca z Action Creator
+
+Tworzenie funkcji wykonujących określone akcje.
+Typ akcji opisuje się przez tworzenie "routy": type: "account/deposit", kiedyś używało się wielkich liter z podkreślnikiem: ACCOUNT_DEPOSIT
+
+repo 20.262
+
+### 20.265 Dodanie większej liczby stanów: Klient
+
+Połączono dwa reducery w jeden za pomocą wbudowanej w react metody combineReducers
+
+repo 20.262
+
+### 20.266 Praktyczna struktura plików Redux: State Slices
+
+repo 20.262
+
+### 20.267 Powrót do React, połączenie redux i aplikacji
+
+instalacja react-redux:
+
+npm i react-redux
+
+Dodanie providera z react-redux:
+```
+  <Provider store={store}>
+    <App />
+  </Provider>
+```
+
+react-redux udostępnia hook **useSelector** dzięki któremu można pobrać informacje z reduxa:
+
+```
+  const customer = useSelector((store) => store.customer.fullName);
+```
+
+### 20.268 Dodanie akcji do aplikacji
+
+W handlerze komponentu używamy metody react-redux:
+
+```
+import { useDispatch } from "react-redux";
+
+const dispatch = useDispatch();
+
+function handleClick() {
+  if (!fullName || !nationalId) return;
+  dispatch(createCustomer(fullName, nationalId));
+}
+```
+
+repo 20.262
+
+### 20.269 Starsza metoda podpinania komponentów do Redux
+
+Przez użycie Connect API
+
+```
+import { connect } from "react-redux";
+
+function BalanceDisplay({balance}) {
+  return <div className="balance">{formatCurrency(balance)}</div>;
+}
+
+function mapStateToProps(state) {
+  return {
+    balance: state.account.balance
+  }
+}
+export default connect(mapStateToProps)(BalanceDisplay);
+```
+
+repo 20.262
+
+### 20.270 Redux Middleware i Thunks
+
+W Redux nie można wykonywać funkcji asynchronicznych, reducery muszą być "pure functions", bez efektów ubocznych.
+Fetchowanie danych bezpośrednio w komponencie nie jest najlepszym rozwiązaniem, zdecydowanie lepiej korzystać z middleware (Thunk).
+
+Middleware są:
+
+- idealne dla kodu asynchronicznego
+- Wywołania API, timery, logi
+- Miejsce do efektów ubocznych
+
+### 20.271 Making an API Call With Redux Thunks
+
+Modyfikacja deposit, tak aby w nim była funkcja asynchroniczna i jej wynik został wysłany dispatchem do reducera:
+
+```
+export function deposit(amount, currency) {
+  if (currency === "USD") return { type: "account/deposit", payload: amount };
+  return async function (dispatch, getState) {
+    dispatch({type: "account/convertingCurrency"});
+    const res = await fetch(
+      `https://api.frankfurter.app/latest?amount=${amount}&from=${currency}&to=USD`
+    );
+    const data = await res.json();
+    const converted = data.rates.USD;
+
+    dispatch({
+      type: "account/deposit",
+      payload: converted,
+    });
+  };
+}
+```
+
+Dodanie obsługi deposit() do handlera w komponencie:
+
+```
+function handleDeposit() {
+  if (!depositAmount) return;
+  dispatch(deposit(depositAmount, currency));
+}
+```
+
+repo 20.262
+
+### 20.272 Redux DevTools
+
+repo 20.262
+
+### 20.273 Czy jest Redux Toolkit (RTK)?
+
+- Nowoczesny i zalecany sposób pisania Redux
+- Zmusza do korzystania z najlepszych praktyk podczas pisania kodu
+- kompatybiny z klasycznym Redux
+- Można napisać mniej kodu
+- Posiada 3 główne korzyści:
+  - Można pisać kod który zmienia stan wewnątrz reducera za pomocą libki Immer, która przetworzy kod znowu na niemutowalny
+  - Akcje są automatycznie tworzone
+  - Automatycznie skonfiguruje thunk middleware i DevTools
+
+### 20.274 Tworzenie i przechowywanie z RTK
+
+repo 20.262
+
+> npm i @reduxjs/toolkit
+
+Zmieniono createStore() na configureStore() z biblioteki reduxjs/toolkit
+
+### 20.275 Utworzenie stanu konta przy użuciu RTK
+
+repo 20.262
+
+### 20.276 Powrót do thunks
+
+W RTK da sie ręcznie ustawić middleware
+
+### 20.277 Utworzenie stanu użytkownika przy użuciu RTK
+
+repo 20.262
+
+### 20.278 Redux vs. Context API
+
+Charakterystyka context api + useReducer
+
+- wbudiwane w react
+- łatwe do zaimplementowania jako pojedynczy kontekst
+- ryzyko provider hell, gdy będzie wiele kontekstów
+- nie ma mechanizmów do operecji async
+- optymalizacja jest bolesna
+- tylko react devtools
+
+Charakterystyka redux
+
+- wymaga dodatkowych bibliotek
+- trudniejsza inicjalizacja w projekcie
+- jeśli już raz został dodany to łatwiej dodawać konteksty do projektu
+- wspiera middleware
+- optymalizacja na starcie
+- wsparcie dedykowanych devtoolsów
+
+W przybliżeniu context api + useReducer są używane w mniejszych aplikacjach, a redux w większych.
