@@ -2888,3 +2888,243 @@ Charakterystyka redux
 - wsparcie dedykowanych devtoolsów
 
 W przybliżeniu context api + useReducer są używane w mniejszych aplikacjach, a redux w większych.
+
+## 21 Sekcja 21: Część 4: PROFESSIONAL REACT DEVELOPMENT [2 PROJECTS]
+
+### 21.279 Wstęp do części 4
+
+### 21.280 Użyteczne źródła do części 4
+
+- https://www.robinwieruch.de/react-libraries/?ref=jonas.io
+- https://www.joshwcomeau.com/css/styled-components/?ref=jonas.io
+- https://css-tricks.com/a-thorough-analysis-of-css-in-js/?ref=jonas.io <3
+- https://tkdodo.eu/blog/practical-react-query?ref=jonas.io
+- https://tkdodo.eu/blog/react-query-meets-react-router?ref=jonas.io
+- https://www.benmvp.com/blog/picking-right-react-component-pattern/?ref=jonas.io
+- https://github.com/alan2207/bulletproof-react?ref=jonas.io
+
+Biblioteki:
+
+- https://tailwindcss.com/docs/guides/vite?ref=jonas.io
+- https://styled-components.com/docs?ref=jonas.io
+- https://supabase.com/docs/reference/javascript/installing
+- https://tanstack.com/query/v4/docs/framework/react/overview?ref=jonas.io
+- https://recharts.org/en-US/examples?ref=jonas.io
+- https://date-fns.org/docs/Getting-Started/?ref=jonas.io
+
+## 22 Sekcja 22: React Router With Data Loading (v6.4+)
+
+### 22.281 Przegląd sekcji
+
+### 22.282 Rozpoczęcie projektu: "Fast React Pizza Co."
+
+repo 22.262
+
+### 22.283 Planowanie aplikacji
+
+"Fast React Pizza Co."
+
+- Restauracja chce umożliwić klientom zamawianie pizzy z dowozem
+- mam ogarnąć frontend do istniejącego backendu
+
+- Zebranie wymagań i funkcji aplikacji
+- Podział aplikacji na strony
+  - zaplanowanie ogólnego wyglądu i UI pojedynczych stron
+  - Podział UI na komponenty
+  - Zaprojektowanie i budowa wersji statycznej
+- Podział na kategorie
+  - Myślenie o zarządzaniu stanem + przepływie danych
+- Decyzja o technologii
+
+Potrzeby biznesowe
+
+- prosta aplikacja gdzie użytkownik może zamówić jedną lub więcej pizz z menu
+- Brak logowania, użytkownik podaje tylko imię gdy zamawia
+- Menu powinno być pobierane z API, będzie mogło zostać zmienione
+- Użytkownicy będą potrzebowali karty zamówienia
+- Zamówienia wymagają imienia, numery tel i adresu
+- Jeśli jest możliwosć to lokalizacja GPS powinna być wprowadzaona, bo ułatwić dostawę
+- Użytkownik moze użyć  priorytetyzacji zamówienia, za 20% wartości koszyka
+- Zamówienia powinny byc wysłane POSTem wraz z pozostałymi danymi (dane użytkownika i dane o pizzach) do API
+- Płatności tylko podczas dostawy, więc nie ma potrzeby obsługi płatności
+- każde zamówienie uzyska unikalny ID, któy będzie wyświetlony, więc użytkownik będzie mógł przeglądać zamówienia na podstawie ID
+- użytkownik może oznaczyć zamówienia jako priorytetowe nawet po jego złozeniu
+
+Kategorie feature:
+
+- User
+- Menu
+- Card
+- Order
+
+Potrzebne strony:
+
+- Homepage (/)
+- Pizza menu (/menu)
+- Card (/card)
+- New order (/order/new)
+- Podejrzenie zamówienia (/order/:orderId)
+
+Zarządzanie stanem
+
+- User -> Globalny stan UI (brak kont, nie musi być propagowane w aplikacji)
+- Menu -> Zdalny, globalny stan (menu jest fetchowany z API)
+- Card -> Globalny stan UI (nie potrzewba API, jest przechowywane w aplikacji)
+- Order -> Zdalny, globalny stan (wysyłany i odbierany przez API) 
+
+Decyzje technoilogiczne:
+
+- Routing - React ROuter
+- Styling tailwindcss
+- Zdalne zarządzanie stanem - React Router - Użycie strategii "render podczas pobierania" zamiast "pobieranie podczas renderu"
+- Zarządzanie stanem UI - Redux - stan jest skomplikowany, a redux ma sporo udogodnień dla UI
+
+### 22.284 Dodanie presjonalnej struktury do projektu
+
+Feature based structure
+
+repo 22.262
+
+### 22.285 Nowy sposób na wdrażanie Routes
+
+tworzenie listy rout przez metodę createBrowserRouter()
+
+repo 22.262
+
+### 22.286 Tworzenie Lauoytu aplikacji
+
+Wykorzystuję komponent react-router: Outlet do pobierania informacji o tym jaki komponent ma być zagnieżdżony
+
+AppLayout:
+
+```
+<main>
+  <Outlet />
+</main>
+```
+
+App:
+
+```
+const router = createBrowserRouter([
+  {
+    element: <AppLayout />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+    ],
+  },
+]);
+```
+
+repo 22.262
+
+### 22.287 Pobieranie danych za pomocą React Router
+
+Pobieranie danych za pomocą Loadera
+
+W komponencie definiuję loader łączący się z api:
+
+```
+export async function loader() {
+  const menu = await getMenu();
+  return menu;
+}
+```
+
+W App, w createBrowserRouter używam loadera przy komponencie:
+
+```
+{
+  path: "/menu",
+  element: <Menu />,
+  loader: menuLoader,
+},
+```
+
+repo 22.262
+
+### 22.288 Wyświetlanie wskaźnika ładowania
+
+Użycie useNavigation:
+
+```
+  const navigation = useNavigation();
+  const isLoading = navigation.state === "loading";
+```
+
+repo 22.262
+
+### 22.289 Obsługa błędów z elementem Error
+
+Pobranie błędów z react-router:
+
+```
+import { useNavigate, useRouteError } from 'react-router-dom';
+
+export function Error() {
+  const error = useRouteError();
+  return (
+    <p>{error.data || error.message}</p>
+  )
+}
+```
+
+repo 22.262
+
+### 22.290 Zaciąganie zamówień
+
+repo 22.262
+
+### 22.291 Wysyłanie danych z React Router "Actions"
+
+Zamiast loader() używamy action()
+
+repo 22.262
+
+### 22.292 Error Handling in Form Actions
+
+Obsługa błędów za pomocą hooka react-router: useActionData
+
+```
+  const formErrors = useActionData(); 
+```
+
+Dodanie w actions sprawdzenia czy zajerestrowano jakiś bład, jeśli nie to złożono zamówienie:
+
+```
+export async function action({ request }) {
+  const formData = await request.formData();
+  const data = Object.fromEntries(formData)
+  const errors = {}
+  const order = {
+    ...data,
+    cart: JSON.parse(data.cart),
+    priority: data.priority === 'on'
+  };
+  
+  if (!isValidPhone(order.phone)) errors.phone = "Please give us your correct contact number. We might need it to contact you."
+  
+  if (Object.keys(errors).length > 0) return errors;
+
+  const newOrder = await createOrder(order);
+
+  return redirect(`/order/${newOrder.id}`);
+}
+```
+
+Jeśli wystąpił błąd to dodano walidację do pola formularza:
+
+```
+<div>
+  <label>Phone number</label>
+  <div>
+    <input type="tel" name="phone" required />
+  </div>
+  {formErrors?.phone && <p>{formErrors.phone}</p>}
+</div>
+```
+
+repo 22.262
