@@ -68,10 +68,10 @@ Wtyczki:
 Prezentacja w jaki sposób można tworzyć kod w React, React przyjmuje kod w czystym JS. React i babel zaimportowany w pliku html z linków:
 
 ```html
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 ```
 
 Renderowanie elementów HTML za pomocą funkcji createElement() zamiast składni JSX.
@@ -191,7 +191,7 @@ Prowadzący zaleca używanie funkcji strzałkowych jako jednolinijkowe:
 wyrażenie funkcyjne:
 
 ```js
-const funkcja = (parametr) => kod
+const funkcja = (parametr) => kod;
 ```
 
 deklaracja funkcji:
@@ -872,6 +872,7 @@ Kiedy: <br/> <br/>
     F -- "Nie" --> G("Użyj Ref (useRef)")
     F -- "Tak" --> H("Utwórz nowy stan dla komponentu")
 ```
+
 Gdzie: <br/> <br/>
 
 ```mermaid
@@ -892,6 +893,7 @@ Gdzie: <br/> <br/>
     F -- "Tak" --> G("Podnieś stan do pierwszego wspólnego komponentu")
     F -- "Nie" --> H("Użyj stanu globalnego")
 ```
+
 Stan globalny możemy wykorzystać gdy jest potrzbny w wielu komponentach rozsianych w rónych miejscdach aplikacji
 
 ### 7.80 Jak myśleć o stanie i wynoszeniu stanu do komponentu nadrzędnego
@@ -907,6 +909,7 @@ Przepływ od rodzica do dziecka. Aktualizacja stanu za pomocą funkcji zadeklaro
 repo katalog 6.69
 
 Usuwanie za pomocą funkcji handleDelete() w App.js
+
 ```js
 > function handleDelete(id) {
 >   setItems((prevItems) => prevItems.filter((item) => item.id !== id));
@@ -947,15 +950,15 @@ repo katalog 6.69
 
 ```js
 > const { items } = props;
->   
+>
 > if (!items.length) // zabezpiczenie przed wykonywaniem obliczeń, gdy nie ma elementów
 >   return (
 >     <p className="stats">
 >       <em>Dodaj coś do listy pakowania</em>
 >     </p>
 >   )
-> 
-> const itemsNumbers = items.length;  
+>
+> const itemsNumbers = items.length;
 > const intemsPackedNumbers = items.filter((item) => item.packed && item).length;
 > const itemsPackedPercentage = Math.round((intemsPackedNumbers / itemsNumbers) * 100);
 ```
@@ -1154,7 +1157,6 @@ https://julesblom.com/writing/usesyncexternalstore
 
 Zagłębienie się jak działają hooki w React
 https://the-guild.dev/blog/react-hooks-system
-
 
 Dlaczego hooki React opierają się na kolejności wywołań?
 https://overreacted.io/why-do-hooks-rely-on-call-order
@@ -1470,7 +1472,7 @@ Jak aktualizacje stanu są grupowane?
 ```
 
 Z powyższego kodu, wywołania setState nie są wykonywane jedno po drugim, a złączone w jedno wywołanie. Dzięki temu wywoływany jest jeden render i commit, zamiast trzech osobnych.
-Console.log wskaże stary stan dla answer, ponieważ zostaje odczytanyz  drzewa Fiber, a rerenderowanie jeszcze nie nastąpiło. Jest to związane z asynchronicznością (gdyby kod był synchroniczny, zmiana byłaby widoczna, ale rozjechałaby sie mechanika React).
+Console.log wskaże stary stan dla answer, ponieważ zostaje odczytanyz drzewa Fiber, a rerenderowanie jeszcze nie nastąpiło. Jest to związane z asynchronicznością (gdyby kod był synchroniczny, zmiana byłaby widoczna, ale rozjechałaby sie mechanika React).
 
 Jeśli potrzebujemy aktualizoweać stan na bazie poprzedniego stanu, to powinniśmy używać setState z callbackiem: (setAnswer(answer => ...))
 
@@ -1783,14 +1785,14 @@ Nie powinno się używać imperatywnego JS w React, chodzi o to, żeby kod był 
 
 ### 13.166 Wstęp do innych hooków: useRef
 
-useRef to obiekt z mutowalną właściwości *.current* którego wartość przetrwa pomiędzy renderami
+useRef to obiekt z mutowalną właściwości _.current_ którego wartość przetrwa pomiędzy renderami
 Przypadki w których używa sie useRef:
 
 - tworzenie zmiennej która ma być taka sama pomiędzy renderami
 - wybieranie i przechowywanie lementów DOM
 
 Refs są dla danych które nie są renderowane (obsługa eventów lub efekty). W JSX trzeba użyć stanu.
-Nie można edytować i odczytywać *.current* wewnątrz logiki renderowania (można tylko w useEffect). Służy do zmierania danych
+Nie można edytować i odczytywać _.current_ wewnątrz logiki renderowania (można tylko w useEffect). Służy do zmierania danych
 
 State vs. Refs
 
@@ -2186,13 +2188,13 @@ repo 17.204
 
 Opcje stylowania:
 
-| STYLING OPTION     | WHERE              | HOW?               | SCOPE              | BASED ON           |
-|--------------------|--------------------|--------------------|--------------------|--------------------|
-| liniowy css        | JSX elements       | style props        | JSX element        | CSS                |
-| plik css lub sass  | External file      | className prop     | Entire app         | CSS                |
-| moduły css         | One external file per component  | className prop        | Component        | CSS |
-| css-in-js          | External file or component file     | Creates new component| Component| JavaScript|
-| Utility-first-css - tailwind| JSX element  | className prop     | JSX element     | CSS                |
+| STYLING OPTION               | WHERE                           | HOW?                  | SCOPE       | BASED ON   |
+| ---------------------------- | ------------------------------- | --------------------- | ----------- | ---------- |
+| liniowy css                  | JSX elements                    | style props           | JSX element | CSS        |
+| plik css lub sass            | External file                   | className prop        | Entire app  | CSS        |
+| moduły css                   | One external file per component | className prop        | Component   | CSS        |
+| css-in-js                    | External file or component file | Creates new component | Component   | JavaScript |
+| Utility-first-css - tailwind | JSX element                     | className prop        | JSX element | CSS        |
 
 Jako alternatywę można użyć gotowej biblioteki UI np. MUI, Chakra UI, Mantine, Ant Designe
 
@@ -2382,7 +2384,6 @@ Dostępność stanu:
 - Local state
   - jeden lub pare komponentów
   - Postępny w komponencie i komponentach potomnych
-  
 - Global state
   - wiele rozproszonych komponentów
   - dostępny z poziomu całej aplikacji
@@ -2393,20 +2394,19 @@ Miejsce stanu:
   - Zdalne dane z np. API
   - zazwyczaj asynchroniczny
   - potrzebuje ponownego fetchowania i aktualizacji
-  
 - UI State
   - pozostałe rzeczy
   - tematy, filtry, dane z formularza itd.
   - synchroniczny i przechowywany w aplikacji
 
-| Where to place?       | Tools                           | When to use?           |
-|-----------------------|---------------------------------|------------------------|
-| Local component       | state, reducer, ref             | Local state            |
-| Perent component      | state, reducer, ref             | Odziedziczony          |
-| Context               | context, state, reducer         | globalny stan (UI)     |
-| Zewnętrzne biblioteki | redux, react query, swr, zustand| globalny stan (zdalny) |
-| URL         | React Router       | globalny stan (przenoszony pomiędzy stronami) |
-| Przeglądarka | Local storage, session storage | Dane przechowywane w przeglądarce|
+| Where to place?       | Tools                            | When to use?                                  |
+| --------------------- | -------------------------------- | --------------------------------------------- |
+| Local component       | state, reducer, ref              | Local state                                   |
+| Perent component      | state, reducer, ref              | Odziedziczony                                 |
+| Context               | context, state, reducer          | globalny stan (UI)                            |
+| Zewnętrzne biblioteki | redux, react query, swr, zustand | globalny stan (zdalny)                        |
+| URL                   | React Router                     | globalny stan (przenoszony pomiędzy stronami) |
+| Przeglądarka          | Local storage, session storage   | Dane przechowywane w przeglądarce             |
 
 ### 18.227 Powrót do WorldWise: tworzenie kontekstu CitiesContext
 
@@ -2436,7 +2436,7 @@ repo 17.204
 
 repo 17.204
 
-W narzędziach dev przeglądarki, w zakładce Components można użyć sensors - Location i dzięki temu użyć podrobionej lokalizacji urządzenia. 
+W narzędziach dev przeglądarki, w zakładce Components można użyć sensors - Location i dzięki temu użyć podrobionej lokalizacji urządzenia.
 
 ### 18.234 Pobranie danych o mieście któe wybrał użytkownik na mapie
 
@@ -2563,7 +2563,7 @@ Zastosowanie useMemo i useCallback:
 - zapamiętywanie wartości (useMemo) i funkcji (useCallback) pomiędzy renderami.
 - Wartości przekazywane do useMemo i useCallback są prze chowywane w cache i zwracane w przyszłych renderach, tak długo jak zależności pozostają takie same.
 - useMemo i useCallback mają tablicę zależności (jak useEffect): gdy jedna z zależności się zmienia, wartość jest przebudowana.
-- to trzy przypadki w których useMemo, useCallback i memo mają sens:  
+- to trzy przypadki w których useMemo, useCallback i memo mają sens:
   - Zapamiętywanie propsa, żeby nie marnować renderów
   - Zapamiętywanie wartości, żeby uniknąć kosztownych obliczeń przy każdym renderze
   - Zapamiętywanie wartości któe są używane w tablicy zalezności w innym hooku np. useEffect
@@ -2651,6 +2651,7 @@ useEffect(() => {
   setDuration((number * sets * speed) / 60 + (sets - 1) * durationBreak);
 }, [number, sets, speed, durationBreak]);
 ```
+
 repo 19.256
 
 ### 19.258 Użycie funkcji wspomagającej w useEffect
@@ -2687,7 +2688,7 @@ Kiedyś Redux był używany w większości aplikacji React do zarządzania globa
 Mechanizm Redux:
 
 - Obsługa zdarzeń
-- funcja tworzenia akcji - do automatycznego pisania akcji, pomocna w trzymaniu każdej akcji w jednym miejscu (to konwencja) 
+- funcja tworzenia akcji - do automatycznego pisania akcji, pomocna w trzymaniu każdej akcji w jednym miejscu (to konwencja)
 - dispatch
 - Store - action: {dispatch, payload} - przechowuje wiele reducerów i informację o aktualnym stanie
 - nowy stan
@@ -2737,6 +2738,7 @@ instalacja react-redux:
 npm i react-redux
 
 Dodanie providera z react-redux:
+
 ```
   <Provider store={store}>
     <App />
@@ -2944,7 +2946,7 @@ Potrzeby biznesowe
 - Użytkownicy będą potrzebowali karty zamówienia
 - Zamówienia wymagają imienia, numery tel i adresu
 - Jeśli jest możliwosć to lokalizacja GPS powinna być wprowadzaona, bo ułatwić dostawę
-- Użytkownik moze użyć  priorytetyzacji zamówienia, za 20% wartości koszyka
+- Użytkownik moze użyć priorytetyzacji zamówienia, za 20% wartości koszyka
 - Zamówienia powinny byc wysłane POSTem wraz z pozostałymi danymi (dane użytkownika i dane o pizzach) do API
 - Płatności tylko podczas dostawy, więc nie ma potrzeby obsługi płatności
 - każde zamówienie uzyska unikalny ID, któy będzie wyświetlony, więc użytkownik będzie mógł przeglądać zamówienia na podstawie ID
@@ -2970,7 +2972,7 @@ Zarządzanie stanem
 - User -> Globalny stan UI (brak kont, nie musi być propagowane w aplikacji)
 - Menu -> Zdalny, globalny stan (menu jest fetchowany z API)
 - Card -> Globalny stan UI (nie potrzewba API, jest przechowywane w aplikacji)
-- Order -> Zdalny, globalny stan (wysyłany i odbierany przez API) 
+- Order -> Zdalny, globalny stan (wysyłany i odbierany przez API)
 
 Decyzje technoilogiczne:
 
@@ -3089,7 +3091,7 @@ repo 22.262
 Obsługa błędów za pomocą hooka react-router: useActionData
 
 ```
-  const formErrors = useActionData(); 
+  const formErrors = useActionData();
 ```
 
 Dodanie w actions sprawdzenia czy zajerestrowano jakiś bład, jeśli nie to złożono zamówienie:
@@ -3104,9 +3106,9 @@ export async function action({ request }) {
     cart: JSON.parse(data.cart),
     priority: data.priority === 'on'
   };
-  
+
   if (!isValidPhone(order.phone)) errors.phone = "Please give us your correct contact number. We might need it to contact you."
-  
+
   if (Object.keys(errors).length > 0) return errors;
 
   const newOrder = await createOrder(order);
@@ -3126,5 +3128,174 @@ Jeśli wystąpił błąd to dodano walidację do pola formularza:
   {formErrors?.phone && <p>{formErrors.phone}</p>}
 </div>
 ```
+
+repo 22.262
+
+## 23 Sekcja 23: Szybki kurs Tailwindcss
+
+### 23.293 Przegląd sekcji
+
+### 23.294 Czym jest Tailwind CSS
+
+Tailwind CSS to framework CSS polegajacy na tworzeniu małych klas, które mają zawężone zastosowanie. Klasy są już gotowe do użycia.
+
+Zalety:
+
+- klasy już istnieją
+- stylowanie w jednym miejscu
+- w kazdym projekcie są te same klasy
+- system projektowania, dzięki czemu UI jest spójniejszy
+- oszczędza czas
+- świetna dokumentacja
+
+Wady:
+
+- Kod staje się trudniejszy do czytania
+- potrzeba nauki klas tailwinda
+- instalacja i konfiguracja w każdym projekcie osobno
+- rezygnacja z czystego CSSa
+
+### 23.295 Dodanie Tailwind CSS do projektu
+
+Przydatne narzędzie:
+
+prettier-plugin-tailwindcss
+
+> npm install -D prettier prettier-plugin-tailwindcss
+
+.prettierrc - plik do konfigurowania ustawień projektu np. użycie singlequotes('') zamiast doublequotes("")
+
+```
+{
+  "plugins": ["prettier-plugin-tailwindcss"]
+}
+```
+
+repo 22.262
+
+### 23.296 Praca z kolorami
+
+repo 22.262
+
+### 23.297 Stylowanie tesktu
+
+repo 22.262
+
+### 23.298 Modelowanie ramek: Spacing, Borders, Display
+
+repo 22.262
+
+### 23.299 Widok responsywny
+
+repo 22.262
+
+### 23.300 Flexbox
+
+repo 22.262
+
+### 23.301 CSS Grid
+
+repo 22.262
+
+### 23.302 Styloanie przycisków: Stan elementu i przejścia (transitions)
+
+repo 22.262
+
+### 23.303 Stylowanie formularzy
+
+repo 22.262
+
+### 23.304 Ponowne użycie styli z @apply
+
+W index.css można zadeklarować style na bazie klas tailwind dla własnej klasy:
+
+```
+@layer components {
+  .input {
+    @apply w-full rounded-full border border-stone-200 px-4 py-2 text-sm transition-all duration-300 placeholder:text-stone-400 focus:outline-none focus:ring focus:ring-yellow-400 md:px-6 md:py-3;
+  }
+}
+```
+
+repo 22.262
+
+### 23.305 Reużywanie styli z React Components
+
+Przydatne tricki podczas tworzenia komponentów linków:
+
+Link korzystający z nawigacji do cofania:
+
+```
+export function LinkButton({ children, to }) {
+  const navigate = useNavigate();
+  const className = 'text-sm text-blue-500 hover:text-blue-600';
+
+  if (to === '-1')
+    return (
+      <button className={className} onClick={() => navigate(-1)}>
+        {children}
+      </button>
+    );
+  return (
+    <Link to={to} className={className}>
+      {children}
+    </Link>
+  );
+}
+```
+
+Współdzielenie klas pomiędzy przyciskiem i linkiem:
+
+```
+export function Button({ children, disabled, to }) {
+  const className =
+    'inline-block rounded-full bg-yellow-400 px-4 py-3 font-semibold uppercase tracking-wide text-stone-800 transition-colors duration-300 hover:bg-yellow-300 focus:bg-yellow-300 focus:outline-none focus:ring focus:ring-yellow-300 focus:ring-offset-2 disabled:cursor-not-allowed sm:px-6 sm:py-4';
+  if (to)
+    return (
+      <Link to={to} className={className}>
+        {children}
+      </Link>
+    );
+  return (
+    <button disabled={disabled} className={className}>
+      {children}
+    </button>
+  );
+}
+```
+
+repo 22.262
+
+### 23.306 Pozycjonowanie absolute, z-index itd
+
+Tailwindcss umożliwia korzystanie z theme tailwind w wartościach czystego cssa:
+
+> linear-gradient(theme(colors.stone.800) 0 0);
+
+repo 22.262
+
+### 23.307 Konfiguracja Tailwinda: Własne fonty
+
+repo 22.262
+
+### 23.308 Stylowanie Menu
+
+repo 22.262
+
+### 23.309 Stylowanie Karty
+
+repo 22.262
+
+### 23.310 Stylowanie formularza zamówień
+
+Zamieszczanie emoji jako favicony:
+
+```
+> <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍕</text></svg>">
+```
+
+repo 22.262
+
+### 23.311 Stylowanie podglądu zamówienia
 
 repo 22.262
