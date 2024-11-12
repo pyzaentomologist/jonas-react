@@ -3299,3 +3299,188 @@ repo 22.262
 ### 23.311 Stylowanie podglądu zamówienia
 
 repo 22.262
+
+## 24 Sekcja 24: Dodanie Redux i zaawansowanego React Router
+
+### 24.312 Przegląd sekcji
+
+- Dodanie karty zamówienia
+- Zaawansowany React Router
+- Realne przypadki użycia Redux
+
+### 24.313 Projektowanie stanu Użytkownika z Redux Toolkit
+
+repo 22.262
+
+### 24.314 Odczytywanie i aktualizacja stanu użytkownika
+
+Aktualizacja nazwy użytkownika za pomocą dispatch
+
+```
+>  const dispatch = useDispatch();
+>  dispatch(updateName(username));
+```
+
+Odczytywanie nazwy użytkownika za pomocą useSelector
+
+```
+>  const username = useSelector((state) => state.user.username);
+```
+
+repo 22.262
+
+### 24.315 Modelowanie stanu karty
+
+repo 22.262
+
+### 24.316 Dodawanie elementó menu do karty zamówienia
+
+repo 22.262
+
+### 24.317 Budowanie podglądu karty za pomocą Redux Selectors
+
+selektory powinny być umieszczone w slice danego obiektu, a w celu poprawienia wydajności powinno się rozważyć użycie biblioteki "reselect".
+
+repo 22.262
+
+### 24.318 Budowanie strony z kartą
+
+repo 22.262
+
+### 24.319 Usuwanie elementów z karty
+
+repo 22.262
+
+### 24.320 Aktualizacja liczby produktów w karcie
+
+Wykonanie metody z redoktora wewnątrz innej metody odbywa sie za pomocą właściwości caseReductor:
+
+```
+>  decreaseItemQuantity(state, action) {
+>    const item = state.cart.find((item) => item.pizzaId === action.payload);
+>    item.quantity--;
+>    item.totalPrice = item.quantity * item.unitPrice;
+>    if (item.quantity === 0) cartSlice.caseReducers.deleteItem(state, action);
+>  },
+```
+
+repo 22.262
+
+### 24.321 Używanie karty do tworzenia nowego zamówienia
+
+repo 22.262
+
+### 24.322 Redux Thunks z createAsyncThunk
+
+Thunks to middleware, tworzy sie za pomocą metody createAsyncThunk():
+
+```
+>  export const fetchAddress = createAsyncThunk("user/fetchAddress", async function () {
+>    const positionObj = await getPosition();
+>    const position = {
+>      latitude: positionObj.coords.latitude,
+>      longitude: positionObj.coords.longitude,
+>    };
+>
+>    const addressObj = await getAddress(position);
+>    const address = `${addressObj?.locality}, ${addressObj?.city} ${addressObj?.postcode}, ${addressObj?.countryName}`;
+>
+>    return { position, address };
+>  });
+```
+
+Nazwa funkcji thunk nie może zaczynać się od get, stąd fetch.
+Thunk tworzy trzy typy akcji:
+
+- dla stanu zależnego od obietnicy
+- dla stanu spełnionego
+- dla stanu odrzuconego
+
+Dodanie thunk do reducera:
+
+```
+>  const userSlice = createSlice({
+>    name: 'user',
+>    initialState,
+>    reducers: {
+>      updateName(state, action) {
+>        state.username = action.payload;
+>      },
+>    },
+>    extraReducers: (builder) =>
+>     builder
+>       .addCase(fetchAddress.pending, (state, action) => {
+>         state.status = 'loading';
+>       })
+>       .addCase(fetchAddress.fulfilled, (state, action) => {
+>         state.position = action.payload.position;
+>         state.address = action.payload.address;
+>         state.status = 'idle';
+>       })
+>       .addCase(fetchAddress.rejected, (state, action) => {
+>         state.status = 'error';
+>         state.error = action.error.message;
+>       }),
+>  });
+```
+
+repo 22.262
+
+### 24.323 Integracja geolokalizacji
+
+repo 22.262
+
+### 24.324 Pobieranie danych bez Navigation: useFetcher
+
+Zaciąganie danych zadeklarowanych w innej trasie:
+
+```
+>  const fetcher = useFetcher();
+>
+>  useEffect(() => {
+>    if (!fetcher.data && fetcher.state === 'idle') fetcher.load('/menu');
+>  }, [fetcher]);
+```
+
+repo 22.262
+
+### 24.325 Aktualizacja danych bez Navigation
+
+Dodanie komponentu przycisku do zamówienia:
+
+```
+>  export function UpdateOrder({ order }) {
+>    const fetcher = useFetcher();
+>
+>    return (
+>      <fetcher.Form method="PATCH" className="text-right">
+>        <Button type="primary">Make priority</Button>
+>      </fetcher.Form>
+>    );
+>  }
+>
+>  export async function action({ request, params }) {
+>    const data = { priority: true };
+>    await updateOrder(params.orderId, data);
+>    return null;
+>  }
+```
+
+action() odpowiada za aktualizację danych, w tym wypadku właściwosci priority.
+Konieczne było winięcie przycisku w formularz bedący komponentem fetchera z odpowiednią metodą.
+
+Na końcu akcja musiałą zostać połaczona z routą w app.jsx:
+
+```
+> import { action as updateOrderAction } from './features/order/UpdateOrder';
+
+> {
+>   path: '/order/:orderId',
+>   element: <Order />,
+>   loader: orderLoader,
+>   errorElement: <Error />,
+>   action: updateOrderAction,
+> },
+```
+
+repo 22.262
