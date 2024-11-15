@@ -3485,7 +3485,7 @@ Na końcu akcja musiałą zostać połaczona z routą w app.jsx:
 
 repo 22.262
 
-## 25 Sekcja 25: Dodanie Redux i zaawansowanego React Router
+## 25 Sekcja 25: Rozpoczęcie największego projektu + użycie Styled Components
 
 ### 25.326 Przegląd sekcji
 
