@@ -3484,3 +3484,288 @@ Na końcu akcja musiałą zostać połaczona z routą w app.jsx:
 ```
 
 repo 22.262
+
+## 25 Sekcja 25: Dodanie Redux i zaawansowanego React Router
+
+### 25.326 Przegląd sekcji
+
+- Planowanie i tworzenie aplikacji
+- Stylowanie przy użyciu styled components
+
+### 25.327 Planowanie aplikacji
+
+The Wild Oasis
+
+- Aplikacja hotelu,
+- Zarządzanie rezerwacjami, lokalami i gośćmi
+- Możliwość potwierdzenia, czy gość już przybył
+- Potrzebują API
+- w późniejszym etapie właściciele będą chcieli stronę na której będzi emożna zamawiać za pomocą api
+
+Jak planować aplikacje:
+
+- Zebranie wymagań i funkcji
+- podział na strony
+- podział na kategorie funkcji
+
+Wymagania projektu:
+
+Autentykacja:
+
+- Użytkownikami są pracownicy hotelu, potrzebują logowania w celu wykonywania obowiązków
+- Nowi użytkownicy mogą być dodawani przez innych użytkowników
+- Użytkownicy powinni mieć możliwość uploadu avatara i zmiany nazwy oraz hasła
+
+Lokale:
+
+- Aplikacja potrzebuje tabeli z lokalami, zdjęciami lokali, nazwą, wielkością, ceną i aktualną dostępnością
+- Użytkownik może dodawać, usuwać i edytoać lokal - włączając aktualizację zdjęć
+
+Rezerwacje:
+
+- Aplikacja będzie potrzebowała widoku tabeli z rezerwacjami, datami zakwaterowania i wykwaterowania, statusem, kwota, dane o lokalu i gościach
+- Status rezerwacji może być "unconfirmed", "checked in", "checked out". Tabela powinna być filtrowalna wg. statusu ważności
+- pozostałe dane o rezerwacji: liczba gości, liczba nocy, uwagi gości, czy zamówili śniadania, cena śniadania
+
+Potwierdzenia, wykwaterowania:
+
+- użytkownik moze usunąć, zatwierdzić, anulować rezerwację gdy gość przybędzie
+- Rezerwacje nie są płatne, do czasu przyjazdu gości. Jednakże podczas zatwierdzania, użytkownicy muszą opłacić (poza aplikacją) i otrzymać potwierdzenie płatności
+- Podczas zatwierdzania gość może domówić śniadania na okres całego pobytu
+
+Goście:
+
+- Dane gościa to: imię, nazwisko, email, dowód, narodowość, flaga kraju
+
+Dashboard:
+
+- Początkowy widok aplikacji to dashboard z informacjami z ostatnich 7, 30 i 90 dni
+  - Lista gości potwierdzonych na dany dzień i wykwaterowujących się
+  - Statystyki obecnych rezerwacji, sprzedaży, potwierdzeń i stopnia zapełnienia hotelu
+  - wykres pokazujący dzienne sprzedaże, pokazujący całościowe i dodatkowe sprzedaże (śniadania)
+  - wykres pokazujący statystyki długości okresu wynajmu, ważna metryka
+
+Ustawienia:
+
+- Użytkownik powinien móc określić kilka ustawień: cena śniadania, niminalne i maksylane długości okresu rezerwacji, maksymalną liczbę gości
+- Aplikacja z dark mode
+
+Strony:
+
+- dashboard
+- bookings
+- cabins
+- checkin/:bookingID
+- settings
+- users
+- login
+- account
+
+Client-site render CSR czy server side render SSR
+
+CSR
+
+- Do SPA - single page apps
+- cały html jest renderowany w przeglądarce
+- cały js musi zostać pobrany, a następnie wyrenderowany (słaba wydajność)
+- Jeden idealny usecase: aplikacja na potrzeby wewnętrzne, bez potrzeby optymalizacji
+
+SSR
+
+- MPA - multi page apps
+- html renderowany po stronie serwera
+- lepsza wydajność, mniej jsa musi być pobrane
+- zalecane przez react
+
+Stack technologiczny:
+
+- ReactRouter
+- styled components
+- React Query
+- Context API
+- React Hook Form
+- React icons, react hot toast, recharts, date-fns, Supabase
+
+### 25.328 Rozpoczęcie projektu "The wild Oasis"
+
+repo 25.328
+
+### 25.329 Wstęp do styled components
+
+> npm i styled-components
+
+Tworzenie komponentu do stylowania:
+
+```
+const H1 = styled.h1`
+  font-size: 30px;
+  font-weight: 600;
+`;
+```
+
+Każdy komponent będzie miał osobne stylowanie co zapobiegnie kolizji nazw
+
+repo 25.328
+
+### 25.330 Globalne style przy użyciu Styled Components
+
+Globalne style wtorzy się przy pomocy metody createGlobalStyle
+
+```
+import { createGlobalStyle } from "styled-components";
+```
+
+Dla styli można tworzyć osobne pliki. Hover obsługuje się jak w sass/scss:
+
+```
+export const Button = styled.button`
+  font-size: 1.4rem;
+  padding: 1.2rem 1.6rem;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-brand-600);
+  color: var(--color-brand-50);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--color-brand-700);
+  }
+`;
+```
+
+repo 25.328
+
+### 25.331 Propsy w Styled Component oraz funkcje css
+
+Użycie funkcji css:
+
+```
+const test = css`
+  text-align: center;
+  ${10 > 5 && "background-color: yellow;"}
+`
+```
+
+Propsy odczutuje
+
+export const Heading = styled.h1`
+  ${(props) =>
+    props.as === "h1" &&
+    css`
+      font-size: 3rem;
+      font-weight: 600;
+    `
+  }
+  ${(props) =>
+    props.as === "h2" &&
+    css`
+      font-size: 2rem;
+      font-weight: 600;
+    `
+  }
+  line-height: 1.4;
+`;
+
+repo 25.328
+
+### 25.332 Budowanie reużywalnego komponentu Styled Components
+
+Ustawienia defaultProps, nie trzeba nic więcej ustawiać:
+
+```
+Row.defaultProps = {
+  type: "vertical",
+}
+```
+
+Style można dzielić na zmienne które będą podawane z propsów np.:
+
+```
+const variations = {
+  primary: css`
+    color: var(--color-brand-50);
+    background-color: var(--color-brand-600);
+
+    &:hover {
+      background-color: var(--color-brand-700);
+    }
+  `,
+  secondary: css`
+    color: var(--color-grey-600);
+    background: var(--color-grey-0);
+    border: 1px solid var(--color-grey-200);
+
+    &:hover {
+      background-color: var(--color-grey-50);
+    }
+  `,
+  danger: css`
+    color: var(--color-red-100);
+    background-color: var(--color-red-700);
+
+    &:hover {
+      background-color: var(--color-red-800);
+    }
+  `,
+};
+
+export const Button = styled.button`
+  border: none;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+
+  ${props=>sizes[props.size]}
+  ${props=>variations[props.variation]}
+`;
+```
+
+repo 25.328
+
+### 25.333 Dodawanie ścieżek i stron
+
+> npm i react-router-dom@6
+
+Deklaratywne budowanie tras przez 
+
+```
+<BrowserRouter>
+  <Routes>  
+  </Routes>
+</BrowserRouter>
+```
+
+repo 25.328
+
+### 25.334 Budowanie Layoutu aplikacji
+
+repo 25.328
+
+### 25.335 Tworzenie Sidebar i nawigacji w Main
+
+Instalacja ikon:
+
+>npm i react-icons
+
+Stylowanie komponenty pochodzącego z jakiejś biblioteki np. reactRouter:
+
+```
+
+const StyledNavLink = styled(NavLink)`
+  &:link,
+  &:visited {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+
+    color: var(--color-grey-600);
+    font-size: 1.6rem;
+    font-weight: 500;
+    padding: 1.2rem 2.4rem;
+    transition: all 0.3s;
+  }
+`
+```
+
+repo 25.328
