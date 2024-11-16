@@ -3769,3 +3769,98 @@ const StyledNavLink = styled(NavLink)`
 ```
 
 repo 25.328
+
+## 26 Sekcja 26: Szybki kurs Supabase: Budowanie Backendu
+
+### 26.336 Przegląd sekcji
+
+- Zaplanowanie danych aplikacji
+- Projektowanie relacji pomiędzy danymi tabel
+- Ładowanie danych do aplikacji przez Supabase API
+
+### 26.337 Czym jest Supabase?
+
+- Serwis który pozwala na łątwe tworzenie backendu na bazie Postgres
+- Automatycznie utworzy bazę danych i API, więc będzie można łatwo wysyłać i uzyskiwać dane z serwera
+- Nie jest potrzebny develop backendu
+- Idealne na szybki początek
+- Dodatkowo Supabase umożliwia łatwe do wdrożenia autentykacje użytkowników i przechowywanie plików
+
+### 26.338 Tworzenie nowej bazy danych
+
+> https://supabase.com/
+
+### 26.339 Modelowanie stanu aplikacji
+
+|State "Domains"/"Slices"|Feature Categories|
+|------------------------|------------------|
+| Bookings | Bookings, Dashboard, Check in/out |
+| Cabins | Cabins |
+| Guests | Guests |
+| Settings | App settings |
+| Users | Authentication |
+
+Wszystkie stany będą globalne, zdalne, przechowywane w Supabase.
+Jedna tabela w bazie, na każdy wycinek stanu
+
+- zamówienia mówią o wynajmie lokum przez gościa
+- zamówienia potrzebują informacji o gościu, które lokum wybrał: musimy połaczyć te informacje
+- Supabase korzysta z PostgresDB, która jest relacyjną bazą SQL. Tabele można łaczyć za pomoca kluczy obcych
+- Booking: id, guestId, cabinId, ...
+- guestId będzie kluczem obcym odwołującym się do klucza podstawowego tabeli guest
+
+### 26.340 Tworzenie tabel
+
+### 26.341 Relacje pomiędzy tabelami
+
+### 26.342 Dodanie polityki bezpieczeństwa (RLS)
+
+Zabezpieczenia RLS to zabezpieczenia na poziomie wiersza, tak aby ktobądź posiadający Bearer token nie mógł modyfikować bazy.
+
+Ustawienia zabezpieczaeń dla tabeli i metod można ustawić w zakładce Authentication -> create policy
+
+### 26.343 Połączenie Supabase do aplikacji
+
+> npm install @supabase/supabase-js
+
+Utworzenie pliku supabase.js:
+
+```
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+```
+
+apiCabin.js oraz metody getCabins:
+
+```
+import { supabase } from "./supabase";
+
+export async function getCabins() {
+  
+  const { data, error } = await supabase.from("cabins").select("*");
+
+  if (error) {
+    console.error(error);
+    throw new Error("Cabins could not be loaded");
+  }
+  return data;
+}
+```
+
+Wywołanie metody w page Cabin.tsx:
+
+```
+useEffect(() => {
+  getCabins().then(data=>console.log(data));
+},[])
+```
+
+repo 25.328
+
+### 26.344 Dodanie plików do pamięci w supabase
+
+repo 25.328
