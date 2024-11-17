@@ -3864,3 +3864,389 @@ repo 25.328
 ### 26.344 Dodanie plików do pamięci w supabase
 
 repo 25.328
+
+## 27 Sekcja 27: React Query: Zarządzanie zdalnym stanem
+
+### 27.345 Przegląd sekcji
+
+- Zarządzanie zdalnym stanem
+- React Query przejmie pobieranie i wysyłanie danych
+
+### 27.346 Czym jest React Query?
+
+- Potężna biblioteka do zdalnego zarządzania stanem
+- Feature które pozwalają pisać mniej kodu i tworzą UX przyjemniejszym
+  - Dane są cacheowane
+  - Automatycznie dostarcza stan ładowania oraz błędów
+  - Automatycznie ponownie pobiera dane w celu utrzymania synchronizacji
+  - Pre-fetching
+  - Łatwe mutowanie zdalnego stanu
+  - Wsparcie offline
+- Potrzebna ponieważ stan zdalny jest inny niż stan UI
+
+### 27.347 Dodanie React Query
+
+> npm i @tanstack/react-query@4
+
+Dodanie narzędzi developerskich:
+
+> npm i @tanstack/react-query-devtools
+
+repo 25.328
+
+### 27.348 Upewnij się, że używasz React Query 4!
+
+Aktualizacja React Query v4 do v5 polega na drobnych zmianach jak:
+
+- isLoading aktualnie to isPending
+- cacheTime to aktualnie gcTime
+
+### 27.349 Pobieranie danych Lokum z Supabase
+
+Biblioteka do manipulwoania datami:
+
+> npm i date-fns
+
+W przeciwieństwie do useEffect React Router zapisuje w pamięci pobrane dane, useEffect pobiera podczas każdego ponownego przełaczenia pomiędzy komponentami
+
+Ustalony staleTime określa po jakim czasie dane mają być gotowe do odświeżenia. np. jeśli doszło do zmiany na bazie to po 60 sekundach staną się przestażałe i react router odświeży się po wejściu na inną kartę/okno. Jeśli staleTome wyniesie 0 to router będzie odświeżał się na każdą zmianę.
+
+repo 25.328
+
+### 27.350 Mutowanie: Usuwanie lokum
+
+Usuwanie elemnetów odbywa się przez hook useMutation, określa się funkcję (mutationFn) oraz co wykonać po sukcesie zapytania (queryClient, który był definiowany w CabinTable.jsx) dostjąc się do queryClient.invalidateQueries({queryKey: ['cabins']}) - tu wybieramy właściwość określoną w CabinTable.jsx, któej ma dotyczyć funkcja on success, któa będzie pobierała dane.
+
+```
+export function CabinRow({ cabin }) {
+  const { id: cabinetId, name, maxCapacity, regularPrice, discount, image, description } = cabin;
+
+  const queryClient = useQueryClient();
+
+  const { isLoading: isDeliting, mutate } = useMutation({
+    mutationFn: deleteCabin,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["cabin"]
+      });
+    }
+  })
+
+  return (
+    <TableRow role="row">
+      <Img src={image} alt={description} />
+      <Cabin>{name}</Cabin>
+      <div>Fits up to {maxCapacity} guests</div>
+      <Price>{formatCurrency(regularPrice)}</Price>
+      <Discount>{formatCurrency(discount)}</Discount>
+      <button onClick={() => mutate(cabinetId)} disabled={isDeliting}>
+        Delete
+      </button>
+    </TableRow>
+  );
+}
+```
+
+repo 25.328
+
+### 27.351 Wyświetlanie powiadomień
+
+Instalacja biblioteki z tostami:
+
+> npm i react-hot-toast
+
+Wprowadza się providera do App.jsx
+
+```
+<Toaster position="top-center" gutter={12} constainerStyle={{ margin: "8px" }}
+toastOPtions={{
+  success: { duration: 3000 },
+  error: { duration: 3000 },
+  style: {
+    fontSize: "16px",
+    maxWidth: "500px",
+    padding: "16px 24px",            
+    backgroundColor: "var(--color-gray-0)",
+    color: "var(--color-gray-700)",
+   },
+  }} 
+/>
+```
+
+W useMutation wykorzystuje się tosty do przekazywania wiadomości:
+
+```
+const { isLoading: isDeliting, mutate } = useMutation({
+  mutationFn: deleteCabin,
+  onSuccess: () => {
+    toast.success("Cabin successfully deleted!");
+    queryClient.invalidateQueries({
+      queryKey: ["cabins"]
+    });
+  },
+  onError: err => toast.error(err.message),
+})
+```
+
+repo 25.328
+
+### 27.352 Wprowadzenie kolejnej biblioteki: React Hook Form
+
+> npm i react-hook-form
+
+Pierwszym krokiem użycia react-hook-form jest utworzenie zmeinnych:
+
+> const { register, handleSubmit } = useForm();
+
+Następnie określienie który element/komponent ma być odczytywany przez metodę register: 
+
+```
+<FormRow>
+  <Label htmlFor="maxCapacity">Maximum capacity</Label>
+  <Input type="number" id="maxCapacity" {...register("maxCapacity")} />
+</FormRow>
+```
+
+Następnie wywołuje się on submit na formularzu
+
+```
+function onSubmit(data) {
+  console.log(data)
+}
+
+return (
+  <Form onSubmit={handleSubmit(onSubmit)}>
+```
+
+repo 25.328
+
+### 27.353 Tworzenie nowego lokum
+
+Oprócz handleSubmit react-hook-form oferuje metodę do resetowania formularza:
+
+> const { register, handleSubmit, reset } = useForm();
+
+Aby wysłąć formularz wystarczy użyć metody mutate:
+
+```
+const { mutate, isLoading } = useMutation({
+  mutationFn: createCabin,
+  onSuccess: () => {
+    toast.success("New cabin successfully created!");
+    queryClient.invalidateQueries({
+      queryKey: ["cabins"]
+    });
+    reset();
+  },
+  onError: (err) => {
+    toast.error(err.message)
+  }
+});
+
+function onSubmit(data) {
+  mutate(data)
+}
+```
+
+repo 25.328
+
+### 27.354 Obsługa błędów formularza
+
+Błędy są pobierane z formState:
+
+```
+  const { register, handleSubmit, reset, getValues, formState } = useForm();
+  const { errors } = formState;
+```
+
+W register przekazuje się required i pod niego można podpiąć informację o walidacji. Dodatkowo możemy dodać informacje o nimimalnych/makstymalnych wartościach i wyświetlić do nich message:
+
+```
+<FormRow error={errors?.maxCapacity?.message} label="Maximum capacity">
+  <Input
+    type="number"
+    id="maxCapacity"
+    disabled={isCreating}
+    defaultValue={0}
+    {...register("maxCapacity", {
+      required: requiredMessage,
+      min: {
+        value: 1,
+        message: "Capacity suold be at least 1",
+      },
+    })}
+  />
+</FormRow>
+```
+
+oraz przeprowadzić walidację, czy wartości pomiedzy polami formularza są w odpowiednich proporcjach (pole składowej, nie może być większe od sumy - moim zdaniem lepiej automatyzować obliczenia...):
+
+```
+<FormRow error={errors?.discount?.message} label="Discount">
+  <Input
+    type="number"
+    id="discount"
+    disabled={isCreating}
+    defaultValue={0}
+    {...register("discount", {
+      required: requiredMessage,
+      validate: (value) =>
+        value <= getValues().regularPrice ||
+        "Discount should be equal or less than regular price",
+    })}
+  />
+</FormRow>
+```
+
+repo 25.328
+
+### 27.355 Wgrywanie obrazów do Supabase
+
+W styled components można nadawać elementom atrybuty przekazujac właściwości w metodzie attrs() np:
+
+```
+import styled from "styled-components";
+
+export const FileInput = styled.input.attrs({type: "file"})`
+  font-size: 1.4rem;
+  border-radius: var(--border-radius-sm);
+`
+```
+
+Aby wysłać obraz trzeba zmodyfikować on sumbit:
+
+```
+function onSubmit(data) {
+  mutate({...data, image: data.image.at(0)})
+}
+```
+
+Dodanie adresu obrazka do metody api, następnie wysłanie obrazka do storage i obsłużenie błędu:
+
+```
+export async function createCabin(newCabin) {
+  const imageName = `${Math.random()}-${newCabin.image.name}`.replace("/", "");
+  const ImagePath = `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
+  // 1. Create cabin
+  const { data, error } = await supabase.from("cabins").insert([{...newCabin, image: ImagePath}]);
+
+  if (error) {
+    console.error(error);
+    throw new Error("Cabins could not be loaded");
+  }
+
+  // 2. Upload image
+  const { error: storageError } = await supabase.storage
+    .from("cabin-images")
+    .upload(imageName, newCabin.image);
+  
+  // 3. Delete the cabin if there was an error uploading image
+  if (storageError) {
+    await supabase.from("cabins").delete().eq("id", data.id);
+    throw new Error("Cabins image could not be uploaded and the cabin was not created");
+  }
+  
+  return data;
+}
+```
+
+repo 25.328
+
+### 27.356 Edycja lokum
+
+Ustalenie czy mamy do czynienia z formulazrem edycji:
+
+```
+const { id: editId, ...editValues } = cabinToEdit;
+const isEditSession = Boolean(editId);
+
+const { register, handleSubmit, reset, getValues, formState } = useForm({
+  defaultValues: isEditSession ? editValues : {},
+});
+```
+
+Rozdzielenie mutate na dwie funkcje: tworzenia i edycji:
+
+```
+const { mutate: createCabin, isLoading: isCreating } = useMutation({
+  mutationFn: createEditCabin,
+  onSuccess: () => {
+    toast.success("New cabin successfully created!");
+    queryClient.invalidateQueries({
+      queryKey: ["cabins"],
+    });
+    reset();
+  },
+  onError: (err) => {
+    toast.error(err.message);
+  },
+});
+
+const { mutate: editCabin, isLoading: isEditing } = useMutation({
+  mutationFn: ({ newCabinData, id }) => createEditCabin(newCabinData, id),
+  onSuccess: () => {
+    toast.success("Cabin successfully edited!");
+    queryClient.invalidateQueries({
+      queryKey: ["cabins"],
+    });
+    reset();
+  },
+  onError: (err) => {
+    toast.error(err.message);
+  },
+});
+```
+
+Obsługa wariantów tworzenia i edycji wiersza w bazie, wewnątrz hooka apiCabins:
+
+```
+export async function createEditCabin(newCabin, id) {
+  const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl);
+  const imageName = `${Math.random()}-${newCabin.image.name}`.replace("/", "");
+  const ImagePath = hasImagePath
+    ? newCabin.image
+    : `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
+  // 1. Create/edit cabin
+  let query = supabase.from("cabins");
+
+  // A. CREATE
+  if (!id) query = query.insert([{ ...newCabin, image: ImagePath }]);
+  // A. EDIT
+  if (id) query = query.update({ ...newCabin, image: ImagePath }).eq("id", id);
+}
+```
+
+repo 25.328
+
+### 27.357 Wydzielanie React Query do własnych hooków
+
+Komponenty są dzięki temu zdecydowanie czystsze
+
+repo 25.328
+
+### 27.358 Kopiowanie lokum
+
+Kopiowanie to poprostu utworzenie nowego wiersza w bazie na postawie istniejącego:
+
+```
+function handleDuplicate() {
+  createCabin({
+    name: `Copy of ${name}`,
+    maxCapacity,
+    regularPrice,
+    discount,
+    image,
+    description,
+  });
+}
+```
+
+repo 25.328
+
+### 27.359 Pobieranie ustawień aplikacji
+
+repo 25.328
+
+### 27.360 Aktualizacja ustawień aplikacji
+
+repo 25.328

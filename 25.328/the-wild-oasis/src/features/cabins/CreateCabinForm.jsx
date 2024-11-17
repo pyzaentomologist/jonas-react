@@ -1,78 +1,115 @@
-import styled from "styled-components";
-
-import Input from "../../ui/Input";
+import { useForm } from "react-hook-form"
+import { Input } from "../../ui/Input";
+import { FileInput } from "../../ui/FileInput";
 import Form from "../../ui/Form";
-import Button from "../../ui/Button";
-import FileInput from "../../ui/FileInput";
+import { Button } from "../../ui/Button";
 import Textarea from "../../ui/Textarea";
+import { FormRow } from "../../ui/FormRow";
+import { useCreateCabin } from "./useCreateCabin";
+import { useUpdateCabin } from "./useUpdateCabin";
 
-const FormRow = styled.div`
-  display: grid;
-  align-items: center;
-  grid-template-columns: 24rem 1fr 1.2fr;
-  gap: 2.4rem;
+export function CreateCabinForm({ cabinToUpdate = {} }) {
+  const { id: updateId, ...updateValues } = cabinToUpdate;
+  const isUpdateSession = Boolean(updateId);
 
-  padding: 1.2rem 0;
+  const { register, handleSubmit, reset, getValues, formState } = useForm({
+    defaultValues: isUpdateSession ? updateValues : {},
+  });
+  const { errors } = formState;
+  
+  const { isLoading: isCreating, createCabin } = useCreateCabin();
+  const { isLoading: isUpdating, updateCabin } = useUpdateCabin();
 
-  &:first-child {
-    padding-top: 0;
+  const isWorking = isCreating || isUpdating;
+
+  function onSubmit(data) {
+    const image = typeof data.image === 'string' ? data.image : data.image[0]
+    if (isUpdateSession) updateCabin({ newCabinData: { ...data, image: image }, id: updateId });
+    else createCabin({ ...data, image: image }, { onSuccess: () => reset() });
   }
 
-  &:last-child {
-    padding-bottom: 0;
-  }
+  const requiredMessage = "This field is required";
 
-  &:not(:last-child) {
-    border-bottom: 1px solid var(--color-grey-100);
-  }
-
-  &:has(button) {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1.2rem;
-  }
-`;
-
-const Label = styled.label`
-  font-weight: 500;
-`;
-
-const Error = styled.span`
-  font-size: 1.4rem;
-  color: var(--color-red-700);
-`;
-
-function CreateCabinForm() {
   return (
-    <Form>
-      <FormRow>
-        <Label htmlFor="name">Cabin name</Label>
-        <Input type="text" id="name" />
+    <Form onSubmit={handleSubmit(onSubmit)}>
+      <FormRow error={errors?.name?.message} label="Cabin name">
+        <Input
+          type="text"
+          id="name"
+          disabled={isWorking}
+          {...register("name", { required: requiredMessage })}
+        />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="maxCapacity">Maximum capacity</Label>
-        <Input type="number" id="maxCapacity" />
+      <FormRow error={errors?.maxCapacity?.message} label="Maximum capacity">
+        <Input
+          type="number"
+          id="maxCapacity"
+          disabled={isWorking}
+          defaultValue={0}
+          {...register("maxCapacity", {
+            required: requiredMessage,
+            min: {
+              value: 1,
+              message: "Capacity suold be at least 1",
+            },
+          })}
+        />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="regularPrice">Regular price</Label>
-        <Input type="number" id="regularPrice" />
+      <FormRow error={errors?.regularPrice?.message} label="Regular price">
+        <Input
+          type="number"
+          id="regularPrice"
+          disabled={isWorking}
+          defaultValue={0}
+          {...register("regularPrice", {
+            required: requiredMessage,
+            min: {
+              value: 1,
+              message: "Price suold be at least 1",
+            },
+          })}
+        />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="discount">Discount</Label>
-        <Input type="number" id="discount" defaultValue={0} />
+      <FormRow error={errors?.discount?.message} label="Discount">
+        <Input
+          type="number"
+          id="discount"
+          disabled={isWorking}
+          defaultValue={0}
+          {...register("discount", {
+            required: requiredMessage,
+            validate: (value) =>
+              value <= getValues().regularPrice ||
+              "Discount should be equal or less than regular price",
+          })}
+        />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="description">Description for website</Label>
-        <Textarea type="number" id="description" defaultValue="" />
+      <FormRow
+        error={errors?.description?.message}
+        label="Description for website"
+      >
+        <Textarea
+          type="number"
+          id="description"
+          disabled={isWorking}
+          defaultValue=""
+          {...register("description", { required: requiredMessage })}
+        />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="image">Cabin photo</Label>
-        <FileInput id="image" accept="image/*" />
+      <FormRow error={errors?.description?.message} label="Cabin photo">
+        <FileInput
+          id="image"
+          disabled={isWorking}
+          accept="image/*"
+          {...register("image", {
+            required: isUpdateSession ? false : requiredMessage,
+          })}
+        />
       </FormRow>
 
       <FormRow>
@@ -80,10 +117,8 @@ function CreateCabinForm() {
         <Button variation="secondary" type="reset">
           Cancel
         </Button>
-        <Button>Edit cabin</Button>
+        <Button>{isUpdateSession ? "Update cabin" : "Create new cabin"}</Button>
       </FormRow>
     </Form>
   );
 }
-
-export default CreateCabinForm;
