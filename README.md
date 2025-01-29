@@ -3727,7 +3727,7 @@ repo 25.328
 
 > npm i react-router-dom@6
 
-Deklaratywne budowanie tras przez 
+Deklaratywne budowanie tras przez
 
 ```
 <BrowserRouter>
@@ -4250,3 +4250,323 @@ repo 25.328
 ### 27.360 Aktualizacja ustawień aplikacji
 
 repo 25.328
+
+## 28 Sekcja 28: Zaawansowane wzorce w React
+
+### 28.361 Przegląd sekcji
+
+### 28.362 Spojrzenie na reużywalnosć w react
+
+Reużywalność dotyczy:
+
+- UI
+  - komponenty i propsy
+  - props children
+- Logiki zarządzania stanem
+  - Własne hooki
+
+Wzorzec renderowania propsów - render props pattern
+
+- do kontrolowania co komponent renderuje poprzed przekazywanie funkcji
+
+Wzorzec komponentu złożonego - compound component pattern
+
+- wiele mniejszych komponentów stworzy główny komponent
+
+### 28.363 Dodanie przykładu
+
+### 28.364 Wzorzec renderowania propsa
+
+Do komponentu jest dodany atrybut, który przekazuje funkcje do renderowania:
+
+```
+export default function App() {
+  return (
+    <div>
+      <h1>Render Props Demo</h1>
+
+      <div className="col-2">
+        <List title="Products" items={products} render={(product) => (
+            <ProductItem key={product.productName} product={product} />
+          )}/>
+      </div>
+    </div>
+  );
+}
+```
+
+Dzęki temu Lista nie wie co będzie renderowała:
+
+```
+function List({ title, items, render }) {
+  const [isOpen, setIsOpen] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const displayItems = isCollapsed ? items.slice(0, 3) : items;
+
+  function toggleOpen() {
+    setIsOpen((isOpen) => !isOpen);
+    setIsCollapsed(false);
+  }
+
+  return (
+    <div className="list-container">
+      <div className="heading">
+        <h2>{title}</h2>
+        <button onClick={toggleOpen}>
+          {isOpen ? <span>&or;</span> : <span>&and;</span>}
+        </button>
+      </div>
+      {isOpen && (
+        <ul className="list">
+          {displayItems.map(render)}
+        </ul>
+      )}
+
+      <button onClick={() => setIsCollapsed((isCollapsed) => !isCollapsed)}>
+        {isCollapsed ? `Show all ${items.length}` : "Show less"}
+      </button>
+    </div>
+  );
+}
+```
+
+### 28.365 Komponent wyższego poziomu: HOC
+
+HOC to komponent który pobiera inny komponent i zwraca nowy komponent jako lepszy.
+Według konwencji HOC zaczynają się od słowa *with* np. *withToggles*
+Trochę jak dekorator, ale children jest przenoszony do dadatkowej funkcji:
+
+```
+expost function withToggles(WrappedComponent) {
+
+  return function List(props) {
+    const [isOpen, setIsOpen] = useState(true);
+    const displayItems = isCollapsed ? items.slice(0, 3) : items;
+
+    return (
+      {isOpen && <WrappedComponent {...props} items={displayItems} />}
+    )
+  }
+}
+
+const ProductListWithToggles = withToggles(ProductList);
+```
+
+Kiedyś HOC odgrywało bardzo ważną rolę, obecnie zdecydowanie mniejszą.
+
+### 28.366 Wzorzec złożonego komponentu (Compound Component Pattern)
+
+[Projekt w sandboxie](https://codesandbox.io/p/sandbox/react-compound-components-starter-forked-4z2trq?file=%2Fsrc%2FApp.js&workspaceId=ws_SBNe5uhLqJFvZRwTPcXBAc "sandbox").
+
+Używa się kontekstów (częste w antd):
+
+```
+<Counter>
+  <Counter.Label>My super flexible counter 😁</Counter.Label>
+  <Counter.Increase icon="+" />
+  <Counter.Decrease icon="-" />
+  <Counter.Count />
+</Counter>
+```
+
+Tworzenie komponentu:
+
+```
+const CounterContext = createContext();
+
+function Counter({ children }) {
+  const [count, setCount] = useState(0);
+  const increase = () => setCount((c) => c + 1);
+  const decrease = () => setCount((c) => c - 1);
+
+  return (
+    <CounterContext.Provider value={{ count, increase, decrease }}>
+      <span>{children}</span>
+    </CounterContext.Provider>
+  );
+}
+
+function Count() {
+  const { count } = useContext(CounterContext);
+  return <span>{count}</span>;
+}
+
+function Label({ children }) {
+  return <span>{children}</span>;
+}
+function Increase({ icon }) {
+  const { increase } = useContext(CounterContext);
+  return <button onClick={increase}>{icon}</button>;
+}
+function Decrease({ icon }) {
+  const { decrease } = useContext(CounterContext);
+  return <button onClick={decrease}>{icon}</button>;
+}
+
+Counter.Count = Count;
+Counter.Label = Label;
+Counter.Increase = Increase;
+Counter.Decrease = Decrease;
+```
+
+### 28.367 Tworzenia okna z modalem przy użyciu React Portal
+
+React Portal to funkcja która pozwala na renderowanie elementu poza strukturą DOM komponentu nadrzędnego, jednocześnie zachowując element w oryginalnej pozycji drzewa komponentów.
+
+```
+import { createPortal } from "react-dom";
+
+export function Modal({ children, onClose }) {
+  return createPortal(
+    (<Overlay>
+      <StyledModal>
+        <Button onClick={onClose}>
+          <HiXMark />
+        </Button>
+        <div>{children}</div>
+      </StyledModal>
+    </Overlay>),
+    document.body
+  )
+}
+```
+
+Jako pierwszy argument metody reactDOM createPortal() podaje się jsx, a jako drugi element w którym zagnieżdża się ten jsx (np. document.body).
+
+Funkcja jest użyteczna gdy chce się użyć komponentu w miejscu w którym rodzic ma ustawiony overflow:hidden.
+
+### 28.368 Zmiana komponentu Modal w złożony komponent (Compound Component)
+
+W lekcji użyto metody React cloneElement(). Przydatne do klonowania elementów i nadawania im propsów używanych tylko w specyficznym miejscu - **zmniejsza to czytelność kodu**, ale dodaje elastyczności komponentowi. Przydatne gdy np. modal implementuje jakąś logikę, ale sterowanie stanem z poziomu rodzica nie zachowuje czystości kodu.
+
+```
+return (
+  <Form onSubmit={handleSubmit(onSubmit)} type={ onCloseModal ? "modal" : "regular"}>
+```
+
+Formularz ma róne zachowanie w zależności od tego czy jest w modalu, czy nie. Do sterowania jest potrzebna wartość onCloseModal, która nie jest przekazywana w prost do modalu:
+
+```
+export function AddCabin() {
+  return (
+    <Modal>
+      <Modal.Open opens="cabin-form">
+        <Button>Add new Cabin</Button>
+      </Modal.Open>
+      <Modal.Window name="cabin-form">
+        <CreateCabinForm />
+      </Modal.Window>
+```
+
+Dlatego dziecko zostaje sklonowane i ma dodany atrybut, którego nie było w AddCabin:
+
+```
+function Window({ children, name }) {
+  const { openName, close } = useContext(ModalContext);
+  if (name !== openName) return null;
+  return createPortal(
+    <Overlay onClick={close}>
+      <StyledModal onClick={e => e.stopPropagation()}>
+        <Button onClick={close}>
+          <HiXMark />
+        </Button>
+        <div>{cloneElement(children, { onCloseModal: close })}</div>
+      </StyledModal>
+    </Overlay>,
+    document.body
+  );
+}
+```
+
+### 28.369 Reagowanie na klik poza modalem
+
+Zdecydowano się na utworzenie własnego hooka, który obsłuży rozpoczęcie nasłuchiwania i zakończy je. W dodatku customowy hook można ponownie wykorzystać w jakimś innym komponencie:
+
+```
+import { useEffect, useRef } from "react";
+
+export function useOutsideClick(handler, listenCapturing = true) {
+  const ref = useRef();
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) handler();
+    }
+
+    document.addEventListener("click", handleClick, listenCapturing);
+
+    return () =>
+      document.removeEventListener("click", handleClick, listenCapturing);
+  }, [handler]);
+  
+  return ref;
+}
+```
+
+```
+function Window({ children, name }) {
+  const { openName, close } = useContext(ModalContext);
+  const ref = useOutsideClick(close);
+
+  if (name !== openName) return null;
+
+  return createPortal(
+    <Overlay>
+      <StyledModal ref={ref}>
+        <Button onClick={close}>
+          <HiXMark />
+        </Button>
+        <div>{cloneElement(children, { onCloseModal: close })}</div>
+      </StyledModal>
+    </Overlay>,
+    document.body
+  );
+}
+```
+
+Pytanie jaki wpływ będzie miał obsłużenie kliku w ten sposób:
+
+```
+return createPortal(
+  <Overlay onClick={close}>
+    <StyledModal onClick={e=>e.preventDefault()}>
+      <Button onClick={close}>
+        <HiXMark />
+      </Button>
+      <div>{cloneElement(children, { onCloseModal: close })}</div>
+    </StyledModal>
+  </Overlay>,
+  document.body
+);
+```
+
+### 28.370 Zatwierdzenie usunięcia pokoju
+
+repo katalog 25.328
+
+### 28.371 Tworzenie reużywalnej tabeli
+
+repo katalog 25.328
+
+### 28.372 Dodanie wzorca Render Props
+
+Przekazanie do Table.Body propsa render:
+
+```
+<Table.Body data={cabins} render={(cabin) => (
+  <CabinRow cabin={cabin} key={cabin.id} />
+)} />
+
+
+function Body({ data, render }) {
+  if (!data.length) return <Empty>No data to show</Empty>;
+  return <StyledBody>{ data.map(render)}</StyledBody>
+}
+```
+
+repo katalog 25.328
+
+### 28.373 Budowa reużywalnego menu kontekstowego
+
+repo katalog 25.328
