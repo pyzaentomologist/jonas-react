@@ -8,7 +8,7 @@ import { FormRow } from "../../ui/FormRow";
 import { useCreateCabin } from "./useCreateCabin";
 import { useUpdateCabin } from "./useUpdateCabin";
 
-export function CreateCabinForm({ cabinToUpdate = {} }) {
+export function CreateCabinForm({ cabinToUpdate = {}, onCloseModal }) {
   const { id: updateId, ...updateValues } = cabinToUpdate;
   const isUpdateSession = Boolean(updateId);
 
@@ -16,22 +16,37 @@ export function CreateCabinForm({ cabinToUpdate = {} }) {
     defaultValues: isUpdateSession ? updateValues : {},
   });
   const { errors } = formState;
-  
+
   const { isLoading: isCreating, createCabin } = useCreateCabin();
   const { isLoading: isUpdating, updateCabin } = useUpdateCabin();
 
   const isWorking = isCreating || isUpdating;
 
   function onSubmit(data) {
-    const image = typeof data.image === 'string' ? data.image : data.image[0]
-    if (isUpdateSession) updateCabin({ newCabinData: { ...data, image: image }, id: updateId });
-    else createCabin({ ...data, image: image }, { onSuccess: () => reset() });
+    const image = typeof data.image === "string" ? data.image : data.image[0];
+
+    if (isUpdateSession) {
+      updateCabin(
+        { newCabinData: { ...data, image: image }, id: updateId },
+        {
+          onSuccess: () => {
+            reset();
+            onCloseModal?.();
+          }
+        }
+      )
+    }
+    else createCabin({ ...data, image: image }, {
+      onSuccess: () => {
+        reset(); 
+        onCloseModal?.();
+    }});
   }
 
   const requiredMessage = "This field is required";
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(onSubmit)} type={ onCloseModal ? "modal" : "regular"}>
       <FormRow error={errors?.name?.message} label="Cabin name">
         <Input
           type="text"
@@ -114,7 +129,7 @@ export function CreateCabinForm({ cabinToUpdate = {} }) {
 
       <FormRow>
         {/* type is an HTML attribute! */}
-        <Button variation="secondary" type="reset">
+        <Button variation="secondary" type="reset" onClick={() => onCloseModal?.()}>
           Cancel
         </Button>
         <Button>{isUpdateSession ? "Update cabin" : "Create new cabin"}</Button>
