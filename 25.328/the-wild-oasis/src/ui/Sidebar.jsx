@@ -19,5 +19,5 @@ export function Sidebar() {
       <Logo />
       <MainNav />
     </StyledSidebar>
-  )
+  );
 }
