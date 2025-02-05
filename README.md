@@ -4570,3 +4570,1055 @@ repo katalog 25.328
 ### 28.373 Budowa reużywalnego menu kontekstowego
 
 repo katalog 25.328
+
+## 29. Dodanie funkcjonalności: Authentication, Dark Mode, Dashboard, itd.
+
+### 29.374 Przegląd sekcji
+
+- budowa realnych funkcjonalności
+- filtry, sortowanie, paginacja
+- dark mode
+- dashboard z wykresami
+- autentykacja i autoryzacja
+
+### 29.375 Filtrowanie po stronie klienta
+
+Filtrowanie przy pomocy react-router-dom
+
+```
+import { useSearchParams } from "react-router-dom"
+
+function handleClick(value) {
+  searchParams.set(filterField, value);
+  setSearchParams(searchParams);
+}
+
+const currentFilter = searchParams.get(filterField) || options.at(0).value;
+```
+
+repo katalog 25.328
+
+### 29.376 Sortowanie po stronie klienta
+
+Sortowanie przy pomocy react-router-dom
+
+```
+const sortBy = searchParams.get("sortBy") || "startDate-asc";
+
+const [field, direction] = sortBy.split("-");
+const modifier = direction === "asc" ? 1 : -1;
+const sortedCabins = filteredCabins.sort(
+  (a, b) => (a[field] - b[field]) * modifier
+);
+```
+
+repo katalog 25.328
+
+### 29.377 Budowa tabeli z rezerwacjami
+
+Pobieranie konkretnych danych z róznych kolumn i tabel, z supabase:
+
+```
+export async function getBookings() {
+  const { data, error } = await supabase
+    .from("bookings")
+    .select(
+      "id, created_at, startDate, endDate, numNights, status, totalPrice, cabins(name), guests(fullName, email)"
+    );
+
+  if (error) {
+    throw new Error("Bookings could not be loaded");
+  }
+
+  return data;
+}
+```
+
+repo katalog 25.328
+
+### 29.378 Wrzucanie danych do Supabase
+
+repo katalog 25.328
+
+### 29.379 Filtrowanie po stronie API
+
+Tablica queryKey zachowuje sie jak tablica zależności z useEffect, zmiana zależności powoduje ponowne pobranie danych przez api.
+
+```
+export function useBookings() {
+  const [searchParams] = useSearchParams();
+
+  //FILTER
+  const filterValue = searchParams.get("status");
+  const filter = !filterValue || filterValue === "all" ? null : { field: "status", value: filterValue, method: "" };
+  
+  const {
+    isLoading,
+    data: bookings,
+    error,
+  } = useQuery({
+    queryKey: ["bookings", filter],
+    queryFn: () => getBookings({ filter }),
+  });
+  return { isLoading, error, bookings };
+}
+```
+
+Aby rozróżnić metody filtrowania można je dodać do obiektów filtra. Obsługa po stronie zapytań API supabase:
+
+```
+// FILTER
+if (filter !== null) query = query[filter.method || "eq"](filter.field, filter.value);
+```
+
+repo katalog 25.328
+
+### 29.380 Sortowanie po stronie API
+
+repo katalog 25.328
+
+### 29.381 Tworzenie reużywalnej paginacji
+
+repo katalog 25.328
+
+### 29.382 Paginacja po stronie API
+
+Dodanie obiektu z {count: "exact"} w select() do bazy supabase pozwoli pozyskać dodatkową właściwość z bazy, która będzie liczbą elementów:
+
+```
+.select(
+  "id, created_at, startDate, endDate, numNights, status, totalPrice, cabins(name), guests(fullName, email)", {count: "exact"}
+);
+
+// [...]
+
+const { data, error, count } = await query;
+
+// [...]
+
+return { data, count };
+
+```
+
+Poza tym paginacja została potraktowana tak jak pozostałe zapytania do bazy (sort i filter)
+
+repo katalog 25.328
+
+### 29.383 Prefetching z ReactQuery
+
+Prefetching z React Queryto wykonanie metody prefetchQuery() z hooka useQueryClient():
+
+```
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+[...]
+const queryClient = useQueryClient();
+
+[...]
+
+// QUERY
+const {
+  isLoading,
+  data: { data: bookings, count } = {},
+  error,
+} = useQuery({
+  queryKey: ["bookings", filter, sortBy, currentPage],
+  queryFn: () => getBookings({ filter, sortBy, currentPage }),
+});
+
+// PRE-FETCHING
+const pageCount = Math.ceil(count / PAGE_SIZE);
+
+if (currentPage < pageCount) {
+  queryClient.prefetchQuery({
+    queryKey: ["bookings", filter, sortBy, currentPage + 1],
+    queryFn: () =>
+      getBookings({ filter, sortBy, currentPage: currentPage + 1 }),
+  });
+}
+if (currentPage > 1) {
+  queryClient.prefetchQuery({
+    queryKey: ["bookings", filter, sortBy, currentPage - 1],
+    queryFn: () =>
+      getBookings({ filter, sortBy, currentPage: currentPage - 1 }),
+  });
+}
+```
+
+Możliwe jest również użycie paginacji jako Infinite Scroll.
+
+repo katalog 25.328
+
+### 29.384 Tworzenie strony z pojedynczą rezerwacją
+
+Dodano route do pojedynczej rezerwacji:
+
+```
+<Route path="bookings" element={<Bookings />} />
+<Route path="bookings/:bookingId" element={<Booking />} />
+```
+
+Oraz spersonalizowany hook:
+
+```
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
+
+import { getBooking } from "../../services/apiBookings";
+
+export function useBooking() {
+  const { bookingId } = useParams();
+
+  const {
+    isLoading,
+    data: booking,
+    error,
+  } = useQuery({
+    queryKey: ["booking"],
+    queryFn: () => getBooking(bookingId),
+    retry: false
+  });
+  return { isLoading, error, booking };
+}
+```
+
+retry: false ma zapobiegać próbie ponownego pobierania zasobu jeśli go nie ma/nie załadował się.
+
+repo katalog 25.328
+
+### 29.385 Meldowanie gości po przybuciu do hotelu
+
+Aktualizacja danych w api za pomocą useMutation, który służy do obsługi wysyłania danych na serwer oraz aktualizacji ich na froncie:
+
+```
+export function useCheckin() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const { mutate: checkin, isLoading: isCheckingIn } = useMutation({
+    mutationFn: (bookingId) =>
+      updateBooking(bookingId, {
+        status: "checked-in",
+        isPaid: true,
+      }),
+    onSuccess: (data) => {
+      toast.success(`Booking #${data.id} successfully checked in`);
+      queryClient.invalidateQueries({ active: true });
+      navigate("/");
+    },
+    onError: () => toast.error("There was an error while checking in")
+  });
+
+  return {checkin, isCheckingIn}
+}
+```
+
+repo katalog 25.328
+
+### 29.386 Dodanie opcjonalnego śniadania
+
+Do useMutation przekazano obiekt, zeby dodać śniadania:
+
+```
+function handleCheckin() {
+  if (!confirmPaid) return;
+  if (addBreakfast) {
+    checkin({
+      bookingId, breakfast: {
+        hasBreakfast: true,
+        extrasPrice: optionalBreakfastPrice,
+        totalPrice: totalPrice + optionalBreakfastPrice
+    }});
+  } else {
+    checkin({bookingId, breakfast: {}});
+  }
+}
+```
+
+```
+mutationFn: ({ bookingId, breakfast }) =>
+  updateBooking(bookingId, {
+  status: "checked-in",
+  isPaid: true,
+  ...breakfast,
+}),
+```
+
+repo katalog 25.328
+
+### 29.387 Zakończenie rezerwacji + naprawa drobrych błędów
+
+repo katalog 25.328
+
+### 29.388 Usuwanie rezerwacji
+
+Aby powrócić po usunięciu elementu do strony z listą rezerwacji można przekazać metodę onSuccess lub onSettle - sukces lub odrzucenie. Dane zostaną przetworzone przez hook useMutation();
+
+```
+<Modal.Window name="delete">
+  <ConfirmDelete
+    resourceName="booking"
+    onConfirm={() => {
+      deleteBooking(bookingId, { onSettled: () => navigate(-1) });
+    }}
+    disabled={isDeleting}
+  />
+</Modal.Window>
+```
+
+repo katalog 25.328
+
+### 29.389 Autentykacja: Login użytkownika z Supabase
+
+Funkcja do logowania się została pobrana z dokumentacji supabase:
+
+```
+import { supabase } from "./supabase";
+
+export async function login({ email, password }) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password,
+  });
+
+  if (error) throw new Error(error.message);
+  console.log(data)
+  return data;
+}
+```
+
+Dodatkowo utworzono hook do obsługi logowania oraz pobrania informacji o zalogowanym użytkowniku:
+
+```
+import { useMutation } from "@tanstack/react-query";
+import { login as loginApi } from "../../services/apiAuth";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
+export function useLogin() {
+  const navigate = useNavigate();
+  const { mutate: login, isLoading} = useMutation({
+    mutationFn: ({ email, password }) => loginApi({
+      email, password
+    }),
+    onSuccess: (user) => {
+      console.log(user)
+      navigate('/dashboard');
+    },
+    onError: (err) => toast.error('Provided email or password are incorrect')
+  })
+
+  return { login, isLoading };
+}
+```
+
+repo katalog 25.328
+
+### 29.390 Autoryzacja: zabezpieczanie tras
+
+Autoryzacja polegała na owrapowaniu najwyższego elementu w roucie:
+
+```
+<Route
+  element={
+    <ProtectedRoute>
+      <AppLayout />
+    </ProtectedRoute>
+  }
+>
+```
+
+ProtectedRoute przeierowywał niezalogowanych na trasę z logowaniem:
+
+```
+export function ProtectedRoute({ children }) {
+  const navigate = useNavigate();
+
+  // 1. Load the authenticated user
+  const { isLoading, isAuthenticated } = useUser();
+
+  // 2. If there is NO authenticated user, redirect to the /login
+  useEffect(() => {
+    if (!isAuthenticated && !isLoading) navigate("/login");
+  }, [isAuthenticated, isLoading, navigate]);
+  
+  // 3. While loading show spinner
+  if (isLoading) return (
+    <FullPage>
+      <Spinner />
+    </FullPage>
+  );
+  // 4. If there IS a user, render the app
+
+  if (isAuthenticated) return children;
+}
+```
+
+Próbę logowania przeprowadza hook:
+
+```
+export function useLogin() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const { mutate: login, isLoading} = useMutation({
+    mutationFn: ({ email, password }) => loginApi({
+      email, password
+    }),
+    onSuccess: (user) => {
+      queryClient.setQueriesData(['user'], user.user)
+      navigate("/dashboard", { replace: true });
+    },
+    onError: (err) => toast.error('Provided email or password are incorrect')
+  })
+
+  return { login, isLoading };
+}
+```
+
+Autoryzacja użytkownika odbywa się przez odpytanie supabase o aktywną sesję dla użytkownika:
+
+```
+export async function getCurrentUser() {
+  const { data: session } = await supabase.auth.getSession();
+
+  if (!session.session) return null;
+
+  const { data, error } = await supabase.auth.getUser();
+
+  if (error) throw new Error(error.message);
+
+  return data?.user;
+}
+```
+
+Pobieranie informacji o zalogowanym użtkowniku odbywa się przez hook:
+
+```
+export function useUser() {
+  const { isLoading, data: user } = useQuery({
+    queryKey: ["user"],
+    queryFn: getCurrentUser,
+  });
+
+  return { isLoading, user, isAuthenticated: user?.role === "authenticated" };
+}
+```
+
+repo katalog 25.328
+
+### 29.391 Wylogowanie użytkownika
+
+Przygotowanie komponentu przycisku do wylogowania:
+
+```
+export function Logout() {
+  const { logout, isLoading } = useLogout();
+  return (
+    <ButtonIcon disabled={isLoading} onClick={logout}>
+      {!isLoading ? <HiArrowRightOnRectangle /> : <SpinnerMini/>}
+    </ButtonIcon>
+  );
+}
+```
+
+Przygotowanie metody łaczącej się z bazą:
+
+```
+export async function logout() {
+  const { error } = await supabase.auth.signOut();
+
+  if (error) throw new Error(error.message);
+}
+```
+
+Oraz hooka:
+
+```
+export function useLogout() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const { mutate: logout, isLoading } = useMutation({
+    mutationFn: logoutApi,
+    onSuccess: () => {
+      queryClient.removeQueries();
+      navigate("/login", { replace: true });
+    }
+  });
+  return { logout, isLoading };
+}
+```
+
+repo katalog 25.328
+
+### 29.392 Poprawienie ważnego błędu
+
+Błąd w kursie, zastosowano niepoprawną metodę w useQueryClient.
+
+Zamiast _queryClient.setQueryData(['user'],user.user)_ użyto _queryClient.setQueriesData(['user'],user)_
+
+```
+export function useLogin() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const { mutate: login, isLoading} = useMutation({
+    mutationFn: ({ email, password }) => loginApi({
+      email, password
+    }),
+    onSuccess: (user) => {
+      queryClient.setQueryData(['user'], user.user)
+      navigate("/dashboard", { replace: true });
+    },
+    onError: (err) => toast.error('Provided email or password are incorrect')
+  })
+
+  return { login, isLoading };
+}
+```
+
+repo katalog 25.328
+
+### 29.393 Budowa formularza rejestracji
+
+Użytkownik może być dodany tylko przez zarejestrowanego użytkownika.
+Tworzenie nowego formularza za pomocą react-hook-form:
+
+```
+const { register, formState, getValues, handleSubmit } = useForm();
+```
+
+W inpucie używa się destrukturyzowanej metody register(), która moze przyjmować wiele argumentów:
+
+```
+{...register("fullName", { required: "This field is required" })}
+```
+
+```
+{...register("email", {
+  required: "This field is required",
+  pattern: {
+    value: /\S+@\S+\.\S+/,
+    message: "Please provide a valid email",
+  },
+})}
+```
+
+```
+{...register("password", {
+  required: "This field is required",
+  minLength: {
+    value: 8,
+    message: "Password nedds a minimum of 8 characters",
+  },
+})}
+```
+
+```
+{...register("passwordConfirm", {
+  required: "This field is required",
+  validate: (value) =>
+    value === getValues().password || "Password neet to match",
+})}
+```
+
+repo katalog 25.328
+
+### 29.394 Dodanie zarejestrowanego użytkownika
+
+Dodano metodę api, obsługującą dodanie użytkownika:
+
+```
+export async function signup({ fullName, email, password }) {
+  const { data, error } = await supabase.auth.signUp({
+    email, password, options: {
+      data: {
+        fullName,
+        avatar: ''
+      }
+    }
+  })
+  
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+```
+
+Następnie dodano hook:
+
+```
+export function useSignup() {
+  const { mutate: signup, isLoading } = useMutation({
+    mutationFn: signupApi,
+    onSuccess: (user) => {
+      toast.success("Account successfully created!, Please veryfy the new users email adress")
+    } 
+  });
+
+  return { signup, isLoading };
+}
+```
+
+Ustawienie dostawców uwierzytelnienia oraz utworzenie konta na fikcyjny adres mailowy: 
+[Tempmail](https://temp-mail.org/pl "tempmail").
+
+repo katalog 25.328
+
+### 29.395 Autoryzacja w supabase: zabezpieczanie bazy (RLS)
+
+### 29.396 Budowa Headera aplikacji
+
+Dane o użytkowniku pobrano dzięki hookiwi useUser, zamiast korzystania z Providera:
+
+```
+export function UserAvatar() {
+  const { user } = useUser();
+  const { fullName, avatar } = user.user_metadata;
+  return (
+    <StyledUserAvatar>
+      <Avatar
+        src={avatar || "default-user.jpg"}
+        alt={`Avatar of ${fullName}`}
+      />
+      <span>{fullName}</span>
+    </StyledUserAvatar>
+  );
+}
+```
+
+repo katalog 25.328
+
+### 29.397 Aktualizacja danych użytkownika i hasła
+
+Do aktualizacji danych trzeba utworzyć nową metodę api:
+
+```
+export async function updateCurrentUser({ password, fullName, avatar }) {
+  // 1. Update password Or fullName
+  let updateData;
+  if (password) updateData = { password };
+  if (fullName) updateData = {
+    data: {
+    fullName
+    }
+  };
+
+  const { data, error } = await supabase.auth.updateUser(updateData);
+  
+  if (error) throw new Error(error.message);
+  if (!avatar) return data;
+  // 2. Upload avatar image
+  const fileName = `avatar-${data.user.id}-${Math.random()}`;
+
+  const { error: storageError } = await supabase.storage.from('avatars').upload(fileName, avatar)
+
+  if (storageError) throw new Error(storageError.message);
+
+  // 3. Update avatar in the user
+  const { data: updatedUser, error: errorUpdate } = supabase.auth.updateUser({
+    data: {
+      avatar: `${supabaseUrl}/storage/v1/object/public/avatars/${fileName}`,
+    },
+  });
+
+  if (errorUpdate) throw new Error(errorUpdate.message);
+
+  return updatedUser;
+}
+```
+
+Następnie jest utworzony hook wspólnie obsługujący zmianę hasłą oraz danych użytkownika:
+
+```
+export function useUpdateUser() {
+  const queryClient = useQueryClient();
+  const { mutate: updateUser, isLoading: isUpdating } = useMutation({
+    mutationFn: updateCurrentUser,
+    onSuccess: () => {
+      toast.success("Account successfully updated!");
+
+      queryClient.invalidateQueries({
+        queryKey: ["user"],
+      });
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  return { updateUser, isUpdating };
+}
+```
+
+repo katalog 25.328
+
+### 29.398 Dodanie dark mode z css variables
+
+Podczas lekcji trzeba było utworzyć kontekst oraz obsłużyć zmienne w stylach.
+
+```
+const DarkModeContext = createContext();
+
+function DarkModeProvider({ children }) {
+  const [isDarkMode, setIsDarkMode] = useLocalStorageState(false, "isDarkMode");
+
+  function toggleDarkMode() {
+    setIsDarkMode((isDark) => !isDark)
+  }
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark-mode");
+      document.documentElement.classList.remove("light-mode");
+    } else {
+      document.documentElement.classList.remove("dark-mode");
+      document.documentElement.classList.add("light-mode");
+    }
+  }, [isDarkMode])
+
+  return (
+    <DarkModeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
+      {children}
+    </DarkModeContext.Provider>
+  );
+}
+
+function useDarkMode() {
+  const context = useContext(DarkModeContext);
+
+  if (context === undefined) throw new Error("DarkModeContext was used outside of DarkModeProvider");
+
+  return context;
+}
+
+export { DarkModeProvider, useDarkMode };
+```
+
+Użycie kontekstu w komponencie:
+
+```
+export function DarkModeToggle() {
+  const {isDarkMode, toggleDarkMode} = useDarkMode();
+
+  return (
+    <ButtonIcon onClick={toggleDarkMode}>
+      {isDarkMode ? <HiOutlineSun /> : <HiOutlineMoon />}
+    </ButtonIcon>
+  );
+}
+```
+
+repo katalog 25.328
+
+### 29.399 Budowa layoutu dashboardu
+
+repo katalog 25.328
+
+### 29.400 Obliczanie ostatnich rezerwacji i pobytów
+
+repo katalog 25.328
+
+### 29.401 Wyświetlanie statystyk
+
+repo katalog 25.328
+
+### 29.402 Wyświetlanie wykresów za pomocą biblioteki Recharts
+
+Skorzystano z biblioteki dayjs oraz recharts:
+
+> npm i recharts@2
+
+```
+export function SalesChart({ bookings, numDays }) {
+  const { isDarkMode } = useDarkMode();
+  
+  const allDates = eachDayOfInterval({
+    start: subDays(new Date(), numDays - 1),
+    end: new Date()
+  })
+
+  const data = allDates.map((date) => {
+    return {
+      label: format(date, "MMM dd"),
+      totalSales: bookings
+        .filter((booking) => isSameDay(date, new Date(booking.created_at)))
+        .reduce((acc, curr) => acc + curr.totalPrice, 0),
+      extrasSales: bookings
+        .filter((booking) => isSameDay(date, new Date(booking.created_at)))
+        .reduce((acc, curr) => acc + curr.extrasPrice, 0),
+    };
+  })
+
+  const colors = isDarkMode
+    ? {
+        totalSales: { stroke: "#4f46e5", fill: "#4f46e5" },
+        extrasSales: { stroke: "#22c55e", fill: "#22c55e" },
+        text: "#e5e7eb",
+        background: "#18212f",
+      }
+    : {
+        totalSales: { stroke: "#4f46e5", fill: "#c7d2fe" },
+        extrasSales: { stroke: "#16a34a", fill: "#dcfce7" },
+        text: "#374151",
+        background: "#fff",
+    };
+  
+  return (
+    <StyledSalesChart>
+      <Heading as="h2">Sales</Heading>
+
+      <ResponsiveContainer height={300} width={"100%"}>
+        <AreaChart data={data}>
+          <XAxis
+            dataKey="label"
+            tick={{ fill: colors.text }}
+            tickLine={{ stroke: colors.text }}
+          />
+          <YAxis
+            unit="$"
+            tick={{ fill: colors.text }}
+            tickLine={{ stroke: colors.text }}
+          />
+          <CartesianGrid strokeDasharray={4} />
+          <Tooltip contentStyle={{ backgroundColor: colors.background }} />
+          <Area
+            dataKey="totalSales"
+            type="monotone"
+            stroke={colors.totalSales.stroke}
+            fill={colors.totalSales.fill}
+            strokeWidth={2}
+            name="Total sales"
+            unit="$"
+          />
+          <Area
+            dataKey="extrasSales"
+            type="monotone"
+            stroke={colors.extrasSales.stroke}
+            fill={colors.extrasSales.fill}
+            strokeWidth={2}
+            name="Extras sales"
+            unit="$"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </StyledSalesChart>
+  );
+}
+```
+
+repo katalog 25.328
+
+### 29.403 Wyświetlanie wykresu kołowego
+
+Render wykresu kołowego:
+
+```
+export function DurationChart({ confirmedStays }) {
+  const { isDarkMode } = useDarkMode();
+
+  const startData = isDarkMode ? startDataDark : startDataLight;
+  const data = prepareData(startData, confirmedStays);
+
+  return (
+    <ChartBox>
+      <Heading as="h2">Stay duration summary</Heading>
+      <ResponsiveContainer width="100%" height={240}>
+        <PieChart>
+          <Pie
+            data={data}
+            nameKey="duration"
+            dataKey="value"
+            innerRadius={80}
+            outerRadius={110}
+            cx="40%"
+            cy="50%"
+            paddingAngle={3}
+          >
+            {data.map((entry) => (
+              <Cell
+                fill={entry.color}
+                stroke={entry.color}
+                key={entry.duration}
+              />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend
+            verticalAlign="middle"
+            align="right"
+            width="30%"
+            layout="vertical"
+            iconSize={15}
+            iconType="circle"
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </ChartBox>
+  );
+}
+```
+
+Funkcja prepareData() do obróbki danych:
+
+```
+const startDataLight = [
+  {
+    duration: "1 night",
+    value: 0,
+    color: "#ef4444",
+  },
+  {
+    duration: "2 nights",
+    value: 0,
+    color: "#f97316",
+  },
+  {
+    duration: "3 nights",
+    value: 0,
+    color: "#eab308",
+  },
+  {
+    duration: "4-5 nights",
+    value: 0,
+    color: "#84cc16",
+  },
+  {
+    duration: "6-7 nights",
+    value: 0,
+    color: "#22c55e",
+  },
+  {
+    duration: "8-14 nights",
+    value: 0,
+    color: "#14b8a6",
+  },
+  {
+    duration: "15-21 nights",
+    value: 0,
+    color: "#3b82f6",
+  },
+  {
+    duration: "21+ nights",
+    value: 0,
+    color: "#a855f7",
+  },
+];
+
+const startDataDark = [
+  {
+    duration: "1 night",
+    value: 0,
+    color: "#b91c1c",
+  },
+  {
+    duration: "2 nights",
+    value: 0,
+    color: "#c2410c",
+  },
+  {
+    duration: "3 nights",
+    value: 0,
+    color: "#a16207",
+  },
+  {
+    duration: "4-5 nights",
+    value: 0,
+    color: "#4d7c0f",
+  },
+  {
+    duration: "6-7 nights",
+    value: 0,
+    color: "#15803d",
+  },
+  {
+    duration: "8-14 nights",
+    value: 0,
+    color: "#0f766e",
+  },
+  {
+    duration: "15-21 nights",
+    value: 0,
+    color: "#1d4ed8",
+  },
+  {
+    duration: "21+ nights",
+    value: 0,
+    color: "#7e22ce",
+  },
+];
+function prepareData(startData, stays) {
+  // A bit ugly code, but sometimes this is what it takes when working with real data 😅
+
+  function incArrayValue(arr, field) {
+    return arr.map((obj) =>
+      obj.duration === field ? { ...obj, value: obj.value + 1 } : obj
+    );
+  }
+
+  const data = stays
+    .reduce((arr, cur) => {
+      const num = cur.numNights;
+      if (num === 1) return incArrayValue(arr, "1 night");
+      if (num === 2) return incArrayValue(arr, "2 nights");
+      if (num === 3) return incArrayValue(arr, "3 nights");
+      if ([4, 5].includes(num)) return incArrayValue(arr, "4-5 nights");
+      if ([6, 7].includes(num)) return incArrayValue(arr, "6-7 nights");
+      if (num >= 8 && num <= 14) return incArrayValue(arr, "8-14 nights");
+      if (num >= 15 && num <= 21) return incArrayValue(arr, "15-21 nights");
+      if (num >= 21) return incArrayValue(arr, "21+ nights");
+      return arr;
+    }, startData)
+    .filter((obj) => obj.value > 0);
+
+  return data;
+}
+```
+
+repo katalog 25.328
+
+### 29.404 Wyświetlanie danych dla bieżącego dnia
+
+repo katalog 25.328
+
+### 29.405 Obsługa błędów
+
+Biblioteka Error boundaries to odpowiednik try-catch, ale dla React. Pozwala reagować na błędy w renderowaniu jsa. 
+
+Komponent projektuje sie w następujący sposób:
+
+```
+export function ErrorFallback({error, resetErrorBoundary}) {
+  return (
+    <>
+      <GlobalStyles />
+      <StyledErrorFallback>
+        <Box>
+          <Heading as="h1">Something went wrong... 🧐</Heading>
+          <p>{error.message}</p>
+          <Button size="large" onClick={resetErrorBoundary}>
+            Try again
+          </Button>
+        </Box>
+      </StyledErrorFallback>
+    </>
+  );
+}
+```
+
+ErrorBoundary wrapuje aplikację w main.js:
+
+```
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => window.location.replace("/")}>
+      <App />
+    </ErrorBoundary>
+  </React.StrictMode>
+);
+```
+
+repo katalog 25.328
+
+### 29.406 Ostateczne poprawki
+
+repo katalog 25.328

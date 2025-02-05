@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { isFuture, isPast, isToday } from "date-fns";
-import supabase from "../services/supabase";
-import Button from "../ui/Button";
+import { supabase } from "../services/supabase";
+import { Button } from "../ui/Button";
 import { subtractDates } from "../utils/helpers";
 
 import { bookings } from "./data-bookings";
@@ -100,7 +100,7 @@ async function createBookings() {
   if (error) console.log(error.message);
 }
 
-function Uploader() {
+export function Uploader() {
   const [isLoading, setIsLoading] = useState(false);
 
   async function uploadAll() {
@@ -150,5 +150,3 @@ function Uploader() {
     </div>
   );
 }
-
-export default Uploader;
