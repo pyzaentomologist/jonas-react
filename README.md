@@ -5622,3 +5622,24 @@ repo katalog 25.328
 ### 29.406 Ostateczne poprawki
 
 repo katalog 25.328
+
+## 30. Wrzucenie aplikacji na "produkcję" - deploy na Netlify i Vercel
+
+### 30.407 Przegląd sekcji
+
+### 30.408 Deploy na Netlify
+
+Na Netlify wrzuciłem katalog dist oraz dodałem plik netlify.toml:
+
+```
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+```
+
+repo katalog 25.328
+
+### 30.409 Dodawanie projektu do repozytorium GitHub
+
+### 30.410 Deploy na Vercel
