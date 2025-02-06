@@ -5643,3 +5643,22 @@ repo katalog 25.328
 ### 30.409 Dodawanie projektu do repozytorium GitHub
 
 ### 30.410 Deploy na Vercel
+
+## 31. Część 5: Full-stack react + next.js
+
+### 31.411 Wstęp do części 5-tej
+
+### 31.412 Przydatne źródła
+
+[28 advanced Next.js features that everyone should know](https://codedrivendevelopment.com/posts/rarely-known-nextjs-features "konieczne do zapoznania")
+[How React Server Components work](https://www.plasmic.app/blog/how-react-server-components-work "")
+[RSC DevTools](https://www.alvar.dev/blog/creating-devtools-for-react-server-components "")
+[Next.js Image Component Tutorial](https://www.fullstackfoundations.com/blog/nextjs-image-component-tutorial "")
+[Understanding Next.js cache](https://blog.webdevsimplified.com/2024-01/next-js-app-router-cache/ "")
+[Static Site Generation (SSG) Next.js documentation page](https://nextjs.org/docs/app/building-your-application/deploying/static-exports "")
+[High-quality open-source Next.js app for learning](https://tx.shadcn.com/ "")
+
+Dokumentacje:
+[Next.js documentation](https://nextjs.org/docs "")
+[React Server Components documentation](https://react.dev/reference/rsc/server-components "")
+[Auth.js documentation](https://authjs.dev/getting-started "")
