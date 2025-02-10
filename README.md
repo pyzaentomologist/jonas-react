@@ -6021,3 +6021,162 @@ RSC vs. SSR:
 - Oba rozwiązania są inicjowane po stronie serwera, a SSR dodatkowo jest przez serwer obsługiwane
 - W RSC serwer to poprostu komputer deva
 - RSC nie wymaga serwera webowego, komponenty są budowane raz (statycznie generowana strona)
+
+## 33. Tworzenie projektu strony "Wild Oasis"
+
+### 33.431 Przegląd sekcji
+
+Poruszone zagadnienia:
+
+- Struktura projektu w next.js
+- implementacja stron
+- Optymalizacja obrazków i fontów
+- Dodawanie metadanych i favicon
+- Zagnieżdżone layouty
+
+### 33.432 Plan projektu strony dla konsumenta "The Wild Oasis"
+
+Lista funkcji do stworzenia:
+
+- ABOUT
+- CABINS
+- RESERVATIONS
+- AUTHENTICATION
+- PROFILE
+
+Strony:
+
+- / - homepage
+- /about
+- /cabins
+- /cabins/:cabinId
+- /login
+- /account/reservations
+- /account/reservations/add
+- /account/profile
+
+TechStack:
+
+- Next.js
+- Context API
+- Supabase
+- tailwindcss
+
+### 33.433 Organizacja projektu
+
+Oprócz nie nazywania plików page.js w katalogach, które nie mają być routami aplikacji jak np. /components, można dodać "_" na początku nazwy katalogu: /_components.
+Next js wspiera automatyczne importy. Nie trzeba wpisywać ścieżki do katalogu z którego wykorzystujemy komponent, wystarczy użyć "@/app"
+
+repo 32.420
+
+### 33.434 Stylowanie z tailwind css
+
+Dodanie do projektu odbywa się przez dodanie importu do layout.js:
+
+```
+import "@/app/_styles/globals.css"
+```
+
+repo 32.420
+
+### 33.435 Dodanie metadanych i favicony
+
+Można zmieniać metadane dla każdej podstrony dzięki eksportowaniu z niej metadata:
+
+```
+export const metadata = {
+  title: "The wild Oasis",
+}
+```
+
+Obiekty można rozwijać, czięki czemu na podstronach będzie dodawany tytuł po znaku %s:
+
+```
+export const metadata = {
+  title: {
+    template: "%s The wild Oasis",
+    default: "Welcome / The wild Oasis",
+  },
+  description: "Projekt testowy do nauki Next.js. Pozdro Paweł xD"
+}
+```
+
+Favicon dodaje się automatycznie, gdy w katalogu głównym /app jest grafika o dowolnym rozszerzeniu z nazwą "icon" icon.*
+
+repo 32.420
+
+### 33.436 Ładowanie i optymalizacja fontów
+
+Import czcionek odbywa siew  następujący sposób:
+
+```
+import { Josefin_Sans } from "next/font/google";
+
+const josefin = Josefin_Sans({
+  subsets: ["latin"],
+  display: "swap",
+});
+```
+
+Użycie fontu odbywa się przez implementację w klasach:
+
+```
+<body className={`bg-blue-950 text-primary-100 min-h-screen ${josefin.className}`}>
+```
+
+repo 32.420
+
+### 33.437 Ulepszenie nawigacji i layoutu
+
+repo 32.420
+
+### 33.438 Optymalizacja grafik z komponentem Next.js < Image />
+
+Podczas importowania obrazka do komponentu Image, nie ma konieczności podawania propsów z height oraz width:
+
+```
+<Image alt="The Wild Oasis logo" src={logo} />
+```
+
+Jeśli obrazek jest klasycznie zaciągnięty bezpośrednio do Image to height oraz width są wymaganie:
+
+```
+<Image height="60" width="60" alt="The Wild Oasis logo" src="/logo.png"/>
+```
+
+Obrazkom można nadać jakość generowania:
+
+```
+<Image height="60" width="60" quality={100} alt="The Wild Oasis logo" src={logo} />
+```
+
+repo 32.420
+
+### 33.439 Budowa strony głównej
+
+repo 32.420
+
+### 33.440 Tworzenie stron /cabins i /about z responsywnymi grafikami
+
+Grafiki importowane statycznie mogą mieć taki atrubut jak placeholder, który można ustawić na blur i dzięki niemu, wyświetlana grafika będzie zablurowana:
+
+```
+<Image
+  src={image1}
+  placeholder="blur"
+  quality={80}
+  alt="Family sitting around a fire pit in front of cabin"
+/>
+```
+
+repo 32.420
+
+### 33.441 Dodawanie zagnieżdżonych rout i stron
+
+repo 32.420
+
+### 33.442 Dodanie zagnieżdżonego layoutu
+
+Dodawanie zagnieżdżonego layoutu odbywa sie analogicznie do rout i page.js
+
+repo 32.420
