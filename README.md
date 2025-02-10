@@ -5638,11 +5638,17 @@ to = "/index.html"
 status = 200
 ```
 
+https://thriving-florentine-e947d3.netlify.app/login
+login: sstepien@wip.pl
+pass: 123123123123
+
 repo katalog 25.328
 
 ### 30.409 Dodawanie projektu do repozytorium GitHub
 
 ### 30.410 Deploy na Vercel
+
+https://jonas-react-blush.vercel.app/login
 
 ## 31. Część 5: Full-stack react + next.js
 
@@ -5662,3 +5668,356 @@ Dokumentacje:
 [Next.js documentation](https://nextjs.org/docs "")
 [React Server Components documentation](https://react.dev/reference/rsc/server-components "")
 [Auth.js documentation](https://authjs.dev/getting-started "")
+
+## 32. Część 5: Full-stack react + next.js
+
+### 32.413 Przegląd sekcji
+
+- Czym jest SSR (server-side-rendering)
+- Czym jest Next.js
+- Zagłębienie się w RSC (React Server Components)
+
+### 32.414 Pobranie plików startowych
+
+### 32.415 Zapoznanie z SSR (Server-Side Rendering)
+
+Wady CSR (Client-Side Rendering):
+
+- Powolne ładowanie strony
+- Duży bundle jsa
+- Danie są pobierane po zamontowaniu komponentu
+- brak kodu html podczas skanowania przez roboty, przez to gorsze wyniki w SEO
+
+Zalety CSR:
+
+- Wysoce interaktywne - cały kod, oprócz danych, jest załadowany
+
+Najlepiej stosować w:
+
+- SPA - idealne do aplikacji webowych
+- splikacje nie potrzebujące seo np. firmowe lub ukryte za logowaniem
+
+Wady SSR:
+
+- niższa interaktywność - strony muszą być pobrane co wywołuje pełne przeładowanie
+
+Zalety SSR:
+
+- Szybsze ładowanie
+- Mniej JSu potrzeba pobrać
+- Dane są pobierane przed renderem HTMLa
+- Lepsze pozycjonowanie SEO
+
+Najlepiej stosować w:
+
+- Nośnikach treści jak strony lub aplikacje wymagające SEO
+
+Dwa typy SSR:
+
+- Statyczny: HTML jest generowany podczas builda (SSG Static-Side Generation)
+- Dynamiczny: HTML jest generowany podczas otrzymania nowego requestu
+
+### 32.416 Experyment: Manual SSR with React DOM + NODE.JS
+
+Uruchomienie serwera na NodeJS
+
+Uruchamia sie komendą:
+
+> node -- watch start.js
+
+Zawartość pliku start.js to:
+
+```
+require("@babel/register")({ extensions: [".js", ".jsx"] });
+require("./server.js");
+```
+
+Zawartość servera to:
+
+```
+const { readFileSync } = require("fs");
+const { createServer } = require("http");
+const { parse } = require("url");
+const { renderToString } = require("react-dom/server");
+const React = require("react");
+
+const server = createServer((req, res) => {
+  const pathName = parse(req.url, true).pathname;
+
+  if (pathName === "/") {
+    const renderedHtml = renderToString(<Home />);
+    const html = htmlTemplate.replace("%%%CONTENT%%%", renderedHtml)
+
+    res.writeHead(200, {"Content-type": "text/html"})
+    res.end(html);
+  } else if (pathName === "/test") {
+    res.end("TEST");
+  } else {
+    res.end("URL nie działa");
+  }
+})
+
+server.listen(8000, () => console.log("Nasłuchuję"))
+```
+
+repo 32.414/manual-ssr
+
+### 32.417 Hydration
+
+Strona wygenerowana przez serwer jest statyczna, nie jest interaktywna, dlatego nie działają funkcje np. hooki react.
+
+Hydration to dodawanie obsługi wydarzeń, które zostały utracone podczas renderowania przez serwer HTMLa.
+React tworzy drzewo komponentów i dopasowuje z aktualnym SSRd DOM.
+Powody błędów hydracji:
+
+- niepoprawna semantyka HTML
+- różne dane używane do renderowania
+- używanie api używanego przez przeglądarkę np. local storage
+- efekty uboczne itd.
+
+repo 32.414/manual-ssr
+
+### 32.418 Dodawanie Hydracji
+
+Hydracja w React jest obsługiwana przez metodę ReactDOM:
+
+```
+ReactDOM.hydrateRoot(document.getElementById("root"), <Home/>);
+```
+
+Ciekawe jest to, że komponenty w server.js zostały użyte podczas renderowania na serwerze oraz drugi raz w pliku client.js do obsługi przez ReactDOM.
+
+repo 32.414/manual-ssr
+
+### 32.419 Czym jest Next.js
+
+Twórcą next.js jest Vercel
+
+- next.js wg. Vercel to framework webowy
+- framework zbudowany na React (Jonas traktuje React jako framework więc nazywa next.js meta frameworkiem)
+- ustandaryzowana struktura budowania aplikacji Reactowych: zestaw regół, dobrych praktyk itd.
+- Pozwala tworzyć całe aplikacje webowe i strony internetowe jako full-stack
+- Pozwala na korzystanie z najnowoczeszniejszych technologii Reactowych jak Suspense, Server Components, Server Actions itd, bez konieczności dodatkowego konfigurtowania
+
+4 główne cechy Next.js:
+
+- SSR dynamiczny i statyczny (można wybrać dla każdej routy)
+- oparty na plikach routing (foldery to routy, występują specjalne pliki dla stron, layoutów, loaderów itd)
+- Fetchowanie danych i mutowanie jest na serwerze (Fetchowanie w Sserver Components, Mutowanie w Server Actions)
+- Optymalizacje (Obrazki, fonty, SEO, wcześniejsze ładowanie - preloading)
+
+W Next.js są dwa routery:
+
+- Nowoczesny: APP Router
+  - wprowadzony w 2023 r.
+  - zalecany dla nowych projektów
+  - Implementuje Reactową architekturę full-stack: Server Components, Server Actions, Streaming itd.
+  - proste fetchowanie za pomocą funkcji fetch()
+  - Bardzo proste do tworzenia layoutów, loaderów itd.
+  - zaawansowany routing (np. parallel routing)
+  - lepszy DX (developer experience) i UX (user experience)
+  - Cache jest bardzo uciążliwe i mylące
+
+- Legacy: PAGES Router
+  - od 2016 roku
+  - wciąż wspierany feature
+  - prostszy i łatwiejszy do nauki
+  - niektóre proste koncepcje jak implementacja Layoutu jest bardziej skomplikowana
+  - Pobieranie danych za pomocą wbudowanych metow w Next.js getStaticProps() i getServerSideProps()
+
+### 32.420 Utworzenie nowego projektu Next.js
+
+Tworzenie projektu za pomocą komendy:
+
+
+Na potrzeby kursu zainstalowana jest konkretna wersja:
+
+> npx create-next-app@14
+
+Uruchomienie za pomocą komedy:
+
+> npm run dev
+
+### 32.421 Update Next.js + dokumentacja
+
+Aktualizacja za pomocą komendy:
+
+> npm install next@latest react@latest react-dom@latest eslint-config-next@latest
+
+### 32.422 Tworzenie routingu i stron
+
+Tworzenie nowej routy odbywa sie w katalogu app, przez dodanie nowego katalogu np. cabins i w nim umieszcza się plik page.js
+Zagnieżdżenia w routach również odbywają sie w ten sposób.
+
+### 32.423 Nawigacja pomiędzy stronami
+
+Nawigacja odbywa sie za pomocą komponentu Next.js ```<Link></Link>```. Link jest lepszy niż element html ```<a></a>```, ponieważ element html przebuduje aplikację, a Link pozwala przemieszczać sie bez przełądowania.
+
+```
+<Link href="/">Home</Link>
+```
+
+### 32.424 Tworzenie Layoutu
+
+Standardem w Next.js jest dodawanie metadanych przez utworzenie obiektu metadata w layout.js:
+
+```
+export const metadata = {
+  title: "The wild Oasis",
+}
+```
+
+### 32.425 Czym jest RSC (React Server Components)
+
+RSC łączy zalety stanu lokalnego oraz serwerowej interakcji z użytkownikiem:
+
+- Interaktywność
+- komponenty
+
+- Łatwe i szybie pobieranie danych
+- bliskość źródła danych
+- brak potrzeby używania JS podczas renderowania
+
+RSC w oderwaniu od Next.js to:
+
+- nowa architektura React - full-stack
+- wprowadza serwer jako integralną część komponentów reactowych: **react components**
+  - komponenty renderowane tylko na serwerze
+  - dzięki temu potrzebują 0kb jsa
+  - można budować backend dzięki react
+  - domyślne w aplikacjach używających architektury RSC np. Next.js
+- do obsługi po stronie klienta są regularne komponenty: **client components**
+- jeśli komponent ma być po stronie klienta, to trzeba zaznaczyć przez użycie dyrektywy "use client" np. przycisk obsługujący dark-mode, ale już komponenty potomne nie muszą mieć tego oznaczenia
+- RSC nie jest domyślnie aktywne w aplikacjach React - potrzebują implementacji dzięki frameworkowi np. Next.js
+
+#### Porównanie komponentów
+
+Client components:
+
+- używają hooków i stanów
+- podnosi się stan
+- przekazujemy props
+- możliwe pobieranie danych z pomocą bibliotek jak React Query (Server Component nie wykluczają React Query)
+- mogą importować tylko inne komponenty klienckie
+- mogą renderować komponenty klienckie oraz serwerowe (serwerowe, gdy zostaną przekazane jako props)
+- re-renderują sie na zmianę stanu
+
+Server components
+
+- nie używają hooków i stanów
+- nie podnosi się stanu
+- przekazujemy props (musi być serializowany gdy jest przekazywany do komponentów klienta, brak funkcji lub klas)
+- preferowane pobieranie danych, używa sie przez async/await w komponencie - po pobraniu można przekazaćpropsem do komponentów klienckich
+- można importować komponenty klienckie oraz serwerowe
+- mogą renderować komponenty klienckie oraz serwerowe
+- re-renderują się gdy zmienia się URL (przeskakuje nawigacja)
+
+Tradycyjna aplikacja react wysyła kod który buduje sie na przeglądarce i ten kod wchodzi we wszelkie interakcje.
+RSC wysyła zbudowaną warstwę widoku składającego się z server components, które przez interakcje re-renderują się, aktualizuje się stan w widoku, dochodzi do interakcji pomiędzy komponentami klienckimi.
+Gdy klient zaktualizuje url, to następi re-render komponentu serwerwego.
+
+Wady i zalety architektury RSC:
+
+Zalety:
+
+- Można utworzyć aplikację full-stack w jednej technologii
+- jeden codebase dla frontu i backendu
+- serwerowe komponenty mają bezpieczniejszy dostęp do źródeł danych (nie widać api, kluczy itd)
+- Sprawne fetchowanie wszystkich danych, zamiast pobierania w pojedynczym komponencie
+- nie odczuwa sie korzystania z wielkich bibliotek zewnętrznych, bo nie jest przesyłany ich kod z komponentów serwerowych
+
+Wady:
+
+- Bardziej złożony kod
+- większy poziom wejścia
+- Context API nie działa na komponentach serwerowych
+- Więcej skomplikjowanych decyzji np. Jakiego rodzaju powiniene to być komponent (serwer/klient)? Czy dane powinny być zaciągnięte po stronie serwera czy klienta?
+- czesem i tak jest potrzebne API, choćby z powodu aplikacji mobilnej
+- RSC mogą być tylko używane z frameworkiem
+
+### 32.426 Fetchowanie danych na stronie
+
+Page.js zawsze są komponentami serwerowaymi.
+
+Skorzystono z jsonplaceholder:
+
+```
+export default async function Page() {
+  const res = await fetch('https://jsonplaceholder.typicode.com/users')
+
+  const data = await res.json();
+
+  return <>
+    <h1>Cabins Page</h1>
+    <ul>{data.map(user => <li key={user.id}>{ user.name }</li>) }</ul>
+  </>
+}
+```
+
+repo 32.420
+
+### 32.427 Dodanie interaktywności wraz z komponentami klienckimi
+
+Wszystkie komponenty przed wysłaniem do klienta są początkowo renderowane na serwerze i dopiero po tym trafiają do klienta. Przez to mogą jeszcze nie działać hooki i inne metopdy react, ale np. będą zaciągnięte propsy w komponencie klienta.
+
+repo 32.420
+
+### 32.428 Wyświetlanie stanu ładowania strony
+
+Loading jest uruchaminy z kodu znajdującego się w pliku loading.js. Loading nie zadziała poprawnie jeśli użytkownik będzie miał wyłączony javascript w przeglądarce.
+
+```
+export default function Loading() {
+  return <p>Loading data</p>
+}
+```
+
+repo 32.420
+
+### 32.429 Jak działa RSC
+
+Redner w tradycyjnym React:
+
+- drzewo komponentów
+- render drzewa komponentów
+- Utworzenie wirtualnego DOM
+- Utworzenie Elementów DOM (HTML)
+
+Render w RSC:
+
+- Komponenty serwerowe przesyłają werenderowany kod, bez kodu który będzie renderowany po stronie klienta
+  - Dzieje się tak przez serializację kodu, funkcje i klasy nie są serializowane
+  - na serwerze nie ma drzewa Fiber, a nawet gdyby było, to nie mogłoby zostać przesłąne przez serializacje
+- Elementy React wysłane z serwera mają placeholdery ("dzióry") na zawartość komponentów klienckich
+- każdy z takich placeholderów zawiera:
+  - serializowany props przekazywany z serwerowego komponentu do klienckiego
+  - URL do skryptu z kodem komponentu - nadawany przez framework
+- wysłanie RSC payload do przeglądarki
+  - payload ma charakterystyczny format w którym znajdują sie zserializowane wartości:
+![notatka](/img/notatka.jpg)
+- w RSC podział Server i Client to nie jest typowy podział na serwer i przeglądarkę
+
+RSC Payload to nie jest tylko HTML, ale elementy react.
+
+- to traktuje UI jako dane, a nie końcowy HTML, dzięki temu serwer może reagować na zmiany w komponentach
+- Gdy komponent od serwera jest re-renderowany to react może porównać fiber tree na kliencie oraz ten z serwera
+- dzięki temu stan UI zostaje zachowany i nie jest przebudowany od początku
+
+### 32.430 RSC vs. SSR - jak są powiązane
+
+SSR:
+
+- SSR zaczyna się zawsze od drzewa komponentów
+- Następnie jest renderowany HTML
+- po stronie klienta następuje hydracja
+- mamy interaktywną aplikację react
+- DOM został wygenerowany na serwerze, a nie na kliencie
+
+RSC vs. SSR:
+
+- osobna technologia od SSR
+- uzupełniają SSR
+- Współpracuje z SSR
+- Oba rozwiązania są inicjowane po stronie serwera, a SSR dodatkowo jest przez serwer obsługiwane
+- W RSC serwer to poprostu komputer deva
+- RSC nie wymaga serwera webowego, komponenty są budowane raz (statycznie generowana strona)
