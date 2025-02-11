@@ -6180,3 +6180,384 @@ repo 32.420
 Dodawanie zagnieżdżonego layoutu odbywa sie analogicznie do rout i page.js
 
 repo 32.420
+
+## 34. Pobieranie danych, cache i render
+
+### 34.443 Przegląd sekcji
+
+- Jak pracować z danycmi w next.js
+- Streaming wraz z Suspense i loading.js
+- Statyczne i dynamiczne renderowanie
+- Mechanizm pamieci cache
+
+### 34.444 Dodawanie Supabase
+
+Next domyślnie ukrywa zmienne z local.env, ale można je upublicznić dodając na początku zmiennej: NEXT_PUBLIC_
+
+repo 32.420
+
+### 34.445 Pobieranie i wyświetlanie listy kabin
+
+Do poprawnej obsługi obrazów trzeba dodać konfigurację w next.congig.mjs:
+
+```
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "psnfkezsmbxjbnytqdmz.supabase.co",
+        port: "",
+        pathname: "/storage/v1/object/public/cabin-images/**",
+        search: "",
+      },
+    ],
+  },
+};
+```
+
+repo 32.420
+
+### 34.446 Streamowanie części rout z loading.js
+
+repo 32.420
+
+### 34.447 Czym jest React Suspense
+
+- Wbudowany w React komponent, który wyłapuje/izoluje komponenty (lub całe gałęzie), które nie są gotowe do renderowania
+- Czy jest wywoływany Suspense?
+  - Pobieranie danych (ze wspieraną biblioteką React Query lub Next.js)
+  - Ładowanie kodu (react lazy loading)
+- Natywny sposób wsparcia asynchronicznych operacji w sposób deklaratywny (nie jest potrzebny stan isLoading)
+
+Jak działa Suspense:
+
+- Podczas renderowania jest znaleziony komponent do zawieszenia
+- Przejście do rodzica zawieszonego komponentu i podmiana renderowanego children na komponent Suspense
+- Wyświetlanie komponentu ładującego
+- Renderowanie gałęzi z komponentem pod komponentem Suspense
+
+Komponenty nie zawieszają się automatycznie, ale przez to, że wykonywana jest w nich asynchroniczna operacja. Integracja asynchroniczna jest trudna, dlatego używmy bibliotek.
+
+Suspense kieruje do komponentu Activity, który zarządza wyświetlaniem stanu ładowania lub właściwego komponentu. O ile podczas renderu następuje podmiana children na Suspense, to w drzewie Fiber tej podmiany nie ma. Dzięki temu stan zostaje zachowany w późniejszym zawieszeniu.
+
+Fallback (np. komponent ze spinerem) nie zostanie ponownie pokazany, jeśli wyzwalacz Suspense jest owinięty w transition (startTransition). W Next.js przykładem jest nawigacja. Suspense można zresetować za pomocą unikalnego propsu key.
+
+Skąd Suspense wie, że dzici są już gotowe do wyświetlenia?
+Dzięki throw new Promise()
+
+#### Warto wrócić do lekcji
+
+### 34.448 Strumieniowanie UI przy pomocy Suspense: Cabin List
+
+Przykład użycia Suspense dla pojedynczego komponentu:
+
+```
+import { Suspense } from "react";
+
+export default async function Page() {
+  
+  return (
+    <div>
+      <h1 className="text-4xl mb-5 text-accent-400 font-medium">
+        Our Luxury Cabins
+      </h1>
+      <p className="text-primary-200 text-lg mb-10">
+        Cozy yet luxurious cabins, located right in the heart of the Italian
+        Dolomites. Imagine waking up to beautiful mountain views, spending your
+        days exploring the dark forests around, or just relaxing in your private
+        hot tub under the stars. Enjoy nature's beauty in your own little home
+        away from home. The perfect spot for a peaceful, calm vacation. Welcome
+        to paradise.
+      </p>
+      <Suspense fallback={<Spinner />}>
+        <CabinList />
+      </Suspense>
+    </div>
+  );
+}
+```
+
+Suspense nadpisał loading.js. loading.js ustawia zachowanie dla całej strony, ale użycie Suspense pozwala na "granulację". Suspense musi być poza, lub ponad komponentem wykonującym pracę asynchroniczną.
+
+repo 32.420
+
+### 34.449 Dynamiczne segmenty routy: Tworzenie strony pokoju
+
+- trzeba utworzyć katalog z nazwą parametru w nawiasie kwadratowym np. [cabinId]
+- do komponentu strony zostaje przekazany props "params", który ma jako paramentr nazwę katalogu oraz wartość z URLa
+
+```
+export default function Page({ params }) {
+
+  const { id, name, maxCapacity, regularPrice, discount, image, description } =
+    await getCabin(params.cabinId);
+``` 
+
+repo 32.420
+
+### 34.450 Tworzenie Dynamicznych Metadanych
+
+Obsługa dynamicznych metadanych jest za pomocą eksportu metody generateMetadata, która zwraca obiekt zawierający edytowane właściwości metadanych:
+
+```
+export async function generateMetadata({ params }) {
+  const { id, name, maxCapacity, regularPrice, discount, image, description } =
+    await getCabin(params.cabinId);
+  
+  return {
+    title: `Cabin: ${name} /`,
+  };
+}
+```
+
+repo 32.420
+
+### 34.451 Obsługa błędów: Dodawanie obsługi błędów
+ 
+Wystarczy zamieścić komponent kliencki error.js w katalogu:
+
+```
+"use client"
+export default function Error({ error, reset }) {
+  return (
+    <main className="flex justify-center items-center flex-col gap-6">
+      <h1 className="text-3xl font-semibold">Something went wrong!</h1>
+      <p className="text-lg">{ error.message }</p>
+
+      <button className="inline-block bg-accent-500 text-primary-800 px-6 py-3 text-lg" onClick={reset}>
+        Try again
+      </button>
+    </main>
+  );
+}
+```
+
+Ta obsługa błędów nie wyłapuje błędów z roota oraz z callbacków, tylko z pobierania danych.
+Do wyłapywania błędów z roota jest global-error.js
+
+repo 32.420
+
+### 34.452 Obsługa błędów: "Not Found"
+
+Obsługa jest przez plik not-found.js:
+
+```
+import Link from "next/link";
+
+function NotFound() {
+  return (
+    <main className="text-center space-y-6 mt-4">
+      <h1 className="text-3xl font-semibold">
+        This page could not be found :(
+      </h1>
+      <Link
+        href="/"
+        className="inline-block bg-accent-500 text-primary-800 px-6 py-3 text-lg"
+      >
+        Go back home
+      </Link>
+    </main>
+  );
+}
+
+export default NotFound;
+```
+
+Jeśli potzrebujemy obsługi dla konkretnych rout możemy dodać przez wstrzyknięcie metody notFound() z next/navigation do serwisu api:
+
+```
+export async function getCabin(id) {
+  const { data, error } = await supabase
+    .from('cabins')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  // For testing
+  // await new Promise((res) => setTimeout(res, 1000));
+
+  if (error) {
+    notFound();
+  }
+
+  return data;
+}
+```
+
+Przez dodanie not-found.js do konkretnej routy możemy zmieniać treść strony z błędem.
+
+repo 32.420
+
+### 34.453 Różne typy SSR: Statyczny i Dynamiczny render
+
+- Next.js to framework React, renderowany przez React
+- Komponent serwerowy i kliencki są renderowane na serwerze podczas inicjalizującego renderu
+- W Next.js render po stronie serwera jest podzielony pomięddzy routy
+- każda z rout może być albo dynamiczna, albo statyczna - to nie jest ustaiwenie aplikacji, ale rout
+- istnieje jeszcze częściowe pre-renderowanie które jest mieszanką renderowania statycznego i dynamicznego
+
+Renderowanie statyczne:
+
+- HTML jest generowany w czasie builda albo w tle podczas re-fetchingu
+- użyteczne gdy strona jest statyczna, użytkownik nie wchodzi w interakcje
+- Domyślna stategia w Next.js (nawet gdy strona lub komponent pobierają dane)
+- Gdy jest wrzucane na Vercel to każda statyczna routa jest automnatycznie hostowana na CDN (Content Delivery Network)
+- jeśli wszystkie routy są statyczne, to cała aplikacja będzie eksportowana jako statyczna (SSG)
+
+Renderowanie dynamiczne:
+
+- HTML jest generowany w czasie zapytania serwera
+- ma to sens gdy:
+  - dane zmieniają się często w zależności od wyborów użytkownika (np. karta)
+  - render routy wymaga informacji zależnych od zapytania np. search params
+- routy automatycznie przełączają się na dynamiczne podczas spełniania kilku warunków
+- jeśli jest wrzucone Vercel to dynamiczne routy są bezserworowymi funkcjami (serverless function)
+
+- Next.js automatycznie wybiera która routa jest dynamiczna, oto warunki:
+  - routa używa paramsów
+  - searchParams jest używany w page.js
+  - headers() lub cookies() są używane w dowolnym komponencie serwerowym routy
+  - niescachowane dane występują w dowolnym komponencie serwerowym routy
+- to konieczne, bo żadna z tych wartości nie jest znana w czasie builda
+- możemy wpłynąć na Next.js, żeby renderował route dynamicznie:
+  - export const dynamic = 'force-dynamic'; - w page.js
+  - export const revalidate = 0; - w page.js
+  - {cache: "no-store"} - dodawane do pobierania danych w każdym komponencie serwerowym routy
+  - noStore() - w każdym komponencie serwerowym routy
+
+**CDN** (COntent Delivery Network) - serwery rozsiane po świecie, zeby być jak najbliżej użytkownika i dosłyłąć mu kontent statyczny.
+**Serverless computing** - serwer jest uruchamiany tylko na czas wykonania obliczeń, nie działa w sposób ciągły jak klasyczny node.js.
+**Edge** - "najbliżej użytkownika jak tylko się da". CDN jest częścią sieci "edge", ale tak samo mogą być jej częścią serverless "edge" computing.
+**Incremental Static Regeneration (ISR)** - feature który umożliwia developerom aktualizować strony statyczne w tle.
+
+### 34.454 Analizowanie renderowania w aplikacji
+
+Można to sprawdzić za pomocą npm run build
+
+repo 32.420
+
+### 34.455 Robienie stron dynamicznych statycznymi z użyciem generateStaticParams
+
+Zwrócenie listy Id kabin, co już zmieni komponent na statyczny, wcześniej wygenerowany:
+
+```
+export async function generateStaticParams() {
+  const cabins = await getCabins();
+
+  const ids = cabins.map((cabin) => ({ cabinId: String(cabin.id) }))
+  
+  return ids;
+}
+```
+
+repo 32.420
+
+### 34.456 Generowanie stron statycznych (SSG)
+
+Dodanie do next.config.mjs output: "export" pozwala na wyeksportowanie gdziekolwiek jako stronę statyczną.
+
+```
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "psnfkezsmbxjbnytqdmz.supabase.co",
+        port: "",
+        pathname: "/storage/v1/object/public/cabin-images/**",
+        search: "",
+      },
+    ],
+  },
+  output: "export"
+};
+
+export default nextConfig;
+```
+
+Jeśli włączy się output na export, a mimo to jakaś trasa będzie dynamiczna, np. przez korzystanie z cookies to konsola wyświetli bład.
+W buildzie są pliki tekstowe, te pliki to payload dla przeglądarki (ładunek RSC).
+
+repo 32.420
+
+### 34.457 Częściowy pre-render
+
+Mieszanka generowania dynamicznego i statycznego. całe layouty są ładowane jako statyczne z elementami dynamicznymi. Jeśli załaduje się część statyczna, to jest dociągana część dynamiczna.
+
+PPR nie jest jeszcze ustabilizowane i działa jako eksperymentalne.
+
+Wprowadzanie komponentów dynamicznych odbywa się za pomocą wprowadzania komponentu dziecka do Suspense
+
+repo 32.420
+
+### 34.458 Jak Next.js cachuje dane
+
+- cache - przechowywanie danych na później
+- cache w Next.js jest bardzo agresywny
+- Next.js wprowadził API do aktualizowania cache
+- dzieki cache aplikacje są szybsze i oszczędzają zasoby
+- cache jest domyślnie włączony w Next.js, niektóre cache nie mogą być wyłączone
+- bywa mylące
+
+Mechanizmy cache:
+
+- request memoization
+  - serwer
+  - dane pobierane z podobnych requestów GET
+  - jeden render, jedna strona
+  - ten sam fetch na wielu komponentach robi jeden request
+  - nie da sie odświeżyć
+  - rezygnacja przez AbourtController
+- data cache
+  - serwer
+  - dane pobierane na route albo na jeden request
+  - na czas deploya
+  - dane do stron statycznych + ISR gdy ponownie sprawdzane
+- full route cache
+  - serwer
+  - całe strony statyczne (HTML i RSC payload)
+  - dopóki dane nie są weryfikowane, lub nie jest uruchomiony deploy
+  - strony statyczne
+- router cache
+  - klient
+  - pre-fetched i odwiedzone strony statyczne i dynamiczne
+  - 30 sek dla dynamicznych ii 5 min dla statycznych (jedna sesja użytkownika)
+  - SPA nawigacja
+  - odświeżenie przez revalidatePath lub revalidateTag w Server Actions(SA), router.refresh, cookies.set lub cookies.delete w SA
+  - nie jest możliwa rezygnacja
+
+- data cache i full route cache
+  - Odświeżenie oparte na czasie dla wysztkich danych: export const revalidate = time; - page.js
+  - Odświeżenie oparte na czasie dla pojedynczego requestu: fetch('...', {next: {revalidate: time}})
+  - Odświeżenie na żądanie: revalidatePath lub revalidateTag
+  - rezygnacja dla całej strony: export const revalidate = 0; - page.js
+  - rezygnacja dla całej strony: export const dynamic = 'force-dynamic'; - page.js
+  - rezygnacja dla pojedynczego requestu: export const dynamic = fetch('...', {cache: 'no-store'})
+  - rezygnacja dla pojedynczego komponentu serwerowego: noStore()
+
+Cache działa na produkcji, ale nie na developmencie.
+
+### 34.459 Eksperymentowanie z cache i ISR
+
+Wartość revalidate musi być konkretną wartością sekund, nie może być wyliczane:
+
+```
+export const revalidate = 0;
+```
+
+Użycie revalidate na page.js skutkuje zmianą routy na dynamiczną. Czyszczenia cache można również użyć w wybranym komponencie który pobiera dane:
+
+```
+import { unstable_noStore as noStore } from "next/cache"; 
+
+export async function CabinList() {
+  noStore();
+```
+
+repo 32.420
+
+### 34.460 Wyzwanie #1: Pobranie liczby pokoi
+
+repo 32.420
