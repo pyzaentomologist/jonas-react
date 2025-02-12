@@ -6561,3 +6561,171 @@ repo 32.420
 ### 34.460 Wyzwanie #1: Pobranie liczby pokoi
 
 repo 32.420
+
+## 35. Client & Server Operations
+
+### 34.461 Przegląd sekcji
+
+- Składanie aplikacji full stack
+- Render komponentó swerewowych w komponentach klienckich
+- dzielenie stanu pomiędzy serwerem i klientem
+- URL i React Context API
+- Jak planować pobieranie danych
+
+### 34.462 Rozmyta granica pomiedzy komponentem serwerowym i klienckim
+
+W tradycyjnym podziale na backend i frontend:
+
+- jest bardzo jasna granica pomiędzy serwerem i klientem, 
+- komunikacja odbywa się po api, 
+- json który steruje frontendem pochodzi z backendu
+
+Next.js z RSC + SA:
+
+- podział na komponenty klienckie i serwerowe co nie jest jasnym podziałem na frontend i backend
+- przechodzenie przez siebie komponentów frontendowych i backendowych
+- możemy pisać całą aplikację jako jeden codebase
+
+Importowanie vs. renderowanie
+
+- w komponencie klienckim można renderować komponent sewerowy jeśli zostanie przekazany jako props np. jako children
+- Komponent serwerowy jest już gotowy, dlatego może zostać wstrzyknięty do klienckiego
+- Komponent kliencki może tylko importować komponent kliencki, ale może renderować zarówno kliencki jak i serwerowy
+- komponent serwerowy może importować i renderować komponenty klienckie i serwerowe
+- jeśli w drzewie zależności jeden komponent jest użyty w dwóch miejscach: 1. jako serwerowy i w 2. jako dziecko klienckiego, to ta druga instancja będzie z automatu traktowana jako komponent kliencki.
+
+### 34.463 Komponenty klienckie w komponentach serwerowych
+
+repo 32.420
+
+### 34.464 Podświetrlanie aktualnej strony w nawigacji
+
+Czasem może zaistnieć potrzeba wykorzystania jakiegoś komponentu jako kliencki, tylko dlatego, że musi skorzystać z hooka React.
+
+repo 32.420
+
+### 34.465 Współdzielenie stanu pomiędzy komponentami klienckim i serwerowym - URL
+
+Dodano filtr na froncie, co w sumie nie ma wielkiego znaczenia, bo zamiast filtrować wartości na fron, trzebaby przygotować końcówkę API na otrzymywanie zapytania o wyfiltrowane dane.
+
+Filtr korzysta z metod Next.js: usePathname, useSearchParams, useRouter.
+
+Na stronie odbiera się parametry w propsie:
+
+```
+export default async function Page({ searchParams }) {
+  const filter = searchParams?.capacity ?? "all"
+```
+
+Podczas przełączania filtrów nie widać komponentu ładowania, którym zarządza Suspense, a w tym wypadku Suspense nie widzi potrzeby zmian. Trzeba do niego przekazać key i wymusić odświeżenie. Kluczem, może być choćby zmienna filter. Powodem jest opakowanie każdej zmiany w nawigacji w Transitions w Next.js.
+
+repo 32.420
+
+### 34.466 Zaawansowane: Komponenty serwerowe w komponentach klienckich
+
+Przekazanie komponenty serwerowego do komponentu klienckiego za pomocą propsa children:
+
+```
+<UpdateProfileForm>
+  <SelectCountry
+    name="nationality"
+    id="nationality"
+    className="px-5 py-3 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm"
+    defaultCountry={nationality}
+    countryFlag={countryFlag}
+  />
+</UpdateProfileForm>
+```
+
+repo 32.420
+
+### 34.467 Srategie pobierania danych dla sekcji z rezerwacjami
+
+Przydatny skrót klawiszowy w VSC: shift alt o - usuwa nieużywane importy
+
+Przydatne do wykonywania wielu zapytań do api jest Promise.all, wykonuje wszystkie zapytania jednym zamiast tworzyć trzy osobne:
+
+```
+const [
+  { id, name, maxCapacity, regularPrice, discount, image, description },
+  settings,
+  bookedDates,
+] = await Promise.all([
+  getCabin(params.cabinId),
+  getSettings(),
+  getBookedDatesByCabinId(params.cabinId),
+]);
+```
+
+repo 32.420
+
+### 34.468 Użycie Context API do zarządzania stanem
+
+**Ważne** komponenty korzystające z hooków, również tych customowych muszą być komponentami klienckimi.
+Przydatny był customowy hook korzystający z Context API, który był umieszczony wysoko w drzewie (plik loading.js)
+
+```
+"use client"
+import { createContext, useContext, useState } from "react"
+
+const ReservationContext = createContext();
+
+const initialState = { from: null, to: null };
+
+export function ReservationProvider({ children }) {
+  const [range, setRange] = useState(initialState);
+
+  function resetRange() {
+    setRange({ from: null, to: null });
+  }
+
+  return (
+    <ReservationContext.Provider value={{ range, setRange, resetRange }}>
+      {children}
+    </ReservationContext.Provider>
+  );
+}
+
+export function useReservation() {
+  const context = useContext(ReservationContext);
+
+  if (context === undefined) throw new Error("Context jest użyty poza providerem")
+  
+  return context;
+}
+```
+
+repo 32.420
+
+### 34.469 Tworzenie końcówki API do obsługi rout
+
+Do tego służy feature route handlers.
+
+Potrzebny jest katalog api i w nim route.js
+
+Nazwy metod api są ustandaryzowane i takie same jak metody, którymi komunikujemy się get to GET, post to POST .itd
+Api nie jest już tak przydatne jaki kiedyś, bo teraz zastępują je akcje serwerowe, ale może być potrzebne np. dp wystawienia jakichś informacji na zewnątrz.
+
+```
+// routa api: /api/cabins/51
+import { getBookedDatesByCabinId, getCabin } from "@/app/_lib/data-service";
+
+export async function GET(request, { params }) {
+  const { cabinId } = params;
+
+  try {
+    const [cabin, bookedDates] = await Promise.all([
+      getCabin(cabinId),
+      getBookedDatesByCabinId(cabinId),
+    ]);
+    return Response.json({ cabin, bookedDates });
+  } catch (error) {
+    return Response.json({ message: "Cabin not found" });
+  }
+
+}
+
+// export async function POST() {}
+```
+
+repo 32.420
