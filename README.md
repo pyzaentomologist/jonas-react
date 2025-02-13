@@ -6564,7 +6564,7 @@ repo 32.420
 
 ## 35. Client & Server Operations
 
-### 34.461 Przegląd sekcji
+### 35.461 Przegląd sekcji
 
 - Składanie aplikacji full stack
 - Render komponentó swerewowych w komponentach klienckich
@@ -6572,12 +6572,12 @@ repo 32.420
 - URL i React Context API
 - Jak planować pobieranie danych
 
-### 34.462 Rozmyta granica pomiedzy komponentem serwerowym i klienckim
+### 35.462 Rozmyta granica pomiedzy komponentem serwerowym i klienckim
 
 W tradycyjnym podziale na backend i frontend:
 
 - jest bardzo jasna granica pomiędzy serwerem i klientem, 
-- komunikacja odbywa się po api, 
+- komunikacja odbywa się po api,
 - json który steruje frontendem pochodzi z backendu
 
 Next.js z RSC + SA:
@@ -6594,17 +6594,17 @@ Importowanie vs. renderowanie
 - komponent serwerowy może importować i renderować komponenty klienckie i serwerowe
 - jeśli w drzewie zależności jeden komponent jest użyty w dwóch miejscach: 1. jako serwerowy i w 2. jako dziecko klienckiego, to ta druga instancja będzie z automatu traktowana jako komponent kliencki.
 
-### 34.463 Komponenty klienckie w komponentach serwerowych
+### 35.463 Komponenty klienckie w komponentach serwerowych
 
 repo 32.420
 
-### 34.464 Podświetrlanie aktualnej strony w nawigacji
+### 35.464 Podświetrlanie aktualnej strony w nawigacji
 
 Czasem może zaistnieć potrzeba wykorzystania jakiegoś komponentu jako kliencki, tylko dlatego, że musi skorzystać z hooka React.
 
 repo 32.420
 
-### 34.465 Współdzielenie stanu pomiędzy komponentami klienckim i serwerowym - URL
+### 35.465 Współdzielenie stanu pomiędzy komponentami klienckim i serwerowym - URL
 
 Dodano filtr na froncie, co w sumie nie ma wielkiego znaczenia, bo zamiast filtrować wartości na fron, trzebaby przygotować końcówkę API na otrzymywanie zapytania o wyfiltrowane dane.
 
@@ -6621,7 +6621,7 @@ Podczas przełączania filtrów nie widać komponentu ładowania, którym zarzą
 
 repo 32.420
 
-### 34.466 Zaawansowane: Komponenty serwerowe w komponentach klienckich
+### 35.466 Zaawansowane: Komponenty serwerowe w komponentach klienckich
 
 Przekazanie komponenty serwerowego do komponentu klienckiego za pomocą propsa children:
 
@@ -6639,7 +6639,7 @@ Przekazanie komponenty serwerowego do komponentu klienckiego za pomocą propsa c
 
 repo 32.420
 
-### 34.467 Srategie pobierania danych dla sekcji z rezerwacjami
+### 35.467 Srategie pobierania danych dla sekcji z rezerwacjami
 
 Przydatny skrót klawiszowy w VSC: shift alt o - usuwa nieużywane importy
 
@@ -6659,7 +6659,7 @@ const [
 
 repo 32.420
 
-### 34.468 Użycie Context API do zarządzania stanem
+### 35.468 Użycie Context API do zarządzania stanem
 
 **Ważne** komponenty korzystające z hooków, również tych customowych muszą być komponentami klienckimi.
 Przydatny był customowy hook korzystający z Context API, który był umieszczony wysoko w drzewie (plik loading.js)
@@ -6697,7 +6697,7 @@ export function useReservation() {
 
 repo 32.420
 
-### 34.469 Tworzenie końcówki API do obsługi rout
+### 35.469 Tworzenie końcówki API do obsługi rout
 
 Do tego służy feature route handlers.
 
@@ -6726,6 +6726,235 @@ export async function GET(request, { params }) {
 }
 
 // export async function POST() {}
+```
+
+repo 32.420
+
+## 36. Autentykacja z NextAuth (Auth.js)
+
+### 36.470 Przegląd sekcji
+
+- Biblioteka NextAuth (Auth.js) do autentykacji
+- Google provider
+- Middleware do autoryzacji
+- Konta w bazie Supabase
+
+### 36.471 Dodawanie NextAuth
+
+Instalacja nextAuth:
+
+> npm install next-auth@beta
+
+Tworzenie bezpiecznych sekretów: [vercel secrets](https://generate-secret.vercel.app/32 "")
+
+Uwierzytelnienie będzie się odbywało przez konto google. Konfiguracja jest w pliku _lib/auth.js:
+
+```
+import NextAuth from "next-auth";
+import Google from "next-auth/providers/google";
+
+const authConfig = {
+  providers: [
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+    }),
+  ],
+};
+
+export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth(authConfig);
+```
+
+Jeśli zechcę skorzystać z autoryzacji z bazy to powinienem używać Credentials Provider
+
+Następnie muszę stworzyć route w api/auth/[...nextauth]:
+
+```
+export { GET, POST } from "@/app/_lib/auth";
+```
+
+repo 32.420
+
+### 36.472 Uzyskiwanie sesji użytkownika
+
+Informacja o sesji jest teraz dostępna w pliku _lib/auth.js:
+
+```
+import { auth } from "../_lib/auth";
+
+export default async function Navigation() {
+  const session = await auth()
+```
+
+repo 32.420
+
+### 36.473 Czym jest Middleware w Next.js
+
+Middleware to oprogramowanie pośredniczące pomiędzy requestem, a routą aplikacji, która to jest przed response.
+
+- Uruchamiane przed każdą routą w projekcie, ale możemy określić tracy przez **matcher**,
+- Jest to jak zbiór kodu w każdym komponencie page.js, ale w rzeczywistości zadeklarowany ponad wszystkimi trasami, w centralnym miejscu
+- Wystarczy tylko jeden plik middleware w katalogu roota
+- middleware zawsze musi wyprodukować odpowiedź (na dwa sposoby):
+  1. przekierowanie do routy, routa do response
+  2. wysyłanie bezpośrednio do response (przez jsona)
+
+Rola middleware:
+
+- Czytanie i dodawanie ciastek
+- Autentykacja i autoryzacja
+- analizy po stronie serwera
+- przekierowania na bazie lokalizacji
+- Testy A/B
+
+### 36.474 Zabezpieczanie rout z NextAuth Middleware
+
+Middleware jest tworzone w katalogu głównym, **ponad katalogiem** /app.
+
+```
+import { NextResponse } from "next/server"
+
+export function middleware(request) {
+  console.log(request)
+
+  return NextResponse.redirect(new URL("/about", request.url));
+}
+
+export const config = {
+  matcher: ["/account"]
+}
+```
+
+Wraz z NextAuth można użyć:
+
+```
+import { auth } from "./app/_lib/auth";
+export const middleware = auth;
+
+export const config = {
+  matcher: ["/account"]
+}
+```
+
+W pliku auth.js trzeba dodać callback sprawdzający czy użytkownik jest zalogowany:
+
+```
+const authConfig = {
+  providers: [
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+    }),
+  ],
+  callbacks: {
+    authorized({ auth, request }) {
+      return !!auth?.user
+    }
+  }
+};
+```
+
+repo 32.420
+
+### 36.475 Utworzenie własnej strony z logowaniem
+
+Utworzenie działającego przycisku z przekierowaniem do logowania google musi odbyć sie za pomocą akcji serwerowej (zostanie omówiona szerzej w następnym dziale).
+Akcja musi zostać podpięta pod formularz, nie da się obsłużyć tego logowania przez komponent kliencki.
+
+```
+import { signInAction } from "../_lib/actions";
+
+function SignInButton() {
+  return (
+    <form action={signInAction}>
+      <button
+        className="flex items-center gap-6 text-lg border border-primary-300 px-10 py-4 font-medium"
+      >
+        <img
+          src="https://authjs.dev/img/providers/google.svg"
+          alt="Google logo"
+          height="24"
+          width="24"
+        />
+        <span>Continue with Google</span>
+      </button>
+    </form>
+  );
+}
+```
+
+Akcja cerworowa musi mieć deklarację "use server":
+
+```
+"use server"
+
+import { signIn } from "./auth"
+
+export async function signInAction() {
+  await signIn("google", {redirectTo: "/account"});
+}
+```
+
+repo 32.420
+
+### 36.476 Tworzenie własnego przycisku do wylogowana
+
+Akcje serwerowe mogą być wykonane z poziomu klienta. Wylogowanie odbyło sie za pomocą akcji:
+
+```
+export async function signOutAction() {
+  await signOut({redirectTo: "/"});
+}
+```
+
+Podpiętej pod przycisk:
+
+```
+import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/solid';
+import { signOutAction } from '../_lib/actions';
+
+function SignOutButton() {
+  return (
+    <form action={signOutAction}>
+      <button className='py-3 px-5 hover:bg-primary-900 hover:text-primary-100 transition-colors flex items-center gap-4 font-semibold text-primary-200 w-full'>
+        <ArrowRightOnRectangleIcon className='h-5 w-5 text-primary-600' />
+        <span>Sign out</span>
+      </button>
+    </form>
+  );
+}
+```
+
+repo 32.420
+
+### 36.477 Tworzenie nowego gościa po zalogowaniu
+
+Dodanie nowego gościa odbywa sie w callbacku auth.js za pomocą metod api:
+
+```
+async signIn({user, account, profile}) {
+  try {
+    const existingGuest = await getGuest(user.email);
+
+    if (!existingGuest) await createGuest({email: user.email, fullName: user.name});
+
+    return true;
+  } catch (error) {
+    return false;
+  }
+},
+```
+
+Rozszerzenie informacji o gościu w sesji odbywa sie również w callbacku auth.js:
+
+```
+async session({ session, user }) {
+  const guest = await getGuest(session.user.email);
+
+  session.user.guestId = guest.id;
+
+  return session;
+}
 ```
 
 repo 32.420
