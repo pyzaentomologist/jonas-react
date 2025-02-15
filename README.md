@@ -7314,6 +7314,8 @@ repo pozostawiam to samo, katalog 32.420
 
 ### 38.492 Deploying na Vercelu
 
-Link: jonas-react-lp-git-master-pyzaentomologists-projects.vercel.app
+Link: [jonas-react-lp](https://jonas-react-lp.vercel.app/)
 
 ### 38.493 Aktualizacja zmiennych środowiskowych i dostępów OAuth
+
+Trzeba było dostosować w zmiennych next link do projektu oraz dodać linki do autoryzacji google w Google Developer Console
