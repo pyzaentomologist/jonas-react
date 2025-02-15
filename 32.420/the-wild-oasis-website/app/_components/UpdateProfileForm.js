@@ -57,7 +57,7 @@ export function UpdateProfileForm({ guest, children }) {
       </div>
 
       <div className="flex justify-end items-center gap-6">
-        <SubmitButton children="Update profile" pendingLabel="Updating..." />
+        <SubmitButton pendingLabel="Updating...">Update profile</SubmitButton>
       </div>
     </form>
   );

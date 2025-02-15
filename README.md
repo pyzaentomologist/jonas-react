@@ -7300,3 +7300,20 @@ export async function createBooking(bookingData, formData) {
 ```
 
 repo 32.420
+
+## 38. Deployment na Vercelu
+
+### 38.490 Przegląd sekcji
+
+- Deploy na Vercelu
+- Dodanie zmiennych środowiskowych i warunków autentykacji
+
+### 38.491 Dodanie projektu do repo GH
+
+repo pozostawiam to samo, katalog 32.420
+
+### 38.492 Deploying na Vercelu
+
+Link: jonas-react-lp-git-master-pyzaentomologists-projects.vercel.app
+
+### 38.493 Aktualizacja zmiennych środowiskowych i dostępów OAuth
