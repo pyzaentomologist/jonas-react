@@ -6958,3 +6958,345 @@ async session({ session, user }) {
 ```
 
 repo 32.420
+
+## 37. Mutacje i akcje serwerowe + nowoczesne hooki React
+
+### 37.478 Przegląd sekcji
+
+- Akcje serwerowe do mutowania danych
+- Implementacja funkcjonalności: tworzenie, aktualizacja i usuwanie rezerwacji + aktualizacja profilu
+- Nowoczesne hooki React
+
+### 37.479 Czym są akcje serwerowe?
+
+Akcje edycji i dodawania nowych danych są nazywane mutacjami.
+
+Akcje serwera to:
+
+- brakujący element w architekturze RSC, który pozwala na pełną interaktywność
+- funkcje async, któe mogą być wykonane na serwerze i pozwalają na mutowanie danych
+- są tworzone z dyrektywą **"use server"**
+- można je zadeklarować:
+  - jako funkcje asynchroniczne w komponencie serwerowym, użyte mogą być zarówno w komponentach serwerowych oraz mogą zostać przekazane jako props do klienckich (w przeciwieństwie do funkcji),
+  - samodzielny plik: eksportowane funkcje będące akcjami serwera mogą być importowane w każdym komponencie (**zalecane**)
+- deklaracja "use server" jest zarezerwowana dla akcje serwerowych **nie** dla komponentów serwerowych
+- Next.js tworzy końcówkę API dla każdej akcji serwera, kiedy jest wykonywana akcja serwera to leci zapytanie do POSTa pod jego URL (funkcja nigdy nie uderza do klienta)
+- akcje serwerowe, w przeciwieństwie do komponentów serwerowych potrzebują uruchomionego serwera webowego
+
+Akcje serwerowe mogą być wywołane przez:
+
+- atrybut akcji w form zarówno na serwerowym jak i klienckim komponencie
+- Event handlers (tylko komponenty klienckie)
+- useEffect (tylko komponenty klienckie)
+
+W akcjach serwerowych można:
+
+- mutować dane (create, update, delete)
+- aktualizacja UI z nowymi danymi: odświeżenie cache z revalidatePath i revelidateTag
+- praca z cookies
+- i wiele innych
+
+### 37.480 Aktualizacja profilu przy użyciu akcji serwerowych
+
+Odczytano dane użytkownika w account/page.js:
+
+```
+export default async function Page() {
+  const session = await auth();
+  const guest = await getGuest(session.user.email);
+```
+
+Odczytano dane użytkownika w formularzu z akcją:
+
+```
+export function UpdateProfileForm({ guest, children }) {
+  const { fullName, email, nationality, nationalID, countryFlag } = guest;
+
+  return (
+    <form
+      action={updateProfile}
+      className="bg-primary-900 py-8 px-12 text-lg flex gap-6 flex-col"
+    >
+```
+
+Przeniesiono do akcji zapytanie API supabase:
+
+```
+export async function updateProfile(formData) {
+  const session = await auth();
+
+  if (!session) throw new Error("You must be logged in");
+
+  const nationalID = formData.get("nationalID");
+  const [nationality, countryFlag] = formData.get("nationality").split("%");
+
+  if (!/^[a-zA-Z0-9]{6,12}$/.test(nationalID))
+    throw new Error("Please provide a valid national ID");
+
+  const updateData = { nationality, countryFlag, nationalID };
+
+  const { data, error } = await supabase
+    .from("guests")
+    .update(updateData)
+    .eq("id", session.user.guestId);
+
+  if (error) throw new Error('Guest could not be updated');
+  
+  return data;
+}
+```
+
+repo 32.420
+
+### 37.481 Ręczne odświeżanie cache
+
+revalidatePath działa, gdy wstrzyknie sie do niego ścieżkę, która ma być wyłaczona z cache:
+
+```
+export async function updateProfile(formData) {
+  const session = await auth();
+
+  if (!session) throw new Error("You must be logged in");
+
+  const nationalID = formData.get("nationalID");
+  const [nationality, countryFlag] = formData.get("nationality").split("%");
+
+  if (!/^[a-zA-Z0-9]{6,12}$/.test(nationalID))
+    throw new Error("Please provide a valid national ID");
+
+  const updateData = { nationality, countryFlag, nationalID };
+
+  const { data, error } = await supabase
+    .from("guests")
+    .update(updateData)
+    .eq("id", session.user.guestId);
+
+  if (error) throw new Error('Guest could not be updated');
+  
+  revalidatePath("/account/profile");
+
+  return data;
+}
+```
+
+repo 32.420
+
+### 37.482 Wyświetlanie wskaźnika ładowania: useHormStatus hook
+
+Komponent któy jest użyty w formularzu może korzystać z tego hooka, komponent formularza, nie może zarządzać informacjami z tego hooka:
+
+```
+function Button() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button disabled={pending} className="flex gap-3 bg-accent-500 px-8 py-4 text-primary-800 font-semibold hover:bg-accent-600 transition-all disabled:cursor-not-allowed disabled:bg-gray-500 disabled:text-gray-300">
+      {pending ? (
+        <>
+          Updating
+          <SpinnerMini />
+        </>
+      ) : (
+        "Update profile"
+      )}
+    </button>
+  );
+}
+```
+
+repo 32.420
+
+### 37.483 Tworzenie strony z rezerwacjami
+
+repo 32.420
+
+### 37.484 Usuwanie Rezerwacji
+
+Usuwanie odbywa się przez akcję serwerową wywołaną w komponencie przycisku (nie ma wielu przesyłanych danych, więc nie ma potrzeby tworzenia formularza):
+
+```
+export async function deleteReservation(bookingId) {
+  const session = await auth();
+
+  if (!session) throw new Error("you must be logged in");
+
+  const guestBookings = await getBookings(session.user.guestId);
+  const guestBookingsIds = guestBookings.map(booking => booking.id);
+
+  if (!guestBookingsIds.includes(bookingId)) throw new Error("You are not allowed to delete this booking");
+
+  const { error } = await supabase
+    .from("bookings")
+    .delete()
+    .eq("id", bookingId);
+  
+  if (error) {
+    console.error(error);
+    throw new Error('Booking could not be deleted');
+  }
+
+  revalidatePath("/account/reservations");
+}
+```
+
+Pobieramy informacje o rezerwacji i zabezpieczamy dane przed edycją poprzez sprawdzenie czy użytkownik który chce edytować jest właścicielem danych. Na końcu jest wywoływane czyszczenie cache.
+
+repo 32.420
+
+### 37.485 Kolejny wskaźnik ładowana: useTransition Hook
+
+useTransition destrukturyzuje się na isPending oraz startTransition:
+
+```
+function DeleteReservation({ bookingId }) {
+  const [isPending, startTransition] = useTransition();
+
+  function handleDelete() {
+    if (confirm("Are you sure you want to delete this reserwation?")) {
+      startTransition(() => deleteReservation(bookingId));
+    }
+  }
+
+  return (
+    <button
+      onClick={handleDelete}
+```
+
+repo 32.420
+
+### 37.486 Wyzwanie #1: Aktualizacja rezerwacji
+
+repo 32.420
+
+### 37.487 Usuwanie rezerwacji: useOptimistic hook
+
+useOptimistic przyjmuje dwa argumenty:
+
+```
+const [optimisticBookings, optimisticDelete] = useOptimistic(bookings, (currBookings, bookingId) => {
+  return currBookings.filter(booking => booking.id !== bookingId)
+});
+```
+
+Działa tak, ze zakłąda powodzenie akcji, a jeśli zostanie odrzucona, to poprzedni stan zostaje przywrócony. Przypomina useReducer.
+
+```
+"use client"
+
+import { useOptimistic } from "react";
+import ReservationCard from "./ReservationCard";
+import { deleteReservation } from "../_lib/actions";
+
+export function ReservationList({bookings}) {
+  const [optimisticBookings, optimisticDelete] = useOptimistic(bookings, (currBookings, bookingId) => {
+    return currBookings.filter(booking => booking.id !== bookingId)
+  });
+
+  async function handleDelete(bookingId) {
+    optimisticDelete(bookingId);
+    await deleteReservation(bookingId)
+  }
+
+  return (
+    <ul className="space-y-6">
+      {optimisticBookings.map((booking) => (
+        <ReservationCard
+          onDelete={handleDelete}
+          booking={booking}
+          key={booking.id}
+        />
+      ))}
+    </ul>
+  );
+}
+```
+
+repo 32.420
+
+### 37.488 Powrót do strony z pokojami: Dokończenie selektora daty
+
+repo 32.420
+
+### 37.489 Tworzenie nowej rezerwacji
+
+Do danych wysyłanych za pomocą formularza rezerwacji można przekazać dane za pomocą .bind:
+
+```
+function ReservationForm({ cabin, user }) {
+  const { range, resetRange } = useReservation();
+  const { maxCapacity, regularPrice, discount, id } = cabin;
+
+  const startDate = range.from;
+  const endDate = range.to;
+  
+  const numNights = differenceInDays(endDate, startDate);
+  const cabinPrice = numNights * (regularPrice - discount);
+  
+  const bookingData = {
+    startDate,
+    endDate,
+    numNights,
+    cabinPrice,
+    cabinId: id
+  };
+
+  const createBookingWIthData = createBooking.bind(null, bookingData)
+
+  return (
+    <div>
+      <div className="bg-primary-800 text-primary-300 px-16 py-2 flex justify-between items-center">
+        <p>Logged in as</p>
+
+        <div className="flex gap-4 items-center">
+          <img
+            // Important to display google profile images
+            referrerPolicy="no-referrer"
+            className="h-8 rounded-full"
+            src={user.image}
+            alt={user.name}
+          />
+          <p>{user.name}</p>
+        </div>
+      </div>
+      <form
+        action={async (formData) => {
+          await createBookingWIthData(formData);
+          resetRange();
+        }}
+```
+
+Następnie dane są odczytywane i wstrzykiwane do bazy:
+
+```
+export async function createBooking(bookingData, formData) {
+  const session = await auth();
+  
+  if (!session) throw new Error("You must be logged in");
+
+  const newBooking = {
+    ...bookingData,
+    numGuests: Number(formData.get("numGuests")),
+    observations: formData.get("observations").slice(0, 1000),
+    guestId: session.user.guestId,
+    extrasPrice: 0,
+    totalPrice: bookingData.cabinPrice,
+    isPaid: false,
+    hasBreakfast: false,
+    status: "unconfirmed",
+
+  }
+
+  const { error } = await supabase.from("bookings").insert([newBooking]);
+
+  if (error) {
+    console.error(error);
+    throw new Error("Booking could not be created");
+  }
+
+  revalidatePath(`/cabins/${bookingData.cabinId}`);
+
+  redirect('/thankyou');
+}
+```
+
+repo 32.420
