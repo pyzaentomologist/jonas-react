@@ -7319,3 +7319,52 @@ Link: [jonas-react-lp](https://jonas-react-lp.vercel.app/)
 ### 38.493 Aktualizacja zmiennych środowiskowych i dostępów OAuth
 
 Trzeba było dostosować w zmiennych next link do projektu oraz dodać linki do autoryzacji google w Google Developer Console
+
+## 39. Legacy Next.js: Router
+
+### 39.494 Przegląd sekcji
+
+- Stare podejście do routera
+- potrzebna jest wiedza z poprzednich sekcji
+- App router vs. pages roter
+- Stary "pages router" już nie powinien być używany
+
+### 39.495 Utworzenie nowego projektu
+
+repo 39.495
+
+### 39.496 Routes, Pages i nawigacja
+
+repo 39.495
+
+### 39.497 Dynamiczne routy
+
+repo 39.495
+
+### 39.498 Tworzenie layoutu z własnym plikiem _APP
+
+repo 39.495
+
+### 39.499 Tworzenie stron
+
+repo 39.495
+
+### 39.500 Określania tytułu strony oraz favicony
+
+repo 39.495
+
+### 39.501 Pobieranie danych z getStaticProp (SSG)
+
+repo 39.495
+
+### 39.502 Pobieranie danych z getServerSideProp (SSR)
+
+repo 39.495
+
+### 39.503 API Routes
+
+repo 39.495
+
+### 39.504 Obsługa wysyłki formularza
+
+repo 39.495
